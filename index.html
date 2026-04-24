@@ -9,16 +9,16 @@
   <body>
     <div id="app">
       <!-- Navigation Shell -->
-      <nav id="navigation-shell" class="hidden">
+      <nav id="navigation-shell" class="hidden" aria-label="Main Menu">
         <h1>Kids Games Suite</h1>
-        <div id="game-list">
-          <button data-game="bubbleWrap">Bubble Wrap</button>
-          <button data-game="noButton">The "No" Button</button>
+        <div id="game-list" role="menu">
+          <button data-game="bubbleWrap" role="menuitem">🫧 Bubble Wrap</button>
+          <button data-game="noButton" role="menuitem">🔴 The "No" Button</button>
         </div>
       </nav>
 
       <!-- Game Container (Canvas) -->
-      <canvas id="game-canvas" class="hidden"></canvas>
+      <canvas id="game-canvas" class="hidden" aria-label="Game Canvas"></canvas>
     </div>
     <script type="module" src="/src/main.ts"></script>
   </body>
