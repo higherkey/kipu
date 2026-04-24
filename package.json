@@ -1,0 +1,22 @@
+{
+  "name": "temp-vite",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "@types/howler": "^2.2.12",
+    "@types/matter-js": "^0.20.2",
+    "typescript": "~6.0.2",
+    "vite": "^8.0.10",
+    "vite-plugin-pwa": "^1.2.0"
+  },
+  "dependencies": {
+    "howler": "^2.2.4",
+    "matter-js": "^0.20.0"
+  }
+}
