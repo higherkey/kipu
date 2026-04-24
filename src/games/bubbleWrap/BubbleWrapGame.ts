@@ -1,0 +1,120 @@
+import type { Game } from '../../core/Game';
+import { AudioController } from '../../core/AudioController';
+import { HapticController } from '../../core/HapticController';
+
+interface Bubble {
+  x: number;
+  y: number;
+  radius: number;
+  popped: boolean;
+}
+
+export class BubbleWrapGame implements Game {
+  private canvas: HTMLCanvasElement | null = null;
+  private ctx: CanvasRenderingContext2D | null = null;
+  private bubbles: Bubble[] = [];
+  private audio: AudioController;
+  private haptics: HapticController;
+
+  constructor() {
+    this.audio = AudioController.getInstance();
+    this.haptics = HapticController.getInstance();
+    this.audio.registerSound('pop', '/sounds/pop.ogg');
+  }
+
+  init(canvas: HTMLCanvasElement): void {
+    this.canvas = canvas;
+    this.ctx = canvas.getContext('2d');
+    this.createGrid();
+
+    canvas.addEventListener('touchstart', this.handleTouch);
+    canvas.addEventListener('mousedown', this.handleMouseDown);
+  }
+
+  private createGrid() {
+    if (!this.canvas) return;
+    const padding = 60;
+    const spacing = 100;
+    const cols = Math.floor((this.canvas.width - padding) / spacing);
+    const rows = Math.floor((this.canvas.height - padding) / spacing);
+
+    this.bubbles = [];
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        this.bubbles.push({
+          x: padding + c * spacing + spacing / 2,
+          y: padding + r * spacing + spacing / 2,
+          radius: 40,
+          popped: false
+        });
+      }
+    }
+  }
+
+  private handleTouch = (e: TouchEvent) => {
+    Array.from(e.changedTouches).forEach(touch => {
+      this.checkPop(touch.clientX, touch.clientY);
+    });
+  }
+
+  private handleMouseDown = (e: MouseEvent) => {
+    this.checkPop(e.clientX, e.clientY);
+  }
+
+  private checkPop(x: number, y: number) {
+    this.bubbles.forEach(bubble => {
+      if (!bubble.popped) {
+        const dist = Math.sqrt((x - bubble.x) ** 2 + (y - bubble.y) ** 2);
+        if (dist < bubble.radius) {
+          bubble.popped = true;
+          this.audio.play('pop');
+          this.haptics.lightTap();
+        }
+      }
+    });
+  }
+
+  update(_dt: number): void {
+    this.render();
+  }
+
+  private render() {
+    if (!this.ctx || !this.canvas) return;
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+    this.bubbles.forEach(bubble => {
+      this.ctx!.beginPath();
+      this.ctx!.arc(bubble.x, bubble.y, bubble.radius, 0, Math.PI * 2);
+      
+      if (bubble.popped) {
+        this.ctx!.strokeStyle = 'rgba(47, 48, 97, 0.2)';
+        this.ctx!.lineWidth = 2;
+        this.ctx!.stroke();
+      } else {
+        // Bubble gradient
+        const grad = this.ctx!.createRadialGradient(
+          bubble.x - bubble.radius/3, bubble.y - bubble.radius/3, bubble.radius/10,
+          bubble.x, bubble.y, bubble.radius
+        );
+        grad.addColorStop(0, '#ffffff');
+        grad.addColorStop(1, '#4ECDC4');
+        
+        this.ctx!.fillStyle = grad;
+        this.ctx!.fill();
+        this.ctx!.strokeStyle = 'rgba(47, 48, 97, 0.5)';
+        this.ctx!.lineWidth = 3;
+        this.ctx!.stroke();
+      }
+    });
+  }
+
+  pause(): void {}
+  resume(): void {}
+
+  destroy(): void {
+    if (this.canvas) {
+      this.canvas.removeEventListener('touchstart', this.handleTouch);
+      this.canvas.removeEventListener('mousedown', this.handleMouseDown);
+    }
+  }
+}

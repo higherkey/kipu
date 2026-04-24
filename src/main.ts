@@ -1,11 +1,14 @@
 import './style.css';
+import { registerSW } from 'virtual:pwa-register';
+import { Icons } from './ui/Icons';
+import { IdleManager } from './core/IdleManager';
+import { PauseMenu } from './ui/PauseMenu';
+import type { Game } from './core/Game';
+import { GameLoop } from './core/GameLoop';
 
 // PWA Support
-import { registerSW } from 'virtual:pwa-register';
-
 registerSW({
   onNeedRefresh() {
-    // Show a prompt to the user to refresh the app
     console.log('New content available, click on reload button to update.');
   },
   onOfflineReady() {
@@ -13,12 +16,36 @@ registerSW({
   },
 });
 
+let activeGame: Game | null = null;
+let gameLoop: GameLoop | null = null;
+let pauseMenu: PauseMenu | null = null;
+let idleManager: IdleManager | null = null;
+
 document.addEventListener('DOMContentLoaded', () => {
   const navShell = document.getElementById('navigation-shell');
   const gameCanvas = document.getElementById('game-canvas') as HTMLCanvasElement;
   const gameButtons = document.querySelectorAll('#game-list button');
 
-  // Prevent default touch behaviors globally on the canvas
+  // Inject Icons
+  gameButtons.forEach(button => {
+    const gameId = (button as HTMLElement).dataset.game;
+    const iconContainer = button.querySelector('.icon');
+    if (iconContainer && gameId) {
+      iconContainer.innerHTML = (Icons as any)[gameId === 'noButton' ? 'no' : gameId === 'bubbleWrap' ? 'bubble' : 'balloon'];
+    }
+  });
+
+  // Setup Global Systems
+  pauseMenu = new PauseMenu(
+    () => resumeGame(),
+    () => exitToHome()
+  );
+
+  idleManager = new IdleManager(60000, () => {
+    if (activeGame) pauseGame();
+  });
+
+  // Global touch prevention on canvas
   if (gameCanvas) {
     gameCanvas.addEventListener('touchstart', (e) => {
       e.preventDefault();
@@ -29,29 +56,86 @@ document.addEventListener('DOMContentLoaded', () => {
     }, { passive: false });
   }
 
-  // Basic Navigation Logic
+  // Navigation Logic
   if (navShell && gameCanvas) {
-    // Show navigation initially
     navShell.classList.remove('hidden');
 
     gameButtons.forEach(button => {
       button.addEventListener('click', (e) => {
-        const gameId = (e.target as HTMLButtonElement).dataset.game;
-        
-        // Hide nav, show canvas
+        const gameId = (e.currentTarget as HTMLButtonElement).dataset.game;
+        if (!gameId) return;
+
         navShell.classList.add('hidden');
         gameCanvas.classList.remove('hidden');
         
-        // Resize canvas to fill window
         resizeCanvas(gameCanvas);
         window.addEventListener('resize', () => resizeCanvas(gameCanvas));
 
-        console.log(`Starting game: ${gameId}`);
-        // TODO: Initialize specific game logic based on gameId
+        startGame(gameId, gameCanvas);
       });
     });
   }
 });
+
+import { NoButtonGame } from './games/noButton/NoButtonGame';
+import { BubbleWrapGame } from './games/bubbleWrap/BubbleWrapGame';
+import { BalloonPopGame } from './games/balloonPop/BalloonPopGame';
+
+function startGame(gameId: string, canvas: HTMLCanvasElement) {
+  // Clear previous game if any
+  if (activeGame) activeGame.destroy();
+
+  // Instantiate selected game
+  switch (gameId) {
+    case 'noButton':
+      activeGame = new NoButtonGame();
+      break;
+    case 'bubbleWrap':
+      activeGame = new BubbleWrapGame();
+      break;
+    case 'balloonPop':
+      activeGame = new BalloonPopGame();
+      break;
+    default:
+      console.warn(`Unknown game: ${gameId}`);
+      return;
+  }
+
+  activeGame.init(canvas);
+  
+  gameLoop = new GameLoop((dt) => {
+    if (activeGame) activeGame.update(dt);
+  });
+  gameLoop.start();
+  idleManager?.start();
+}
+
+function pauseGame() {
+  if (activeGame) activeGame.pause();
+  gameLoop?.stop();
+  pauseMenu?.show();
+}
+
+function resumeGame() {
+  if (activeGame) activeGame.resume();
+  gameLoop?.start();
+  pauseMenu?.hide();
+  idleManager?.start();
+}
+
+function exitToHome() {
+  if (activeGame) activeGame.destroy();
+  activeGame = null;
+  gameLoop?.stop();
+  gameLoop = null;
+  pauseMenu?.hide();
+  idleManager?.stop();
+
+  const navShell = document.getElementById('navigation-shell');
+  const gameCanvas = document.getElementById('game-canvas');
+  navShell?.classList.remove('hidden');
+  gameCanvas?.classList.add('hidden');
+}
 
 function resizeCanvas(canvas: HTMLCanvasElement) {
   canvas.width = window.innerWidth;

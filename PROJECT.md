@@ -22,8 +22,8 @@ The application delivers a highly responsive, near-native mobile experience thro
 
 ### Phase 1: Proof of Concept (The Foundation)
 - [x] **Milestone 1 - Infrastructure**: Initialize Vite + TS repository, establish PWA manifest, create central navigation shell.
-- [ ] **Milestone 2 - The Sensory Baseline**: Implement "Bubble Wrap" and "The 'No' Button".
-- [ ] **Milestone 3 - Basic Physics and Logic**: Implement "Color Mixer" and "Balloon Pop".
+- [x] **Milestone 2 - The Sensory Baseline**: Implement "Bubble Wrap", "The 'No' Button", and "Balloon Pop" with a unified Pause/Idle system.
+- [ ] **Milestone 3 - Basic Physics and Logic**: Implement "Color Mixer".
 - [ ] **Milestone 4 - Exploratory UI**: Implement "Bug Catcher".
 
 ### Phase 2: Minimum Viable Product (The Core Suite)
@@ -60,14 +60,22 @@ src/
 └── style.css
 ```
 
+## 4. Work Trace (Branch: `feat/milestone-2-sensory-baseline`)
+
 ## 4. Work Trace: In Progress
 
-- **Active Task**: Phase 1, Milestone 2 - The Sensory Baseline
+- **Active Task**: Phase 1, Milestone 3 - Basic Physics and Logic
 - **Current Objectives**:
-  - Implement "Bubble Wrap" logic and rendering.
-  - Implement "The 'No' Button".
-  - Integrate haptics and audio feedback for both.
+  - Implement "Color Mixer".
+  - Refine particle systems and physics consistency.
 
 ## 5. Work Trace: Completed Work
 
 - **Phase 1, Milestone 1**: Initialized Vite + TS repository. Set up `vite-plugin-pwa`, `matter-js`, and `howler`. Scaffolded core UI and architecture classes (`AudioController`, `HapticController`, `StateManager`, `Preloader`). Established central navigation shell in `index.html` and `main.ts`.
+- **Phase 1, Milestone 2**: Implemented `GameLoop`, `IdleManager` (60s timeout), and `PauseMenu`. Integrated **Lucide SVG icons** and established CC0 audio pipeline. Completed three sensory games: **The "No" Button** (DOM/shake), **Bubble Wrap** (Canvas/multi-touch), and **Balloon Pop** (Canvas/scaling/multi-layer). Ensured **iOS 12/13 compatibility** with CSS fallbacks and visual feedback.
+
+## 6. Issues and Out of Scope
+
+- **4b) Opportunities**:
+  - Implement a dedicated splash/loading screen to handle asset pre-caching (Milestone 1 stubbed the `Preloader`, but a visual indicator is needed).
+  - Add "Game Exit" functionality to return to the menu from within a game.
