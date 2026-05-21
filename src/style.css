@@ -46,8 +46,9 @@ body, html {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   padding: 32px;
+  overflow-y: auto;
   background: radial-gradient(circle at center, #ffffff 0%, #F7FFF7 100%);
   background: radial-gradient(circle at center, #ffffff 0%, var(--bg-color) 100%);
 }
@@ -114,6 +115,14 @@ body, html {
 
 #game-list button[data-game="balloonPop"] {
   background-color: #6BCBFF;
+}
+
+#game-list button[data-game="soundBoard"] {
+  background-color: #A78BFA;
+}
+
+#game-list button[data-game="particlePhysics"] {
+  background-color: #34D399;
 }
 
 #game-canvas {

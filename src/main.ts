@@ -31,7 +31,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const gameId = (button as HTMLElement).dataset.game;
     const iconContainer = button.querySelector('.icon');
     if (iconContainer && gameId) {
-      iconContainer.innerHTML = (Icons as any)[gameId === 'noButton' ? 'no' : gameId === 'bubbleWrap' ? 'bubble' : 'balloon'];
+      const iconMap: Record<string, string> = {
+        noButton: 'no',
+        bubbleWrap: 'bubble',
+        balloonPop: 'balloon',
+        soundBoard: 'sound',
+        particlePhysics: 'particle',
+      };
+      const iconKey = iconMap[gameId];
+      if (iconKey && iconKey in Icons) {
+        iconContainer.innerHTML = Icons[iconKey as keyof typeof Icons];
+      }
     }
   });
 
@@ -80,6 +90,8 @@ document.addEventListener('DOMContentLoaded', () => {
 import { NoButtonGame } from './games/noButton/NoButtonGame';
 import { BubbleWrapGame } from './games/bubbleWrap/BubbleWrapGame';
 import { BalloonPopGame } from './games/balloonPop/BalloonPopGame';
+import { SoundBoardGame } from './games/soundBoard/SoundBoardGame';
+import { ParticlePhysicsGame } from './games/particlePhysics/ParticlePhysicsGame';
 
 function startGame(gameId: string, canvas: HTMLCanvasElement) {
   // Clear previous game if any
@@ -95,6 +107,12 @@ function startGame(gameId: string, canvas: HTMLCanvasElement) {
       break;
     case 'balloonPop':
       activeGame = new BalloonPopGame();
+      break;
+    case 'soundBoard':
+      activeGame = new SoundBoardGame();
+      break;
+    case 'particlePhysics':
+      activeGame = new ParticlePhysicsGame();
       break;
     default:
       console.warn(`Unknown game: ${gameId}`);
