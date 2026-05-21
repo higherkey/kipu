@@ -114,6 +114,9 @@ export class SoundBoardGame implements Game {
 
   private playTone(frequency: number, waveType: OscillatorType) {
     if (!this.audioCtx) return;
+    if (this.audioCtx.state === 'suspended') {
+      this.audioCtx.resume();
+    }
     const osc = this.audioCtx.createOscillator();
     const gain = this.audioCtx.createGain();
 

@@ -55,6 +55,7 @@ export class ParticlePhysicsGame implements Game {
     canvas.addEventListener('touchstart', this.onTouchStart);
     canvas.addEventListener('touchmove', this.onTouchMove);
     canvas.addEventListener('touchend', this.onTouchEnd);
+    canvas.addEventListener('touchcancel', this.onTouchEnd);
   }
 
   private onMouseDown = (e: MouseEvent) => {
@@ -220,6 +221,7 @@ export class ParticlePhysicsGame implements Game {
       this.canvas.removeEventListener('touchstart', this.onTouchStart);
       this.canvas.removeEventListener('touchmove', this.onTouchMove);
       this.canvas.removeEventListener('touchend', this.onTouchEnd);
+      this.canvas.removeEventListener('touchcancel', this.onTouchEnd);
     }
     this.particles = [];
     this.pointers.clear();
