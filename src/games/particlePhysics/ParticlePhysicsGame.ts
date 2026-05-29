@@ -30,6 +30,8 @@ export class ParticlePhysicsGame implements Game {
   private particleDuration = 3;
   private particleDensity = 4;
   private currentHue = 0;
+  private lastHapticTime = 0;
+  private hapticInterval = 80;
 
   constructor() {
     this.haptics = HapticController.getInstance();
@@ -61,6 +63,7 @@ export class ParticlePhysicsGame implements Game {
   private onMouseDown = (e: MouseEvent) => {
     this.pointers.set(-1, { x: e.clientX, y: e.clientY });
     this.haptics.lightTap();
+    this.lastHapticTime = performance.now();
   };
 
   private onMouseMove = (e: MouseEvent) => {
@@ -78,6 +81,7 @@ export class ParticlePhysicsGame implements Game {
       this.pointers.set(touch.identifier, { x: touch.clientX, y: touch.clientY });
     }
     this.haptics.lightTap();
+    this.lastHapticTime = performance.now();
   };
 
   private onTouchMove = (e: TouchEvent) => {
@@ -128,6 +132,13 @@ export class ParticlePhysicsGame implements Game {
         }
       }
       this.currentHue = (this.currentHue + dt * 0.1) % 360;
+
+      // Continuous haptic feedback during drag
+      const now = performance.now();
+      if (now - this.lastHapticTime >= this.hapticInterval) {
+        this.haptics.lightTap();
+        this.lastHapticTime = now;
+      }
     }
 
     // Update particles
