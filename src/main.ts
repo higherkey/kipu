@@ -2,7 +2,7 @@ import './style.css';
 import { registerSW } from 'virtual:pwa-register';
 import { Icons } from './ui/Icons';
 import { IdleManager } from './core/IdleManager';
-import { PauseMenu } from './ui/PauseMenu';
+import { GameUI } from './ui/GameUI';
 import type { Game } from './core/Game';
 import { GameLoop } from './core/GameLoop';
 
@@ -16,17 +16,31 @@ registerSW({
   },
 });
 
+// Game State
 let activeGame: Game | null = null;
 let gameLoop: GameLoop | null = null;
-let pauseMenu: PauseMenu | null = null;
+let gameUI: GameUI | null = null;
 let idleManager: IdleManager | null = null;
+
+// Settings State (persisted in localStorage)
+let soundEnabled = localStorage.getItem('soundEnabled') !== 'false';
+let vibrationEnabled = localStorage.getItem('vibrationEnabled') !== 'false';
+
+// Game Name Mapping
+const gameNames: Record<string, string> = {
+  noButton: 'The "No" Button',
+  bubbleWrap: 'Bubble Wrap',
+  balloonPop: 'Balloon Pop',
+  soundBoard: 'Sound Board',
+  particlePhysics: 'Particle Play',
+};
 
 document.addEventListener('DOMContentLoaded', () => {
   const navShell = document.getElementById('navigation-shell');
   const gameCanvas = document.getElementById('game-canvas') as HTMLCanvasElement;
   const gameButtons = document.querySelectorAll('#game-list button');
 
-  // Inject Icons
+  // Inject Icons into menu buttons
   gameButtons.forEach(button => {
     const gameId = (button as HTMLElement).dataset.game;
     const iconContainer = button.querySelector('.icon');
@@ -45,14 +59,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Setup Global Systems
-  pauseMenu = new PauseMenu(
-    () => resumeGame(),
-    () => exitToHome()
-  );
-
+  // Setup IdleManager
   idleManager = new IdleManager(60000, () => {
-    if (activeGame) pauseGame();
+    if (activeGame && gameUI) {
+      gameUI.pause();
+      gameUI.openMenu();
+    }
   });
 
   // Global touch prevention on canvas
@@ -77,6 +89,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         navShell.classList.add('hidden');
         gameCanvas.classList.remove('hidden');
+        gameCanvas.classList.add('with-hud');
         
         resizeCanvas(gameCanvas);
         window.addEventListener('resize', () => resizeCanvas(gameCanvas));
@@ -96,6 +109,37 @@ import { ParticlePhysicsGame } from './games/particlePhysics/ParticlePhysicsGame
 function startGame(gameId: string, canvas: HTMLCanvasElement) {
   // Clear previous game if any
   if (activeGame) activeGame.destroy();
+  if (gameUI) gameUI.unmount();
+
+  const gameName = gameNames[gameId] || 'Game';
+
+  // Create the unified Game UI
+  gameUI = new GameUI({
+    gameName,
+    onHome: () => exitToHome(),
+    onPause: () => pauseGame(),
+    onResume: () => resumeGame(),
+    onRestart: () => restartGame(gameId, canvas),
+    soundEnabled,
+    vibrationEnabled,
+    onSoundToggle: (enabled) => {
+      soundEnabled = enabled;
+      localStorage.setItem('soundEnabled', String(enabled));
+      // Notify active game of sound setting change
+      if (activeGame && 'setSoundEnabled' in activeGame) {
+        (activeGame as any).setSoundEnabled(enabled);
+      }
+    },
+    onVibrationToggle: (enabled) => {
+      vibrationEnabled = enabled;
+      localStorage.setItem('vibrationEnabled', String(enabled));
+      // Notify active game of vibration setting change
+      if (activeGame && 'setVibrationEnabled' in activeGame) {
+        (activeGame as any).setVibrationEnabled(enabled);
+      }
+    },
+  });
+  gameUI.mount();
 
   // Instantiate selected game
   switch (gameId) {
@@ -131,14 +175,21 @@ function startGame(gameId: string, canvas: HTMLCanvasElement) {
 function pauseGame() {
   if (activeGame) activeGame.pause();
   gameLoop?.stop();
-  pauseMenu?.show();
 }
 
 function resumeGame() {
   if (activeGame) activeGame.resume();
   gameLoop?.start();
-  pauseMenu?.hide();
   idleManager?.start();
+}
+
+function restartGame(gameId: string, canvas: HTMLCanvasElement) {
+  if (activeGame) activeGame.destroy();
+  activeGame = null;
+  gameLoop?.stop();
+  
+  // Start the same game again
+  startGame(gameId, canvas);
 }
 
 function exitToHome() {
@@ -146,16 +197,19 @@ function exitToHome() {
   activeGame = null;
   gameLoop?.stop();
   gameLoop = null;
-  pauseMenu?.hide();
+  gameUI?.unmount();
+  gameUI = null;
   idleManager?.stop();
 
   const navShell = document.getElementById('navigation-shell');
   const gameCanvas = document.getElementById('game-canvas');
   navShell?.classList.remove('hidden');
   gameCanvas?.classList.add('hidden');
+  gameCanvas?.classList.remove('with-hud');
 }
 
 function resizeCanvas(canvas: HTMLCanvasElement) {
   canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
+  // Account for HUD height
+  canvas.height = window.innerHeight - 60;
 }
