@@ -5,6 +5,8 @@ import { IdleManager } from './core/IdleManager';
 import { GameUI } from './ui/GameUI';
 import type { Game } from './core/Game';
 import { GameLoop } from './core/GameLoop';
+import { Router } from './core/Router';
+import { LoadingOverlay } from './ui/LoadingOverlay';
 
 // PWA Support
 registerSW({
@@ -21,6 +23,8 @@ let activeGame: Game | null = null;
 let gameLoop: GameLoop | null = null;
 let gameUI: GameUI | null = null;
 let idleManager: IdleManager | null = null;
+let router: Router | null = null;
+let loadingOverlay: LoadingOverlay | null = null;
 
 // Settings State (persisted in localStorage)
 let soundEnabled = localStorage.getItem('soundEnabled') !== 'false';
@@ -38,9 +42,9 @@ const gameNames: Record<string, string> = {
 document.addEventListener('DOMContentLoaded', () => {
   const navShell = document.getElementById('navigation-shell');
   const gameCanvas = document.getElementById('game-canvas') as HTMLCanvasElement;
-  const gameButtons = document.querySelectorAll('#game-list button');
+  const gameButtons = document.querySelectorAll('#game-list button, #game-list a');
 
-  // Inject Icons into menu buttons
+  // Inject Icons into menu items
   gameButtons.forEach(button => {
     const gameId = (button as HTMLElement).dataset.game;
     const iconContainer = button.querySelector('.icon');
@@ -59,7 +63,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Setup IdleManager
+  // Setup global systems
+  loadingOverlay = new LoadingOverlay();
+
   idleManager = new IdleManager(60000, () => {
     if (activeGame && gameUI) {
       gameUI.pause();
@@ -72,32 +78,75 @@ document.addEventListener('DOMContentLoaded', () => {
     gameCanvas.addEventListener('touchstart', (e) => {
       e.preventDefault();
     }, { passive: false });
-    
+
     gameCanvas.addEventListener('touchmove', (e) => {
       e.preventDefault();
     }, { passive: false });
   }
 
-  // Navigation Logic
-  if (navShell && gameCanvas) {
-    navShell.classList.remove('hidden');
+  // Setup Router
+  router = new Router();
 
-    gameButtons.forEach(button => {
-      button.addEventListener('click', (e) => {
-        const gameId = (e.currentTarget as HTMLButtonElement).dataset.game;
-        if (!gameId) return;
+  router.addRoute('/', () => {
+    const notFound = document.getElementById('not-found-screen');
+    notFound?.classList.add('hidden');
 
-        navShell.classList.add('hidden');
-        gameCanvas.classList.remove('hidden');
-        gameCanvas.classList.add('with-hud');
-        
-        resizeCanvas(gameCanvas);
-        window.addEventListener('resize', () => resizeCanvas(gameCanvas));
+    cleanupActiveGame();
+    navShell?.classList.remove('hidden');
+    gameCanvas?.classList.add('hidden');
+    gameCanvas?.classList.remove('with-hud');
+  });
 
-        startGame(gameId, gameCanvas);
-      });
-    });
-  }
+  router.addRoute('/game/:id', (params) => {
+    const gameId = params?.id;
+    const validGames = ['noButton', 'bubbleWrap', 'balloonPop', 'soundBoard', 'particlePhysics'];
+
+    if (!gameId || !validGames.includes(gameId)) {
+      router?.navigate('*', false);
+      return;
+    }
+
+    const notFound = document.getElementById('not-found-screen');
+    notFound?.classList.add('hidden');
+
+    // Show loading overlay with grace period
+    loadingOverlay?.show(200);
+
+    navShell?.classList.add('hidden');
+    gameCanvas?.classList.remove('hidden');
+    gameCanvas?.classList.add('with-hud');
+
+    resizeCanvas(gameCanvas);
+    window.addEventListener('resize', () => resizeCanvas(gameCanvas));
+
+    startGame(gameId, gameCanvas);
+
+    setTimeout(() => loadingOverlay?.hide(), 500);
+  });
+
+  router.addRoute('*', () => {
+    cleanupActiveGame();
+
+    navShell?.classList.add('hidden');
+    gameCanvas?.classList.add('hidden');
+
+    let notFound = document.getElementById('not-found-screen');
+    if (!notFound) {
+      notFound = document.createElement('div');
+      notFound.id = 'not-found-screen';
+      notFound.className = 'not-found-container';
+      notFound.innerHTML = `
+        <h2>404</h2>
+        <p>Oops! We got lost in the toy box!</p>
+        <a href="/" class="back-home-btn">Go Back Home</a>
+      `;
+      document.getElementById('app')?.appendChild(notFound);
+    } else {
+      notFound.classList.remove('hidden');
+    }
+  });
+
+  router.init();
 });
 
 import { NoButtonGame } from './games/noButton/NoButtonGame';
@@ -193,19 +242,19 @@ function restartGame(gameId: string, canvas: HTMLCanvasElement) {
 }
 
 function exitToHome() {
-  if (activeGame) activeGame.destroy();
-  activeGame = null;
+  router?.navigate('/');
+}
+
+function cleanupActiveGame() {
+  if (activeGame) {
+    activeGame.destroy();
+    activeGame = null;
+  }
   gameLoop?.stop();
   gameLoop = null;
   gameUI?.unmount();
   gameUI = null;
   idleManager?.stop();
-
-  const navShell = document.getElementById('navigation-shell');
-  const gameCanvas = document.getElementById('game-canvas');
-  navShell?.classList.remove('hidden');
-  gameCanvas?.classList.add('hidden');
-  gameCanvas?.classList.remove('with-hud');
 }
 
 function resizeCanvas(canvas: HTMLCanvasElement) {
