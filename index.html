@@ -2,36 +2,89 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>Kids Games Suite</title>
+    <meta name="description" content="Kipu — A tactile, educational, and sensory mini-game suite for children, inspired by the Andean khipu." />
+    <meta name="theme-color" content="#3D2B1F" />
+    <title>Kipu</title>
   </head>
   <body>
     <div id="app">
       <!-- Navigation Shell -->
       <nav id="navigation-shell" class="hidden" aria-label="Main Menu">
-        <h1>Kids Games Suite</h1>
-        <div id="game-list" role="menu">
-          <a href="/game/bubbleWrap" data-game="bubbleWrap" role="menuitem">
-            <span class="icon"></span>
-            <span>Bubble Wrap</span>
-          </a>
-          <a href="/game/noButton" data-game="noButton" role="menuitem">
-            <span class="icon"></span>
-            <span>The "No" Button</span>
-          </a>
-          <a href="/game/balloonPop" data-game="balloonPop" role="menuitem">
-            <span class="icon"></span>
-            <span>Balloon Pop</span>
-          </a>
-          <a href="/game/soundBoard" data-game="soundBoard" role="menuitem">
-            <span class="icon"></span>
-            <span>Sound Board</span>
-          </a>
-          <a href="/game/particlePhysics" data-game="particlePhysics" role="menuitem">
-            <span class="icon"></span>
-            <span>Particle Play</span>
-          </a>
+        <div class="nav-header">
+          <div class="cord-line" aria-hidden="true"></div>
+          <h1>Kipu</h1>
+          <p class="nav-subtitle">Touch. Play. Learn.</p>
+        </div>
+
+        <!-- POC Games -->
+        <div class="game-section">
+          <h2 class="section-label">Sensory Play</h2>
+          <div id="game-list-sensory" class="game-list" role="menu">
+            <a href="/game/poka" data-game="poka" data-category="sensory" role="menuitem">
+              <span class="icon"></span>
+              <span>Poka</span>
+              <span class="game-subtitle">Bubble Wrap</span>
+            </a>
+            <a href="/game/eeno" data-game="eeno" data-category="sensory" role="menuitem">
+              <span class="icon"></span>
+              <span>Eeno</span>
+              <span class="game-subtitle">The "No" Button</span>
+            </a>
+            <a href="/game/maka" data-game="maka" data-category="sensory" role="menuitem">
+              <span class="icon"></span>
+              <span>Maka</span>
+              <span class="game-subtitle">Color Mixer</span>
+            </a>
+            <a href="/game/tapa" data-game="tapa" data-category="sensory" role="menuitem">
+              <span class="icon"></span>
+              <span>Tapa</span>
+              <span class="game-subtitle">Balloon Pop</span>
+            </a>
+            <a href="/game/nuko" data-game="nuko" data-category="sensory" role="menuitem">
+              <span class="icon"></span>
+              <span>Nuko</span>
+              <span class="game-subtitle">Bug Catcher</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- MVP Games -->
+        <div class="game-section">
+          <h2 class="section-label">STEM &amp; Logic</h2>
+          <div id="game-list-stem" class="game-list" role="menu">
+            <a href="/game/equationTower" data-game="equationTower" data-category="stem" role="menuitem">
+              <span class="icon"></span>
+              <span>Equation Tower</span>
+              <span class="game-subtitle">Stack &amp; Sum</span>
+            </a>
+            <a href="/game/marblePipeRun" data-game="marblePipeRun" data-category="stem" role="menuitem">
+              <span class="icon"></span>
+              <span>Marble Pipe Run</span>
+              <span class="game-subtitle">Connect the Flow</span>
+            </a>
+            <a href="/game/soundMemory" data-game="soundMemory" data-category="music" role="menuitem">
+              <span class="icon"></span>
+              <span>Sound Memory</span>
+              <span class="game-subtitle">Simon Says</span>
+            </a>
+            <a href="/game/cloudShapeFinder" data-game="cloudShapeFinder" data-category="stem" role="menuitem">
+              <span class="icon"></span>
+              <span>Cloud Shape Finder</span>
+              <span class="game-subtitle">Shape Discovery</span>
+            </a>
+            <a href="/game/digitalLiteBrite" data-game="digitalLiteBrite" data-category="stem" role="menuitem">
+              <span class="icon"></span>
+              <span>Digital Lite-Brite</span>
+              <span class="game-subtitle">Trace &amp; Color</span>
+            </a>
+            <a href="/game/trashSorcerer" data-game="trashSorcerer" data-category="stem" role="menuitem">
+              <span class="icon"></span>
+              <span>Trash Sorcerer</span>
+              <span class="game-subtitle">Sort to Recycle</span>
+            </a>
+          </div>
         </div>
       </nav>
 
