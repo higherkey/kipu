@@ -241,7 +241,110 @@ body, html {
 }
 
 /* ========================================
-   Game HUD Component
+   Game Header Component (HUD)
+   ======================================== */
+#game-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 12px;
+  background: linear-gradient(180deg, rgba(247, 255, 247, 0.95) 0%, rgba(247, 255, 247, 0.85) 100%);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-bottom: 3px solid var(--text-color);
+  z-index: 100;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+#game-header.hidden {
+  display: none;
+}
+
+.header-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  border: 3px solid var(--text-color);
+  background-color: var(--secondary-color);
+  color: var(--text-color);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  box-shadow: 0 4px 0px var(--text-color);
+  transition: all 0.1s ease;
+  padding: 0 8px;
+  font-family: 'Fredoka', sans-serif;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.header-btn:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0px var(--text-color);
+}
+
+.header-btn.home-btn {
+  background-color: var(--accent-color);
+  width: auto;
+  max-width: 140px;
+}
+
+.header-btn.menu-btn {
+  width: 44px;
+  padding: 0;
+}
+
+.header-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.header-icon svg {
+  width: 22px;
+  height: 22px;
+}
+
+.header-logo {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: none;
+}
+
+/* Show logo on larger screens */
+@media (min-width: 480px) {
+  .header-logo {
+    display: block;
+  }
+  
+  .header-btn.home-btn {
+    width: auto;
+  }
+}
+
+.header-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-color);
+  text-align: center;
+  flex: 1;
+  padding: 0 8px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ========================================
+   Game HUD Component (Legacy Compatibility)
    ======================================== */
 .game-hud {
   position: fixed;
