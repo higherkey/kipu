@@ -30,10 +30,7 @@ export class SoundMemoryGame implements Game {
   private playerSequence: number[] = [];
   private phase: GamePhase = 'ready';
   private level = 0;
-  private highlightPhase = 0;
   private highlightDuration = 400; // ms per highlight
-  private animationFrame = 0;
-  private totalAnimationFrames = 0;
 
   constructor() {
     this.audio = AudioController.getInstance();
@@ -114,9 +111,6 @@ export class SoundMemoryGame implements Game {
     this.sequence.push(Math.floor(Math.random() * 4));
     this.playerSequence = [];
     this.phase = 'show';
-    this.highlightPhase = 0;
-    this.animationFrame = 0;
-    this.totalAnimationFrames = this.sequence.length * (this.highlightDuration + 200);
   }
 
   private getCanvasPos(clientX: number, clientY: number): { x: number; y: number } {

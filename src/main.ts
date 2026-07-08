@@ -43,6 +43,41 @@ const gameNames: Record<string, string> = {
   particlePhysics: 'Particle Play',
 };
 
+// Featured Games list for rotating banner
+const featuredGames = [
+  {
+    id: 'noButton',
+    title: 'Eeno',
+    subtitle: 'The "No" Button',
+    desc: 'Speak with funny voices and learn standard words in many languages!',
+    icon: 'no'
+  },
+  {
+    id: 'bubbleWrap',
+    title: 'Poka',
+    subtitle: 'Bubble Wrap',
+    desc: 'Pop colorful bubbles, hear funny pops, and feel satisfying haptic feedback!',
+    icon: 'bubble'
+  },
+  {
+    id: 'marblePipe',
+    title: 'Marble Pipe',
+    subtitle: 'Marble Run Sandbox',
+    desc: 'Build your own physics marble run with ramps, boosters, and bumpers!',
+    icon: 'pipe'
+  },
+  {
+    id: 'colorMixer',
+    title: 'Maka',
+    subtitle: 'Color Mixer',
+    desc: 'Drop and merge paint drops to mix new colors with voice speech!',
+    icon: 'palette'
+  }
+];
+
+let currentHeroIndex = 0;
+let heroInterval: any = null;
+
 document.addEventListener('DOMContentLoaded', () => {
   const navShell = document.getElementById('navigation-shell');
   const gameCanvas = document.getElementById('game-canvas') as HTMLCanvasElement;
@@ -70,6 +105,84 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
   });
+
+  // Setup Category Filters
+  const filterPills = document.querySelectorAll('#category-filters .filter-pill');
+  filterPills.forEach(pill => {
+    pill.addEventListener('click', () => {
+      filterPills.forEach(p => {
+        p.classList.remove('active');
+        p.setAttribute('aria-selected', 'false');
+      });
+      pill.classList.add('active');
+      pill.setAttribute('aria-selected', 'true');
+
+      const cat = (pill as HTMLElement).getAttribute('data-category');
+      const cards = document.querySelectorAll('#game-list a');
+      cards.forEach(card => {
+        const cardCat = (card as HTMLElement).getAttribute('data-category');
+        if (cat === 'all' || cardCat === cat) {
+          card.classList.remove('hidden');
+        } else {
+          card.classList.add('hidden');
+        }
+      });
+    });
+  });
+
+  // Setup Hero Banner dots indicators
+  const dotsContainer = document.getElementById('hero-dots');
+  if (dotsContainer) {
+    dotsContainer.innerHTML = featuredGames.map((_, i) => `<button class="dot${i === 0 ? ' active' : ''}" data-index="${i}" aria-label="Slide ${i+1}"></button>`).join('');
+    
+    dotsContainer.querySelectorAll('.dot').forEach(dot => {
+      dot.addEventListener('click', (e) => {
+        const idx = parseInt((e.currentTarget as HTMLElement).getAttribute('data-index') || '0');
+        currentHeroIndex = idx;
+        updateHeroBanner();
+        startHeroRotation();
+      });
+    });
+  }
+
+  function updateHeroBanner() {
+    const hero = featuredGames[currentHeroIndex];
+    const heroTitle = document.getElementById('hero-title');
+    const heroSubtitle = document.getElementById('hero-subtitle');
+    const heroDesc = document.getElementById('hero-desc');
+    const heroPlayBtn = document.getElementById('hero-play-btn') as HTMLAnchorElement;
+    const heroIconContainer = document.getElementById('hero-icon-container');
+
+    const heroBannerEl = document.getElementById('hero-banner');
+    if (heroBannerEl) {
+      heroBannerEl.classList.add('fade-transition');
+      setTimeout(() => {
+        if (heroTitle) heroTitle.textContent = hero.title;
+        if (heroSubtitle) heroSubtitle.textContent = hero.subtitle;
+        if (heroDesc) heroDesc.textContent = hero.desc;
+        if (heroPlayBtn) heroPlayBtn.href = `/game/${hero.id}`;
+        if (heroIconContainer && hero.icon in Icons) {
+          heroIconContainer.innerHTML = Icons[hero.icon as keyof typeof Icons];
+        }
+
+        if (dotsContainer) {
+          dotsContainer.querySelectorAll('.dot').forEach((d, i) => {
+            d.classList.toggle('active', i === currentHeroIndex);
+          });
+        }
+
+        heroBannerEl.classList.remove('fade-transition');
+      }, 150);
+    }
+  }
+
+  function startHeroRotation() {
+    if (heroInterval) clearInterval(heroInterval);
+    heroInterval = setInterval(() => {
+      currentHeroIndex = (currentHeroIndex + 1) % featuredGames.length;
+      updateHeroBanner();
+    }, 5000);
+  }
 
   // Setup global systems
   loadingOverlay = new LoadingOverlay();
@@ -103,6 +216,10 @@ document.addEventListener('DOMContentLoaded', () => {
     navShell?.classList.remove('hidden');
     gameCanvas?.classList.add('hidden');
     gameCanvas?.classList.remove('with-hud');
+
+    // Start hero rotation
+    updateHeroBanner();
+    startHeroRotation();
   });
 
   router.addRoute('/game/:id', (params) => {
@@ -112,6 +229,12 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!gameId || !validGames.includes(gameId)) {
       router?.navigate('*', false);
       return;
+    }
+
+    // Stop hero rotation
+    if (heroInterval) {
+      clearInterval(heroInterval);
+      heroInterval = null;
     }
 
     const notFound = document.getElementById('not-found-screen');
