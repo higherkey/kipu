@@ -30,11 +30,11 @@ let loadingOverlay: LoadingOverlay | null = null;
 let soundEnabled = localStorage.getItem('soundEnabled') !== 'false';
 let vibrationEnabled = localStorage.getItem('vibrationEnabled') !== 'false';
 
-// Game Name Mapping
+// Game Name Mapping — Kipu spec names (Quechua short name + descriptive)
 const gameNames: Record<string, string> = {
-  noButton: 'The "No" Button',
-  bubbleWrap: 'Bubble Wrap',
-  balloonPop: 'Balloon Pop',
+  noButton: 'Eeno',
+  bubbleWrap: 'Poka',
+  balloonPop: 'Tapa',
   soundBoard: 'Sound Board',
   particlePhysics: 'Particle Play',
 };

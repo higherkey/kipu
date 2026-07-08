@@ -13,7 +13,7 @@ export class LoadingOverlay {
     this.element.innerHTML = `
       <div class="loader-content">
         <div class="bouncy-ball"></div>
-        <p aria-live="polite">Loading Fun...</p>
+        <p aria-live="polite">Kipu is loading...</p>
       </div>
     `;
     document.body.appendChild(this.element);
