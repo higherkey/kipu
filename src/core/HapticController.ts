@@ -15,7 +15,8 @@ export class HapticController {
    * @param pattern Array of durations (ms) or a single duration for vibration.
    */
   public vibrate(pattern: number | number[]) {
-    if (navigator.vibrate) {
+    const vibrationEnabled = localStorage.getItem('vibrationEnabled') !== 'false';
+    if (vibrationEnabled && navigator.vibrate) {
       navigator.vibrate(pattern);
     }
   }

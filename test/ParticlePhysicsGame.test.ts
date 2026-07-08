@@ -77,11 +77,12 @@ describe('ParticlePhysicsGame', () => {
     canvas.dispatchEvent(downEvent);
     expect(vibrateMock).toHaveBeenCalledTimes(1);
 
-    // Simulate continuous drag by advancing time with update calls
-    // The haptic interval is 80ms, so calling update for ~1000ms should produce ~12 additional pulses
+    // Simulate continuous drag by advancing time and dispatching mousemove
+    // The haptic interval is 80ms, so doing this for ~1000ms should produce ~12 additional pulses
     for (let i = 0; i < 60; i++) {
       now += 16.67; // ~60fps
-      game.update(16.67);
+      const moveEvent = new MouseEvent('mousemove', { clientX: 200 + i, clientY: 400 });
+      canvas.dispatchEvent(moveEvent);
     }
 
     // 1 initial + continuous pulses during ~1000ms at 80ms interval ≈ 12-13 pulses
@@ -93,10 +94,11 @@ describe('ParticlePhysicsGame', () => {
     let now = 1000;
     vi.spyOn(performance, 'now').mockImplementation(() => now);
 
-    // No mousedown, just call update
+    // No mousedown, just dispatch mousemove events
     for (let i = 0; i < 60; i++) {
       now += 16.67;
-      game.update(16.67);
+      const moveEvent = new MouseEvent('mousemove', { clientX: 200 + i, clientY: 400 });
+      canvas.dispatchEvent(moveEvent);
     }
 
     // No haptic should fire since pointer is not down
@@ -111,10 +113,11 @@ describe('ParticlePhysicsGame', () => {
     const downEvent = new MouseEvent('mousedown', { clientX: 200, clientY: 400 });
     canvas.dispatchEvent(downEvent);
 
-    // A few updates while pointer is down (enough to trigger some haptics)
+    // A few mousemoves while pointer is down (enough to trigger some haptics)
     for (let i = 0; i < 10; i++) {
       now += 16.67;
-      game.update(16.67);
+      const moveEvent = new MouseEvent('mousemove', { clientX: 200 + i, clientY: 400 });
+      canvas.dispatchEvent(moveEvent);
     }
 
     const callsBeforeUp = vibrateMock.mock.calls.length;
@@ -124,10 +127,11 @@ describe('ParticlePhysicsGame', () => {
     const upEvent = new MouseEvent('mouseup');
     canvas.dispatchEvent(upEvent);
 
-    // More updates after mouseup
+    // More mousemoves after mouseup
     for (let i = 0; i < 30; i++) {
       now += 16.67;
-      game.update(16.67);
+      const moveEvent = new MouseEvent('mousemove', { clientX: 200 + i, clientY: 400 });
+      canvas.dispatchEvent(moveEvent);
     }
 
     // No additional haptic calls after mouseup
@@ -143,16 +147,18 @@ describe('ParticlePhysicsGame', () => {
     canvas.dispatchEvent(downEvent);
     expect(vibrateMock).toHaveBeenCalledTimes(1);
 
-    // Immediately call update (within 80ms window)
+    // Immediately trigger mousemove (within 80ms window)
     now += 16;
-    game.update(16);
+    const moveEvent1 = new MouseEvent('mousemove', { clientX: 205, clientY: 400 });
+    canvas.dispatchEvent(moveEvent1);
 
     // Should still be 1 call since we're within the 80ms throttle window
     expect(vibrateMock).toHaveBeenCalledTimes(1);
 
     // Advance past throttle interval
     now += 80;
-    game.update(16);
+    const moveEvent2 = new MouseEvent('mousemove', { clientX: 210, clientY: 400 });
+    canvas.dispatchEvent(moveEvent2);
 
     // Now should have 2 calls
     expect(vibrateMock).toHaveBeenCalledTimes(2);

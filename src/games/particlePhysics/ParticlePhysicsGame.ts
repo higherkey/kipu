@@ -66,9 +66,18 @@ export class ParticlePhysicsGame implements Game {
     this.lastHapticTime = performance.now();
   };
 
+  private triggerDragHaptic() {
+    const now = performance.now();
+    if (now - this.lastHapticTime >= this.hapticInterval) {
+      this.haptics.lightTap();
+      this.lastHapticTime = now;
+    }
+  }
+
   private onMouseMove = (e: MouseEvent) => {
     if (this.pointers.has(-1)) {
       this.pointers.set(-1, { x: e.clientX, y: e.clientY });
+      this.triggerDragHaptic();
     }
   };
 
@@ -85,10 +94,15 @@ export class ParticlePhysicsGame implements Game {
   };
 
   private onTouchMove = (e: TouchEvent) => {
+    let moved = false;
     for (const touch of Array.from(e.changedTouches)) {
       if (this.pointers.has(touch.identifier)) {
         this.pointers.set(touch.identifier, { x: touch.clientX, y: touch.clientY });
+        moved = true;
       }
+    }
+    if (moved) {
+      this.triggerDragHaptic();
     }
   };
 
@@ -132,13 +146,6 @@ export class ParticlePhysicsGame implements Game {
         }
       }
       this.currentHue = (this.currentHue + dt * 0.1) % 360;
-
-      // Continuous haptic feedback during drag
-      const now = performance.now();
-      if (now - this.lastHapticTime >= this.hapticInterval) {
-        this.haptics.lightTap();
-        this.lastHapticTime = now;
-      }
     }
 
     // Update particles
