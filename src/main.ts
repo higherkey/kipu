@@ -30,11 +30,15 @@ let loadingOverlay: LoadingOverlay | null = null;
 let soundEnabled = localStorage.getItem('soundEnabled') !== 'false';
 let vibrationEnabled = localStorage.getItem('vibrationEnabled') !== 'false';
 
-// Game Name Mapping
+// Game Name Mapping — Kipu spec names (Quechua short name + descriptive)
 const gameNames: Record<string, string> = {
-  noButton: 'The "No" Button',
-  bubbleWrap: 'Bubble Wrap',
-  balloonPop: 'Balloon Pop',
+  noButton: 'Eeno',
+  bubbleWrap: 'Poka',
+  balloonPop: 'Tapa',
+  colorMixer: 'Maka',
+  bugCatcher: 'Nuko',
+  soundMemory: 'Sound Memory',
+  marblePipe: 'Marble Pipe',
   soundBoard: 'Sound Board',
   particlePhysics: 'Particle Play',
 };
@@ -53,6 +57,10 @@ document.addEventListener('DOMContentLoaded', () => {
         noButton: 'no',
         bubbleWrap: 'bubble',
         balloonPop: 'balloon',
+        colorMixer: 'palette',
+        bugCatcher: 'bug',
+        soundMemory: 'music',
+        marblePipe: 'pipe',
         soundBoard: 'sound',
         particlePhysics: 'particle',
       };
@@ -99,7 +107,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   router.addRoute('/game/:id', (params) => {
     const gameId = params?.id;
-    const validGames = ['noButton', 'bubbleWrap', 'balloonPop', 'soundBoard', 'particlePhysics'];
+    const validGames = ['noButton', 'bubbleWrap', 'balloonPop', 'colorMixer', 'bugCatcher', 'soundMemory', 'marblePipe', 'soundBoard', 'particlePhysics'];
 
     if (!gameId || !validGames.includes(gameId)) {
       router?.navigate('*', false);
@@ -137,7 +145,7 @@ document.addEventListener('DOMContentLoaded', () => {
       notFound.className = 'not-found-container';
       notFound.innerHTML = `
         <h2>404</h2>
-        <p>Oops! We got lost in the toy box!</p>
+        <p>This game could not be found.</p>
         <a href="/" class="back-home-btn">Go Back Home</a>
       `;
       document.getElementById('app')?.appendChild(notFound);
@@ -152,6 +160,10 @@ document.addEventListener('DOMContentLoaded', () => {
 import { NoButtonGame } from './games/noButton/NoButtonGame';
 import { BubbleWrapGame } from './games/bubbleWrap/BubbleWrapGame';
 import { BalloonPopGame } from './games/balloonPop/BalloonPopGame';
+import { ColorMixerGame } from './games/colorMixer/ColorMixerGame';
+import { BugCatcherGame } from './games/bugCatcher/BugCatcherGame';
+import { SoundMemoryGame } from './games/soundMemory/SoundMemoryGame';
+import { MarblePipeGame } from './games/marblePipe/MarblePipeGame';
 import { SoundBoardGame } from './games/soundBoard/SoundBoardGame';
 import { ParticlePhysicsGame } from './games/particlePhysics/ParticlePhysicsGame';
 
@@ -200,6 +212,18 @@ function startGame(gameId: string, canvas: HTMLCanvasElement) {
       break;
     case 'balloonPop':
       activeGame = new BalloonPopGame();
+      break;
+    case 'colorMixer':
+      activeGame = new ColorMixerGame();
+      break;
+    case 'bugCatcher':
+      activeGame = new BugCatcherGame();
+      break;
+    case 'soundMemory':
+      activeGame = new SoundMemoryGame();
+      break;
+    case 'marblePipe':
+      activeGame = new MarblePipeGame();
       break;
     case 'soundBoard':
       activeGame = new SoundBoardGame();

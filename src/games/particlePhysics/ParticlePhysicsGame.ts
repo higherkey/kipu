@@ -58,14 +58,19 @@ export class ParticlePhysicsGame implements Game {
     canvas.addEventListener('touchcancel', this.onTouchEnd);
   }
 
+  private getCanvasPos(clientX: number, clientY: number): { x: number; y: number } {
+    const rect = this.canvas!.getBoundingClientRect();
+    return { x: clientX - rect.left, y: clientY - rect.top };
+  }
+
   private onMouseDown = (e: MouseEvent) => {
-    this.pointers.set(-1, { x: e.clientX, y: e.clientY });
+    this.pointers.set(-1, this.getCanvasPos(e.clientX, e.clientY));
     this.haptics.lightTap();
   };
 
   private onMouseMove = (e: MouseEvent) => {
     if (this.pointers.has(-1)) {
-      this.pointers.set(-1, { x: e.clientX, y: e.clientY });
+      this.pointers.set(-1, this.getCanvasPos(e.clientX, e.clientY));
     }
   };
 
@@ -75,7 +80,7 @@ export class ParticlePhysicsGame implements Game {
 
   private onTouchStart = (e: TouchEvent) => {
     for (const touch of Array.from(e.changedTouches)) {
-      this.pointers.set(touch.identifier, { x: touch.clientX, y: touch.clientY });
+      this.pointers.set(touch.identifier, this.getCanvasPos(touch.clientX, touch.clientY));
     }
     this.haptics.lightTap();
   };
@@ -83,7 +88,7 @@ export class ParticlePhysicsGame implements Game {
   private onTouchMove = (e: TouchEvent) => {
     for (const touch of Array.from(e.changedTouches)) {
       if (this.pointers.has(touch.identifier)) {
-        this.pointers.set(touch.identifier, { x: touch.clientX, y: touch.clientY });
+        this.pointers.set(touch.identifier, this.getCanvasPos(touch.clientX, touch.clientY));
       }
     }
   };

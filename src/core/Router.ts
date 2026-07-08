@@ -1,7 +1,7 @@
 export type RouteHandler = (params?: Record<string, string>) => void;
 
 /**
- * Simple client-side router for the Kids Games Suite.
+ * Simple client-side router for Kipu.
  * Handles URL navigation using the History API.
  */
 export class Router {
