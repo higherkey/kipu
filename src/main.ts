@@ -137,7 +137,7 @@ document.addEventListener('DOMContentLoaded', () => {
       notFound.className = 'not-found-container';
       notFound.innerHTML = `
         <h2>404</h2>
-        <p>Oops! We got lost in the toy box!</p>
+        <p>This game could not be found.</p>
         <a href="/" class="back-home-btn">Go Back Home</a>
       `;
       document.getElementById('app')?.appendChild(notFound);

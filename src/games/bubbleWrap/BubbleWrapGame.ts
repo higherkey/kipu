@@ -52,13 +52,17 @@ export class BubbleWrapGame implements Game {
   }
 
   private handleTouch = (e: TouchEvent) => {
+    if (!this.canvas) return;
+    const rect = this.canvas.getBoundingClientRect();
     Array.from(e.changedTouches).forEach(touch => {
-      this.checkPop(touch.clientX, touch.clientY);
+      this.checkPop(touch.clientX - rect.left, touch.clientY - rect.top);
     });
   }
 
   private handleMouseDown = (e: MouseEvent) => {
-    this.checkPop(e.clientX, e.clientY);
+    if (!this.canvas) return;
+    const rect = this.canvas.getBoundingClientRect();
+    this.checkPop(e.clientX - rect.left, e.clientY - rect.top);
   }
 
   private checkPop(x: number, y: number) {
