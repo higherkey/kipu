@@ -36,6 +36,7 @@ const gameNames: Record<string, string> = {
   bubbleWrap: 'Poka',
   balloonPop: 'Tapa',
   colorMixer: 'Maka',
+  bugCatcher: 'Nuko',
   soundBoard: 'Sound Board',
   particlePhysics: 'Particle Play',
 };
@@ -55,6 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
         bubbleWrap: 'bubble',
         balloonPop: 'balloon',
         colorMixer: 'palette',
+        bugCatcher: 'bug',
         soundBoard: 'sound',
         particlePhysics: 'particle',
       };
@@ -101,7 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   router.addRoute('/game/:id', (params) => {
     const gameId = params?.id;
-    const validGames = ['noButton', 'bubbleWrap', 'balloonPop', 'colorMixer', 'soundBoard', 'particlePhysics'];
+    const validGames = ['noButton', 'bubbleWrap', 'balloonPop', 'colorMixer', 'bugCatcher', 'soundBoard', 'particlePhysics'];
 
     if (!gameId || !validGames.includes(gameId)) {
       router?.navigate('*', false);
@@ -155,6 +157,7 @@ import { NoButtonGame } from './games/noButton/NoButtonGame';
 import { BubbleWrapGame } from './games/bubbleWrap/BubbleWrapGame';
 import { BalloonPopGame } from './games/balloonPop/BalloonPopGame';
 import { ColorMixerGame } from './games/colorMixer/ColorMixerGame';
+import { BugCatcherGame } from './games/bugCatcher/BugCatcherGame';
 import { SoundBoardGame } from './games/soundBoard/SoundBoardGame';
 import { ParticlePhysicsGame } from './games/particlePhysics/ParticlePhysicsGame';
 
@@ -206,6 +209,9 @@ function startGame(gameId: string, canvas: HTMLCanvasElement) {
       break;
     case 'colorMixer':
       activeGame = new ColorMixerGame();
+      break;
+    case 'bugCatcher':
+      activeGame = new BugCatcherGame();
       break;
     case 'soundBoard':
       activeGame = new SoundBoardGame();
