@@ -290,7 +290,160 @@ html, body {
 }
 
 /* ========================================
-   Game Header — Tier 1 HUD "Primary Cord"
+   Custom Voice Dropdown
+   ======================================== */
+.custom-dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-trigger {
+  padding: 0.55rem 1rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  font-family: 'Fredoka', sans-serif;
+  border: 2px solid var(--fg);
+  border-radius: var(--radius-sm);
+  background-color: #fff;
+  color: var(--fg);
+  box-shadow: 0 var(--shadow-depth) 0px var(--fg);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: transform 0.08s ease, box-shadow 0.08s ease;
+}
+
+.dropdown-trigger:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0px var(--fg);
+}
+
+.dropdown-options {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  background: #fff;
+  border: 2px solid var(--fg);
+  border-radius: var(--radius-sm);
+  box-shadow: 0 var(--shadow-depth-lg) 0px var(--fg);
+  max-height: 280px;
+  overflow-y: auto;
+  width: 280px;
+  display: none;
+  flex-direction: column;
+  padding: 0.5rem;
+  gap: 0.25rem;
+  z-index: 200;
+}
+
+.dropdown-options.show {
+  display: flex;
+}
+
+.dropdown-option-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.dropdown-option {
+  width: 100%;
+  padding: 0.6rem 1rem;
+  border: none;
+  background: none;
+  text-align: left;
+  font-size: 0.95rem;
+  font-family: 'Fredoka', sans-serif;
+  color: var(--fg);
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background 0.1s ease;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.dropdown-option:not(.disabled):hover {
+  background-color: var(--color-parchment);
+}
+
+.dropdown-option.active {
+  background-color: var(--cord);
+  color: var(--fg);
+  font-weight: 600;
+}
+
+.dropdown-option.disabled {
+  color: rgba(43, 45, 94, 0.4);
+  cursor: not-allowed;
+}
+
+.dropdown-option .badge {
+  font-size: 0.7rem;
+  background-color: rgba(192, 57, 43, 0.1);
+  color: var(--primary);
+  border: 1.5px solid var(--fg);
+  border-radius: 6px;
+  padding: 0.05rem 0.3rem;
+  font-weight: 600;
+}
+
+/* Tooltip for Disabled Languages */
+.dropdown-option-wrapper .tooltip {
+  position: absolute;
+  left: 105%;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: var(--fg);
+  color: #fff;
+  padding: 0.6rem 0.9rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+  font-family: 'Fredoka', sans-serif;
+  width: 220px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  display: none;
+  z-index: 300;
+  pointer-events: none;
+  border: 1.5px solid #fff;
+}
+
+.dropdown-option-wrapper .tooltip::after {
+  content: "";
+  position: absolute;
+  right: 100%;
+  top: 50%;
+  margin-top: -6px;
+  border-width: 6px;
+  border-style: solid;
+  border-color: transparent var(--fg) transparent transparent;
+}
+
+.dropdown-option-wrapper:hover .tooltip {
+  display: block;
+}
+
+/* Adjust tooltip position on mobile/narrow viewports */
+@media (max-width: 600px) {
+  .dropdown-option-wrapper .tooltip {
+    left: auto;
+    right: 0;
+    top: 100%;
+    transform: none;
+    margin-top: 5px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  }
+  .dropdown-option-wrapper .tooltip::after {
+    right: 20px;
+    bottom: 100%;
+    top: auto;
+    margin-top: 0;
+    border-color: transparent transparent var(--fg) transparent;
+  }
+}
+
+/* ========================================
+   Game Header Component (HUD)
    ======================================== */
 #game-header {
   position: fixed;
