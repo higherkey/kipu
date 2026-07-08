@@ -27,7 +27,7 @@ export class GameHeader {
     header.innerHTML = `
       <button class="header-btn home-btn" title="Go Home" aria-label="Go Home">
         <span class="header-icon">${Icons.home}</span>
-        <span class="header-logo">Kids Games</span>
+        <span class="header-logo">Kipu</span>
       </button>
       <span class="header-title">${this.config.gameName}</span>
       <button class="header-btn menu-btn" title="Menu" aria-label="Open Menu">

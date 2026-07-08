@@ -1,17 +1,17 @@
-# Kids Web Games Suite
+# Kipu
 
 > A premium, sensory-focused collection of tactile and educational mini-games built for the modern web.
 
 [![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen.svg?style=flat-square)](https://github.com/richardlitt/standard-readme)
-[![Live Demo](https://img.shields.io/badge/Live-Demo-brightgreen?style=flat-square)](https://higherkey.github.io/kids-games-site/)
-[![Build Status](https://github.com/higherkey/kids-games-site/actions/workflows/build.yml/badge.svg)](https://github.com/higherkey/kids-games-site/actions/workflows/build.yml)
+[![Live Demo](https://img.shields.io/badge/Live-Demo-brightgreen?style=flat-square)](https://higherkey.github.io/kipu/)
+[![Build Status](https://github.com/higherkey/kipu/actions/workflows/build.yml/badge.svg)](https://github.com/higherkey/kipu/actions/workflows/build.yml)
 [![Vite 8](https://img.shields.io/badge/Vite-8-646CFF?style=flat-square&logo=vite)](https://vite.dev/)
 [![TypeScript 6](https://img.shields.io/badge/TypeScript-6-007ACC?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
 [![PWA Ready](https://img.shields.io/badge/PWA-Ready-5A0FC8?style=flat-square&logo=pwa&logoColor=white)](#)
 [![Matter.js](https://img.shields.io/badge/Matter.js-0.20-EF5350?style=flat-square)](#)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)](LICENSE)
 
-The **Kids Web Games Suite** is a mobile-first platform hosting high-performance, tactile mini-games designed for children (ages 2-10). Our primary focus is **immediate tactile engagement**—ensuring zero perceptible latency between touch events and their corresponding audio/haptic responses.
+**Kipu** is a mobile-first platform hosting high-performance, tactile mini-games designed for children (ages 2-10). Our primary focus is **immediate tactile engagement**—ensuring zero perceptible latency between touch events and their corresponding audio/haptic responses.
 
 ## Table of Contents
 
@@ -58,8 +58,8 @@ For technical specifications, refer to [PROJECT.md](PROJECT.md).
 ### Installation
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/higherkey/kids-games-site.git
-   cd kids-games-site
+   git clone https://github.com/higherkey/kipu.git
+   cd kipu
    ```
 2. **Install dependencies:**
    ```bash
