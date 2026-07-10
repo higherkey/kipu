@@ -2,9 +2,8 @@ import { defineConfig } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig(({ mode }) => {
-  const isProd = mode === 'production';
   return {
-    base: isProd ? '/kipu/' : '/',
+    base: process.env.GITHUB_ACTIONS === 'true' ? '/kipu/' : '/',
     test: {
       environment: 'jsdom',
       globals: true,
