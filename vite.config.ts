@@ -16,8 +16,8 @@ export default defineConfig(({ mode }) => {
           enabled: true
         },
         manifest: {
-          name: 'Kids Games Suite',
-          short_name: 'Kids Games',
+          name: 'Kipu',
+          short_name: 'Kipu',
           description: 'A tactile, educational, and sensory mini-game suite for children',
           theme_color: '#ffffff',
           background_color: '#ffffff',
@@ -48,4 +48,3 @@ export default defineConfig(({ mode }) => {
     ]
   };
 });
-

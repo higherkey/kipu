@@ -60,8 +60,13 @@ export class ParticlePhysicsGame implements Game {
     canvas.addEventListener('touchcancel', this.onTouchEnd);
   }
 
-  private readonly onMouseDown = (e: MouseEvent) => {
-    this.pointers.set(-1, { x: e.clientX, y: e.clientY });
+  private getCanvasPos(clientX: number, clientY: number): { x: number; y: number } {
+    const rect = this.canvas!.getBoundingClientRect();
+    return { x: clientX - rect.left, y: clientY - rect.top };
+  }
+
+  private onMouseDown = (e: MouseEvent) => {
+    this.pointers.set(-1, this.getCanvasPos(e.clientX, e.clientY));
     this.haptics.lightTap();
     this.lastHapticTime = performance.now();
   };
@@ -74,30 +79,30 @@ export class ParticlePhysicsGame implements Game {
     }
   }
 
-  private readonly onMouseMove = (e: MouseEvent) => {
+  private onMouseMove = (e: MouseEvent) => {
     if (this.pointers.has(-1)) {
-      this.pointers.set(-1, { x: e.clientX, y: e.clientY });
+      this.pointers.set(-1, this.getCanvasPos(e.clientX, e.clientY));
       this.triggerDragHaptic();
     }
   };
 
-  private readonly onMouseUp = () => {
+  private onMouseUp = () => {
     this.pointers.delete(-1);
   };
 
-  private readonly onTouchStart = (e: TouchEvent) => {
+  private onTouchStart = (e: TouchEvent) => {
     for (const touch of Array.from(e.changedTouches)) {
-      this.pointers.set(touch.identifier, { x: touch.clientX, y: touch.clientY });
+      this.pointers.set(touch.identifier, this.getCanvasPos(touch.clientX, touch.clientY));
     }
     this.haptics.lightTap();
     this.lastHapticTime = performance.now();
   };
 
-  private readonly onTouchMove = (e: TouchEvent) => {
+  private onTouchMove = (e: TouchEvent) => {
     let moved = false;
     for (const touch of Array.from(e.changedTouches)) {
       if (this.pointers.has(touch.identifier)) {
-        this.pointers.set(touch.identifier, { x: touch.clientX, y: touch.clientY });
+        this.pointers.set(touch.identifier, this.getCanvasPos(touch.clientX, touch.clientY));
         moved = true;
       }
     }
@@ -106,7 +111,7 @@ export class ParticlePhysicsGame implements Game {
     }
   };
 
-  private readonly onTouchEnd = (e: TouchEvent) => {
+  private onTouchEnd = (e: TouchEvent) => {
     for (const touch of Array.from(e.changedTouches)) {
       this.pointers.delete(touch.identifier);
     }

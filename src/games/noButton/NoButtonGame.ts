@@ -1,160 +1,211 @@
 import type { Game } from '../../core/Game';
 import { AudioController } from '../../core/AudioController';
-import { HapticController } from '../../core/HapticController';
 import { LANGUAGES, TranslationManager } from '../../core/TranslationManager';
 
 export class NoButtonGame implements Game {
   private canvas: HTMLCanvasElement | null = null;
   private container: HTMLDivElement | null = null;
-  private langPicker: HTMLDivElement | null = null;
-  private readonly audio: AudioController;
-  private readonly haptics: HapticController;
-  private windowClickListener: ((e: MouseEvent) => void) | null = null;
+  private audio: AudioController;
+  private isDropdownOpen = false;
+  private documentClickListener: ((e: MouseEvent) => void) | null = null;
+  private voicesChangedListener: (() => void) | null = null;
 
   constructor() {
     this.audio = AudioController.getInstance();
-    this.haptics = HapticController.getInstance();
-    
-    // Pre-register sounds
-    this.audio.registerSound('no', '/sounds/no.ogg');
   }
 
   init(canvas: HTMLCanvasElement): void {
     this.canvas = canvas;
     this.canvas.classList.add('hidden'); // We use DOM for this game
 
-    // Create Game Container
     this.container = document.createElement('div');
     this.container.id = 'no-button-game';
     this.container.innerHTML = `
-      <div class="no-button-wrapper">
-        <button id="giant-no-button">NO</button>
+      <div class="game-controls">
+        <div class="custom-dropdown" id="language-dropdown-container">
+          <button class="dropdown-trigger" id="dropdown-trigger-btn" aria-haspopup="listbox" aria-expanded="false">
+            🌐 <span id="current-lang-name">Select Language</span>
+          </button>
+          <div class="dropdown-options" id="dropdown-options-list" role="listbox"></div>
+        </div>
+        <button id="random-lang-btn" class="control-btn">Random</button>
+      </div>
+      <div class="buttons-container">
+        <div class="giant-button-wrapper" id="no-wrapper">
+          <button id="giant-no-button" class="giant-button">NO</button>
+        </div>
+        <div class="giant-button-wrapper" id="yes-wrapper">
+          <button id="giant-yes-button" class="giant-button">YES</button>
+        </div>
       </div>
     `;
 
     document.getElementById('app')?.appendChild(this.container);
 
-    const button = this.container.querySelector('#giant-no-button') as HTMLButtonElement;
-    button?.addEventListener('click', () => this.handlePress());
+    const noBtn = this.container.querySelector('#giant-no-button');
+    const yesBtn = this.container.querySelector('#giant-yes-button');
+    const randomBtn = this.container.querySelector('#random-lang-btn');
+    const triggerBtn = this.container.querySelector('#dropdown-trigger-btn');
 
-    // Create Language Picker
-    this.langPicker = document.createElement('div');
-    this.langPicker.className = 'language-picker-container';
-    this.langPicker.innerHTML = `
-      <button class="language-select-btn" id="lang-picker-toggle" aria-haspopup="listbox" aria-expanded="false">
-        🌐 <span>${TranslationManager.getCurrent().name}</span>
-      </button>
-      <div class="language-dropdown" id="lang-picker-dropdown" role="listbox"></div>
-    `;
-    this.container.appendChild(this.langPicker);
+    noBtn?.addEventListener('click', () => this.handleNo());
+    yesBtn?.addEventListener('click', () => this.handleYes());
 
-    // Populate Languages Dropdown
-    this.populateDropdown();
-    this.updateButtonText();
-
-    // Toggle Dropdown Event
-    const toggleBtn = this.langPicker.querySelector('#lang-picker-toggle');
-    const dropdown = this.langPicker.querySelector('#lang-picker-dropdown');
-    
-    toggleBtn?.addEventListener('click', (e) => {
+    triggerBtn?.addEventListener('click', (e) => {
       e.stopPropagation();
-      const show = !dropdown?.classList.contains('show');
-      dropdown?.classList.toggle('show', show);
-      toggleBtn.setAttribute('aria-expanded', String(show));
+      this.toggleDropdown();
     });
 
-    // Close on outside click
-    this.windowClickListener = (e: MouseEvent) => {
+    randomBtn?.addEventListener('click', () => {
+      // Pick randomly only from installed/supported languages
+      const supportedLanguages = LANGUAGES.filter(l => this.audio.isLanguageSupported(l.code));
+      const candidates = supportedLanguages.length > 0 ? supportedLanguages : [LANGUAGES[0]];
+      const random = candidates[Math.floor(Math.random() * candidates.length)];
+      
+      TranslationManager.setLanguage(random.code);
+      this.updateUI();
+      // Preview by speaking the "Yes" translation in that language
+      this.audio.speak(random.yes + '!', random.code);
+    });
+
+    // Close dropdown on outside click
+    this.documentClickListener = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
-      if (!this.langPicker?.contains(target)) {
-        dropdown?.classList.remove('show');
-        toggleBtn?.setAttribute('aria-expanded', 'false');
+      if (this.isDropdownOpen && !this.container?.querySelector('#language-dropdown-container')?.contains(target)) {
+        this.toggleDropdown(false);
       }
     };
-    window.addEventListener('click', this.windowClickListener);
+    document.addEventListener('click', this.documentClickListener);
+
+    // Initial load of language list
+    this.renderLanguageList();
+    this.updateUI();
+
+    // Listen for Web Speech API voices loading asynchronously
+    if ('speechSynthesis' in window) {
+      this.voicesChangedListener = () => {
+        this.renderLanguageList();
+        this.updateUI();
+      };
+      window.speechSynthesis.addEventListener('voiceschanged', this.voicesChangedListener);
+    }
   }
 
-  private populateDropdown() {
-    const dropdown = this.langPicker?.querySelector('#lang-picker-dropdown');
-    if (!dropdown) return;
+  private toggleDropdown(show?: boolean) {
+    const dropdown = this.container?.querySelector('#dropdown-options-list');
+    const trigger = this.container?.querySelector('#dropdown-trigger-btn');
+    if (!dropdown || !trigger) return;
 
-    dropdown.innerHTML = LANGUAGES.map(lang => {
-      const isActive = lang.code === TranslationManager.getCurrent().code;
+    this.isDropdownOpen = show !== undefined ? show : !this.isDropdownOpen;
+    dropdown.classList.toggle('show', this.isDropdownOpen);
+    trigger.setAttribute('aria-expanded', String(this.isDropdownOpen));
+  }
+
+  private renderLanguageList() {
+    const list = this.container?.querySelector('#dropdown-options-list');
+    if (!list) return;
+
+    list.innerHTML = LANGUAGES.map(l => {
+      const isSupported = this.audio.isLanguageSupported(l.code);
+      const isSelected = l.code === TranslationManager.getCurrent().code;
+
+      if (!isSupported) {
+        // Detect OS for custom installation instructions
+        const userAgent = navigator.userAgent;
+        const isWindows = userAgent.indexOf('Windows') !== -1;
+        const isMac = userAgent.indexOf('Mac') !== -1;
+        const isAndroid = userAgent.indexOf('Android') !== -1;
+        const isIOS = /iPad|iPhone|iPod/.test(userAgent);
+
+        let instructions = 'Install this voice package in your device settings.';
+        if (isWindows) {
+          instructions = 'Settings -> Time & Language -> Speech -> Add voices.';
+        } else if (isMac || isIOS) {
+          instructions = 'Settings -> Accessibility -> Spoken Content -> Voices.';
+        } else if (isAndroid) {
+          instructions = 'Settings -> Languages & Input -> Text-to-speech output.';
+        }
+
+        return `
+          <div class="dropdown-option-wrapper">
+            <button class="dropdown-option disabled" disabled data-code="${l.code}">
+              <span>${l.name}</span>
+              <span class="badge">Not Installed</span>
+            </button>
+            <span class="tooltip">${instructions}</span>
+          </div>
+        `;
+      }
+
       return `
-        <button class="language-option${isActive ? ' active' : ''}" data-code="${lang.code}" role="option" aria-selected="${isActive}">
-          ${lang.name}
-        </button>
+        <div class="dropdown-option-wrapper">
+          <button class="dropdown-option${isSelected ? ' active' : ''}" data-code="${l.code}">
+            <span>${l.name}</span>
+          </button>
+        </div>
       `;
     }).join('');
 
-    // Option Click Events
-    dropdown.querySelectorAll('.language-option').forEach(btn => {
+    // Attach click events to enabled dropdown options
+    list.querySelectorAll('.dropdown-option:not(.disabled)').forEach(btn => {
       btn.addEventListener('click', (e) => {
         const code = (e.currentTarget as HTMLElement).dataset.code;
         if (code) {
           TranslationManager.setLanguage(code);
-          this.updateButtonText();
-          this.updateDropdownActiveState();
-          dropdown.classList.remove('show');
-          this.langPicker?.querySelector('#lang-picker-toggle')?.setAttribute('aria-expanded', 'false');
+          this.updateUI();
+          this.toggleDropdown(false);
         }
       });
     });
   }
 
-  private updateButtonText() {
-    const button = this.container?.querySelector('#giant-no-button');
-    if (button) {
-      button.textContent = TranslationManager.getCurrent().no.toUpperCase();
-    }
-    const toggleBtnSpan = this.langPicker?.querySelector('#lang-picker-toggle span');
-    if (toggleBtnSpan) {
-      toggleBtnSpan.textContent = TranslationManager.getCurrent().name;
-    }
-  }
-
-  private updateDropdownActiveState() {
-    const options = this.langPicker?.querySelectorAll('.language-option');
-    const currentCode = TranslationManager.getCurrent().code;
-    options?.forEach(opt => {
-      const code = (opt as HTMLElement).dataset.code;
-      const isActive = code === currentCode;
-      opt.classList.toggle('active', isActive);
-      opt.setAttribute('aria-selected', String(isActive));
-    });
-  }
-
-  private handlePress() {
-    const currentLang = TranslationManager.getCurrent();
+  private updateUI() {
+    const lang = TranslationManager.getCurrent();
     
-    // Play basic audio feedback
-    this.audio.play('no');
-    
-    // Speak translated text via TTS
-    this.audio.speak(currentLang.no, currentLang.code);
+    // Update Yes/No buttons text
+    const yesBtn = this.container?.querySelector('#giant-yes-button');
+    const noBtn = this.container?.querySelector('#giant-no-button');
+    if (yesBtn) yesBtn.textContent = lang.yes.toUpperCase();
+    if (noBtn) noBtn.textContent = lang.no.toUpperCase();
 
-    // Haptics and visual animations
-    this.haptics.heavyImpact();
-    this.triggerShake();
-    this.triggerSquashStretch();
-  }
+    // Update current selected language trigger button text
+    const triggerSpan = this.container?.querySelector('#current-lang-name');
+    if (triggerSpan) {
+      triggerSpan.textContent = lang.name;
+    }
 
-  private triggerShake() {
-    if (this.container) {
-      this.container.classList.add('shake');
-      setTimeout(() => {
-        this.container?.classList.remove('shake');
-      }, 500);
+    // Refresh option list active classes
+    const list = this.container?.querySelector('#dropdown-options-list');
+    if (list) {
+      list.querySelectorAll('.dropdown-option:not(.disabled)').forEach(opt => {
+        const code = (opt as HTMLElement).dataset.code;
+        opt.classList.toggle('active', code === lang.code);
+      });
     }
   }
 
-  private triggerSquashStretch() {
-    const button = this.container?.querySelector('#giant-no-button');
-    if (button) {
-      button.classList.remove('squash-stretch');
-      // Trigger reflow to restart css animation
-      button.getBoundingClientRect();
-      button.classList.add('squash-stretch');
+  private handleNo() {
+    const lang = TranslationManager.getCurrent();
+    // Speak "No" in selected language via TTS
+    this.audio.speak(lang.no + '.', lang.code);
+    // Visual feedback shake animation
+    this.triggerAnimation('no-wrapper', 'shake');
+  }
+
+  private handleYes() {
+    const lang = TranslationManager.getCurrent();
+    // Speak "Yes" in selected language via TTS
+    this.audio.speak(lang.yes + '!', lang.code);
+    // Visual feedback pulse/squash animation
+    this.triggerAnimation('yes-wrapper', 'squash-stretch');
+  }
+
+  private triggerAnimation(wrapperId: string, className: string) {
+    const wrapper = this.container?.querySelector(`#${wrapperId}`);
+    if (wrapper) {
+      wrapper.classList.remove(className);
+      // Trigger reflow to restart CSS animation
+      void (wrapper as HTMLElement).offsetWidth;
+      wrapper.classList.add(className);
     }
   }
 
@@ -171,16 +222,18 @@ export class NoButtonGame implements Game {
   }
 
   destroy(): void {
-    if (this.windowClickListener) {
-      window.removeEventListener('click', this.windowClickListener);
-      this.windowClickListener = null;
+    if (this.documentClickListener) {
+      document.removeEventListener('click', this.documentClickListener);
+      this.documentClickListener = null;
     }
-
+    if (this.voicesChangedListener) {
+      window.speechSynthesis.removeEventListener('voiceschanged', this.voicesChangedListener);
+      this.voicesChangedListener = null;
+    }
     if (this.container) {
       this.container.remove();
       this.container = null;
     }
-
     if (this.canvas) {
       this.canvas.classList.remove('hidden');
     }

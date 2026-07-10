@@ -3,34 +3,105 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Kids Games Suite</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Kipu</title>
   </head>
   <body>
     <div id="app">
       <!-- Navigation Shell -->
       <nav id="navigation-shell" class="hidden" aria-label="Main Menu">
-        <h1>Kids Games Suite</h1>
-        <div id="game-list" role="menu">
-          <a href="/game/bubbleWrap" data-game="bubbleWrap" role="menuitem">
+        <div class="menu-header">
+          <h1>Kipu</h1>
+          <p class="tagline">Satisfying & learning games for kids</p>
+        </div>
+
+        <!-- Featured Rotating Hero Banner -->
+        <div id="hero-banner" class="hero-card">
+          <div class="hero-content">
+            <span class="featured-badge">FEATURED GAME</span>
+            <h2 id="hero-title">Eeno</h2>
+            <p id="hero-subtitle">The "No" Button</p>
+            <p id="hero-desc">Play with funny voices and learn standard words in many languages!</p>
+            <a href="/game/noButton" id="hero-play-btn" class="hero-btn-play">Play Now</a>
+          </div>
+          <div class="hero-interactive-preview">
+            <span id="hero-icon-container"></span>
+          </div>
+          <div class="hero-dots" id="hero-dots"></div>
+        </div>
+
+        <!-- Category Filters -->
+        <div class="category-filters" id="category-filters" role="tablist">
+          <button class="filter-pill active" data-category="all" role="tab" aria-selected="true">All Games</button>
+          <button class="filter-pill" data-category="sensory" role="tab" aria-selected="false">Sensory & Sound</button>
+          <button class="filter-pill" data-category="brain" role="tab" aria-selected="false">Logic & Brain</button>
+          <button class="filter-pill" data-category="action" role="tab" aria-selected="false">Action & Play</button>
+        </div>
+
+        <!-- Games Grid (Cards) -->
+        <div id="game-list" class="cards-grid" role="menu">
+          <a href="/game/bubbleWrap" data-game="bubbleWrap" data-category="sensory" role="menuitem">
             <span class="icon"></span>
-            <span>Bubble Wrap</span>
+            <span class="game-label">
+              <span class="game-title">Poka</span>
+              <span class="game-subtitle">Bubble Wrap</span>
+            </span>
           </a>
-          <a href="/game/noButton" data-game="noButton" role="menuitem">
+          <a href="/game/noButton" data-game="noButton" data-category="sensory" role="menuitem">
             <span class="icon"></span>
-            <span>The "No" Button</span>
+            <span class="game-label">
+              <span class="game-title">Eeno</span>
+              <span class="game-subtitle">The "No" Button</span>
+            </span>
           </a>
-          <a href="/game/balloonPop" data-game="balloonPop" role="menuitem">
+          <a href="/game/balloonPop" data-game="balloonPop" data-category="sensory" role="menuitem">
             <span class="icon"></span>
-            <span>Balloon Pop</span>
+            <span class="game-label">
+              <span class="game-title">Tapa</span>
+              <span class="game-subtitle">Balloon Pop</span>
+            </span>
           </a>
-          <a href="/game/soundBoard" data-game="soundBoard" role="menuitem">
+          <a href="/game/colorMixer" data-game="colorMixer" data-category="brain" role="menuitem">
             <span class="icon"></span>
-            <span>Sound Board</span>
+            <span class="game-label">
+              <span class="game-title">Maka</span>
+              <span class="game-subtitle">Color Mixer</span>
+            </span>
           </a>
-          <a href="/game/particlePhysics" data-game="particlePhysics" role="menuitem">
+          <a href="/game/bugCatcher" data-game="bugCatcher" data-category="action" role="menuitem">
             <span class="icon"></span>
-            <span>Particle Play</span>
+            <span class="game-label">
+              <span class="game-title">Nuko</span>
+              <span class="game-subtitle">Bug Catcher</span>
+            </span>
+          </a>
+          <a href="/game/soundMemory" data-game="soundMemory" data-category="brain" role="menuitem">
+            <span class="icon"></span>
+            <span class="game-label">
+              <span class="game-title">Sound Memory</span>
+              <span class="game-subtitle">Pattern Recognition</span>
+            </span>
+          </a>
+          <a href="/game/marblePipe" data-game="marblePipe" data-category="brain" role="menuitem">
+            <span class="icon"></span>
+            <span class="game-label">
+              <span class="game-title">Marble Pipe</span>
+              <span class="game-subtitle">Logic Puzzle</span>
+            </span>
+          </a>
+          <a href="/game/soundBoard" data-game="soundBoard" data-category="sensory" role="menuitem">
+            <span class="icon"></span>
+            <span class="game-label">
+              <span class="game-title">Sound Board</span>
+              <span class="game-subtitle">Audio Patterns</span>
+            </span>
+          </a>
+          <a href="/game/particlePhysics" data-game="particlePhysics" data-category="action" role="menuitem">
+            <span class="icon"></span>
+            <span class="game-label">
+              <span class="game-title">Particle Play</span>
+              <span class="game-subtitle">Physics Sandbox</span>
+            </span>
           </a>
         </div>
       </nav>
