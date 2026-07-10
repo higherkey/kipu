@@ -139,6 +139,7 @@ html, body {
   box-shadow: 0 var(--shadow-depth-lg) 0px var(--fg);
   z-index: 2;
   transition: opacity 0.15s ease, transform 0.15s ease;
+  flex-shrink: 0;
 }
 
 .hero-card.fade-transition {
@@ -268,6 +269,118 @@ html, body {
   transform: scale(1.2);
 }
 
+
+
+@media (max-width: 600px) {
+  /* Navigation shell padding */
+  #navigation-shell {
+    padding: 24px 12px;
+  }
+
+  /* ---- Hero Card ---- */
+  .hero-card {
+    padding: 16px 20px 24px 20px;
+    margin-bottom: 1.5rem;
+    border-width: 2px;
+    border-radius: 16px;
+  }
+  .featured-badge {
+    font-size: 0.65rem;
+    padding: 2px 6px;
+    margin-bottom: 0.5rem;
+    border-width: 1.5px;
+  }
+  .hero-card h2 {
+    font-size: 1.5rem;
+    margin-bottom: 0.15rem;
+  }
+  .hero-card p#hero-subtitle {
+    font-size: 0.95rem;
+    margin-bottom: 0.5rem;
+  }
+  .hero-card p#hero-desc {
+    font-size: 0.8rem;
+    margin-bottom: 1rem;
+    line-height: 1.3;
+  }
+  .hero-btn-play {
+    font-size: 0.9rem;
+    padding: 6px 16px;
+    border-width: 2px;
+    border-radius: 8px;
+    box-shadow: 0 3px 0 var(--fg);
+  }
+  .hero-interactive-preview {
+    width: 80px;
+    height: 80px;
+    margin-left: 1.25rem;
+    border-width: 2px;
+  }
+  #hero-icon-container svg {
+    width: 40px;
+    height: 40px;
+  }
+  .hero-dots {
+    bottom: 8px;
+    gap: 6px;
+  }
+  .hero-dots .dot {
+    width: 8px;
+    height: 8px;
+    border-width: 1px;
+  }
+
+  /* ---- Category Filters ---- */
+  .category-filters {
+    margin-bottom: 1.5rem;
+    gap: 8px;
+  }
+  .filter-pill {
+    padding: 6px 12px;
+    font-size: 0.85rem;
+    border-width: 1.5px;
+    box-shadow: 0 2px 0 var(--fg);
+  }
+
+  /* ---- Cards Grid ---- */
+  .cards-grid {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 120px));
+    justify-content: center;
+    gap: 8px;
+    padding-bottom: 24px;
+  }
+  .cards-grid a {
+    padding: 12px 6px;
+    border-width: 2px;
+    border-radius: 12px;
+    gap: 4px;
+    aspect-ratio: 1.05;
+    box-shadow: 0 3px 0 var(--fg);
+  }
+  .cards-grid a .icon {
+    width: 28px;
+    height: 28px;
+    margin-bottom: 0;
+  }
+  .cards-grid a .icon svg {
+    width: 22px;
+    height: 22px;
+  }
+  .cards-grid a .game-title {
+    font-size: 0.95rem;
+  }
+  .cards-grid a .game-subtitle {
+    font-size: 0.72rem;
+  }
+  .cards-grid a::before {
+    width: 3px;
+  }
+  .cards-grid a::after {
+    height: 5px;
+    bottom: -5px;
+  }
+}
+
 /* ---- Category Filters ---- */
 .category-filters {
   display: flex;
@@ -309,7 +422,8 @@ html, body {
 /* ---- Cards Grid ---- */
 .cards-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fill, 175px);
+  justify-content: center;
   gap: 24px;
   width: 100%;
   max-width: 800px;
