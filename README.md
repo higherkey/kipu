@@ -90,7 +90,7 @@ npm run preview
 
 ## Contributing
 
-Please review `PROJECT.md` for our sensory-first coding standards before making changes. Ensure any testing changes align with our `testing-kids-games` plugin workflow.
+Please review `PROJECT.md` for our sensory-first coding standards before making changes. Ensure any testing changes align with our `testing-kipu` plugin workflow.
 
 ### Project Roadmap
 - **Phase 1: Proof of Concept** (In Progress)

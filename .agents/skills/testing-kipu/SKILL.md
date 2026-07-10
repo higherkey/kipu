@@ -1,5 +1,5 @@
 ---
-name: testing-kids-games
+name: testing-kipu
 description: Test the Kipu app end-to-end. Use when verifying new game implementations or checking for regressions in existing games.
 ---
 

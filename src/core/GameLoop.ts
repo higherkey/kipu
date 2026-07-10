@@ -2,7 +2,7 @@ export class GameLoop {
   private lastTime: number = 0;
   private animFrameId: number = 0;
   private isRunning: boolean = false;
-  private tickCallback: (dt: number) => void;
+  private readonly tickCallback: (dt: number) => void;
 
   constructor(tickCallback: (dt: number) => void) {
     this.tickCallback = tickCallback;
