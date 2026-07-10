@@ -23,6 +23,8 @@
     "vitest": "^4.1.5"
   },
   "dependencies": {
+    "@capacitor/core": "^8.4.1",
+    "@capacitor/haptics": "^8.0.2",
     "howler": "^2.2.4",
     "matter-js": "^0.20.0"
   }

@@ -8,7 +8,9 @@ export default defineConfig(({ mode }) => {
     test: {
       environment: 'jsdom',
       globals: true,
+      setupFiles: ['./test/setup.ts'],
     },
+
     plugins: [
       VitePWA({
         registerType: 'autoUpdate',
