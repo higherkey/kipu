@@ -12,7 +12,7 @@ vi.mock('@capacitor/haptics', () => {
         if (navigator.vibrate) navigator.vibrate(duration);
         return Promise.resolve();
       }),
-      notification: vi.fn(({ type }) => {
+      notification: vi.fn((_opts) => {
         if (navigator.vibrate) navigator.vibrate([30, 50, 30]);
         return Promise.resolve();
       }),
