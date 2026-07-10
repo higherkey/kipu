@@ -27,8 +27,8 @@ export class BalloonPopGame implements Game {
   private ctx: CanvasRenderingContext2D | null = null;
   private balloons: Balloon[] = [];
   private particles: Particle[] = [];
-  private audio: AudioController;
-  private haptics: HapticController;
+  private readonly audio: AudioController;
+  private readonly haptics: HapticController;
   private spawnTimer: number = 0;
   private spawnInterval: number = 1500;
   private popsCount: number = 0;
@@ -51,20 +51,20 @@ export class BalloonPopGame implements Game {
     canvas.addEventListener('touchstart', this.handleTouch);
   }
 
-  private handleTouch = (e: TouchEvent) => {
+  private readonly handleTouch = (e: TouchEvent) => {
     Array.from(e.changedTouches).forEach(touch => {
       this.checkPop(touch.clientX, touch.clientY);
     });
   }
 
-  private handleInput = (e: MouseEvent) => {
+  private readonly handleInput = (e: MouseEvent) => {
     this.checkPop(e.clientX, e.clientY);
   }
 
   private checkPop(x: number, y: number) {
     for (let i = this.balloons.length - 1; i >= 0; i--) {
       const b = this.balloons[i];
-      const dist = Math.sqrt((x - b.x) ** 2 + (y - b.y) ** 2);
+      const dist = Math.hypot((x - b.x), (y - b.y));
       if (dist < b.radius) {
         b.hits++;
         if (b.hits >= b.maxHits) {
@@ -212,8 +212,13 @@ export class BalloonPopGame implements Game {
     this.ctx!.globalAlpha = 1.0;
   }
 
-  pause(): void {}
-  resume(): void {}
+  pause(): void {
+    // No-op: This game is event-driven and does not have loops or animations that require pausing
+  }
+
+  resume(): void {
+    // No-op: This game is event-driven and does not have loops or animations that require resuming
+  }
 
   destroy(): void {
     if (this.canvas) {

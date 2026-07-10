@@ -24,14 +24,21 @@ function createMockCanvas(): HTMLCanvasElement {
 
   const ctx = new Proxy(ctxBase, {
     get(target, prop) {
-      if (prop in target) return target[prop];
-      // Return a no-op function for any canvas method not explicitly mocked
-      target[prop as string] = vi.fn();
-      return target[prop as string];
+      if (prop in target) {
+        return (target as any)[prop];
+      }
+      if (typeof prop === 'string') {
+        (target as any)[prop] = vi.fn();
+        return (target as any)[prop];
+      }
+      return undefined;
     },
     set(target, prop, value) {
-      target[prop as string] = value;
-      return true;
+      if (typeof prop === 'string') {
+        (target as any)[prop] = value;
+        return true;
+      }
+      return false;
     },
   });
 
@@ -56,7 +63,7 @@ describe('SoundBoardGame', () => {
     (HapticController as any).instance = undefined;
 
     // Mock AudioContext as a proper constructor
-    global.AudioContext = class MockAudioContext {
+    (globalThis as any).AudioContext = class MockAudioContext {
       destination = {};
       currentTime = 0;
       state = 'running';

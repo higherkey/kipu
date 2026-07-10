@@ -135,7 +135,7 @@ describe('ParticlePhysicsGame', () => {
     }
 
     // No additional haptic calls after mouseup
-    expect(vibrateMock.mock.calls.length).toBe(callsBeforeUp);
+    expect(vibrateMock.mock.calls).toHaveLength(callsBeforeUp);
   });
 
   it('should not double-pulse on initial touch (lastHapticTime prevents it)', () => {

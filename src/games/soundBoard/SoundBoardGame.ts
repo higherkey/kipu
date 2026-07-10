@@ -17,7 +17,7 @@ interface SoundPad {
 export class SoundBoardGame implements Game {
   private canvas: HTMLCanvasElement | null = null;
   private ctx: CanvasRenderingContext2D | null = null;
-  private haptics: HapticController;
+  private readonly haptics: HapticController;
   private pads: SoundPad[] = [];
   private audioCtx: AudioContext | null = null;
   private paused = false;
@@ -82,14 +82,14 @@ export class SoundBoardGame implements Game {
     }
   }
 
-  private handleTouch = (e: TouchEvent) => {
+  private readonly handleTouch = (e: TouchEvent) => {
     if (this.paused) return;
     Array.from(e.changedTouches).forEach(touch => {
       this.hitTest(touch.clientX, touch.clientY);
     });
   };
 
-  private handleMouse = (e: MouseEvent) => {
+  private readonly handleMouse = (e: MouseEvent) => {
     if (this.paused) return;
     this.hitTest(e.clientX, e.clientY);
   };

@@ -21,7 +21,7 @@ const PALETTE = [
 export class ParticlePhysicsGame implements Game {
   private canvas: HTMLCanvasElement | null = null;
   private ctx: CanvasRenderingContext2D | null = null;
-  private haptics: HapticController;
+  private readonly haptics: HapticController;
   private particles: Particle[] = [];
   private paused = false;
   private pointers: Map<number, { x: number; y: number }> = new Map();
@@ -31,7 +31,7 @@ export class ParticlePhysicsGame implements Game {
   private particleDensity = 4;
   private currentHue = 0;
   private lastHapticTime = 0;
-  private hapticInterval = 80;
+  private readonly hapticInterval = 80;
 
   constructor() {
     this.haptics = HapticController.getInstance();
@@ -60,7 +60,7 @@ export class ParticlePhysicsGame implements Game {
     canvas.addEventListener('touchcancel', this.onTouchEnd);
   }
 
-  private onMouseDown = (e: MouseEvent) => {
+  private readonly onMouseDown = (e: MouseEvent) => {
     this.pointers.set(-1, { x: e.clientX, y: e.clientY });
     this.haptics.lightTap();
     this.lastHapticTime = performance.now();
@@ -74,18 +74,18 @@ export class ParticlePhysicsGame implements Game {
     }
   }
 
-  private onMouseMove = (e: MouseEvent) => {
+  private readonly onMouseMove = (e: MouseEvent) => {
     if (this.pointers.has(-1)) {
       this.pointers.set(-1, { x: e.clientX, y: e.clientY });
       this.triggerDragHaptic();
     }
   };
 
-  private onMouseUp = () => {
+  private readonly onMouseUp = () => {
     this.pointers.delete(-1);
   };
 
-  private onTouchStart = (e: TouchEvent) => {
+  private readonly onTouchStart = (e: TouchEvent) => {
     for (const touch of Array.from(e.changedTouches)) {
       this.pointers.set(touch.identifier, { x: touch.clientX, y: touch.clientY });
     }
@@ -93,7 +93,7 @@ export class ParticlePhysicsGame implements Game {
     this.lastHapticTime = performance.now();
   };
 
-  private onTouchMove = (e: TouchEvent) => {
+  private readonly onTouchMove = (e: TouchEvent) => {
     let moved = false;
     for (const touch of Array.from(e.changedTouches)) {
       if (this.pointers.has(touch.identifier)) {
@@ -106,7 +106,7 @@ export class ParticlePhysicsGame implements Game {
     }
   };
 
-  private onTouchEnd = (e: TouchEvent) => {
+  private readonly onTouchEnd = (e: TouchEvent) => {
     for (const touch of Array.from(e.changedTouches)) {
       this.pointers.delete(touch.identifier);
     }
@@ -136,48 +136,10 @@ export class ParticlePhysicsGame implements Game {
     const dtSec = dt / 1000;
 
     // Spawn particles from active pointers
-    if (this.pointers.size > 0) {
-      this.spawnAccum += dt;
-      const spawnInterval = 1000 / (this.particleDensity * 20);
-      while (this.spawnAccum >= spawnInterval) {
-        this.spawnAccum -= spawnInterval;
-        for (const pos of this.pointers.values()) {
-          this.spawnParticle(pos.x, pos.y);
-        }
-      }
-      this.currentHue = (this.currentHue + dt * 0.1) % 360;
-    }
+    this.spawnNewParticles(dt);
 
     // Update particles
-    for (let i = this.particles.length - 1; i >= 0; i--) {
-      const p = this.particles[i];
-      p.vy += this.gravity * dtSec;
-      p.x += p.vx * dtSec;
-      p.y += p.vy * dtSec;
-      p.life -= dtSec;
-
-      // Bounce off walls
-      if (this.canvas.width > 0) {
-        if (p.x < p.radius) {
-          p.x = p.radius;
-          p.vx = Math.abs(p.vx) * 0.6;
-        } else if (p.x > this.canvas.width - p.radius) {
-          p.x = this.canvas.width - p.radius;
-          p.vx = -Math.abs(p.vx) * 0.6;
-        }
-      }
-
-      // Bounce off floor
-      if (p.y > this.canvas.height - p.radius) {
-        p.y = this.canvas.height - p.radius;
-        p.vy = -Math.abs(p.vy) * 0.5;
-        p.vx *= 0.8;
-      }
-
-      if (p.life <= 0) {
-        this.particles.splice(i, 1);
-      }
-    }
+    this.updateParticles(dtSec);
 
     // Cap particle count
     if (this.particles.length > 2000) {
@@ -185,6 +147,58 @@ export class ParticlePhysicsGame implements Game {
     }
 
     this.render();
+  }
+
+  private spawnNewParticles(dt: number) {
+    if (this.pointers.size === 0) return;
+
+    this.spawnAccum += dt;
+    const spawnInterval = 1000 / (this.particleDensity * 20);
+    while (this.spawnAccum >= spawnInterval) {
+      this.spawnAccum -= spawnInterval;
+      for (const pos of this.pointers.values()) {
+        this.spawnParticle(pos.x, pos.y);
+      }
+    }
+    this.currentHue = (this.currentHue + dt * 0.1) % 360;
+  }
+
+  private updateParticles(dtSec: number) {
+    for (let i = this.particles.length - 1; i >= 0; i--) {
+      const p = this.particles[i];
+      p.vy += this.gravity * dtSec;
+      p.x += p.vx * dtSec;
+      p.y += p.vy * dtSec;
+      p.life -= dtSec;
+
+      this.handleBoundaryCollisions(p);
+
+      if (p.life <= 0) {
+        this.particles.splice(i, 1);
+      }
+    }
+  }
+
+  private handleBoundaryCollisions(p: Particle) {
+    if (!this.canvas) return;
+
+    // Bounce off walls
+    if (this.canvas.width > 0) {
+      if (p.x < p.radius) {
+        p.x = p.radius;
+        p.vx = Math.abs(p.vx) * 0.6;
+      } else if (p.x > this.canvas.width - p.radius) {
+        p.x = this.canvas.width - p.radius;
+        p.vx = -Math.abs(p.vx) * 0.6;
+      }
+    }
+
+    // Bounce off floor
+    if (p.y > this.canvas.height - p.radius) {
+      p.y = this.canvas.height - p.radius;
+      p.vy = -Math.abs(p.vy) * 0.5;
+      p.vx *= 0.8;
+    }
   }
 
   private render() {

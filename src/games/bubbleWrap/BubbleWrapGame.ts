@@ -13,8 +13,8 @@ export class BubbleWrapGame implements Game {
   private canvas: HTMLCanvasElement | null = null;
   private ctx: CanvasRenderingContext2D | null = null;
   private bubbles: Bubble[] = [];
-  private audio: AudioController;
-  private haptics: HapticController;
+  private readonly audio: AudioController;
+  private readonly haptics: HapticController;
 
   constructor() {
     this.audio = AudioController.getInstance();
@@ -51,20 +51,20 @@ export class BubbleWrapGame implements Game {
     }
   }
 
-  private handleTouch = (e: TouchEvent) => {
+  private readonly handleTouch = (e: TouchEvent) => {
     Array.from(e.changedTouches).forEach(touch => {
       this.checkPop(touch.clientX, touch.clientY);
     });
   }
 
-  private handleMouseDown = (e: MouseEvent) => {
+  private readonly handleMouseDown = (e: MouseEvent) => {
     this.checkPop(e.clientX, e.clientY);
   }
 
   private checkPop(x: number, y: number) {
     this.bubbles.forEach(bubble => {
       if (!bubble.popped) {
-        const dist = Math.sqrt((x - bubble.x) ** 2 + (y - bubble.y) ** 2);
+        const dist = Math.hypot((x - bubble.x), (y - bubble.y));
         if (dist < bubble.radius) {
           bubble.popped = true;
           this.audio.play('pop');
@@ -108,8 +108,13 @@ export class BubbleWrapGame implements Game {
     });
   }
 
-  pause(): void {}
-  resume(): void {}
+  pause(): void {
+    // No-op: This game is event-driven and does not have loops or animations that require pausing
+  }
+
+  resume(): void {
+    // No-op: This game is event-driven and does not have loops or animations that require resuming
+  }
 
   destroy(): void {
     if (this.canvas) {
