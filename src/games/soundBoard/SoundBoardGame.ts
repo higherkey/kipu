@@ -1,4 +1,5 @@
 import type { Game } from '../../core/Game';
+import { AudioController } from '../../core/AudioController';
 import { HapticController } from '../../core/HapticController';
 
 interface SoundPad {
@@ -9,8 +10,8 @@ interface SoundPad {
   color: string;
   activeColor: string;
   label: string;
-  frequency: number;
-  waveType: OscillatorType;
+  instrument: string;
+  note: string;
   active: number;
 }
 
@@ -18,31 +19,31 @@ export class SoundBoardGame implements Game {
   private canvas: HTMLCanvasElement | null = null;
   private ctx: CanvasRenderingContext2D | null = null;
   private readonly haptics: HapticController;
+  private readonly audio: AudioController;
   private pads: SoundPad[] = [];
-  private audioCtx: AudioContext | null = null;
   private paused = false;
 
   private readonly padConfigs = [
-    { color: '#FF5E5E', activeColor: '#FF8A8A', label: 'Boing', frequency: 220, waveType: 'sine' as OscillatorType },
-    { color: '#6BCBFF', activeColor: '#9DDEFF', label: 'Buzz', frequency: 150, waveType: 'sawtooth' as OscillatorType },
-    { color: '#FFE66D', activeColor: '#FFF0A0', label: 'Beep', frequency: 440, waveType: 'square' as OscillatorType },
-    { color: '#4ECDC4', activeColor: '#7EDDD6', label: 'Whoo', frequency: 330, waveType: 'triangle' as OscillatorType },
-    { color: '#FF85B3', activeColor: '#FFB0CF', label: 'Zap', frequency: 660, waveType: 'sawtooth' as OscillatorType },
-    { color: '#A78BFA', activeColor: '#C4B5FD', label: 'Pop', frequency: 880, waveType: 'sine' as OscillatorType },
-    { color: '#34D399', activeColor: '#6EE7B7', label: 'Wub', frequency: 110, waveType: 'square' as OscillatorType },
-    { color: '#FB923C', activeColor: '#FDBA74', label: 'Ding', frequency: 523, waveType: 'triangle' as OscillatorType },
-    { color: '#F472B6', activeColor: '#F9A8D4', label: 'Boop', frequency: 392, waveType: 'sine' as OscillatorType },
+    { color: '#FF5E5E', activeColor: '#FF8A8A', label: 'Bell', instrument: 'bell', note: 'C4' },
+    { color: '#6BCBFF', activeColor: '#9DDEFF', label: 'Guitar', instrument: 'pluck', note: 'E4' },
+    { color: '#FFE66D', activeColor: '#FFF0A0', label: 'Chime', instrument: 'chime', note: 'G4' },
+    { color: '#4ECDC4', activeColor: '#7EDDD6', label: 'Click', instrument: 'click', note: 'C6' },
+    { color: '#FF85B3', activeColor: '#FFB0CF', label: 'Drum', instrument: 'drum', note: 'C2' },
+    { color: '#A78BFA', activeColor: '#C4B5FD', label: 'Bell High', instrument: 'bell', note: 'E5' },
+    { color: '#34D399', activeColor: '#6EE7B7', label: 'Harp', instrument: 'pluck', note: 'A4' },
+    { color: '#FB923C', activeColor: '#FDBA74', label: 'Ding', instrument: 'chime', note: 'C5' },
+    { color: '#F472B6', activeColor: '#F9A8D4', label: 'Thump', instrument: 'drum', note: 'E2' },
   ];
 
   constructor() {
     this.haptics = HapticController.getInstance();
+    this.audio = AudioController.getInstance();
   }
 
   init(canvas: HTMLCanvasElement): void {
     this.canvas = canvas;
     this.ctx = canvas.getContext('2d');
     this.paused = false;
-    this.audioCtx = new AudioContext();
     this.buildGrid();
 
     canvas.addEventListener('mousedown', this.handleMouse);
@@ -74,24 +75,32 @@ export class SoundBoardGame implements Game {
           color: cfg.color,
           activeColor: cfg.activeColor,
           label: cfg.label,
-          frequency: cfg.frequency,
-          waveType: cfg.waveType,
+          instrument: cfg.instrument,
+          note: cfg.note,
           active: 0,
         });
       }
     }
   }
 
+  private getCanvasPos(clientX: number, clientY: number): { x: number; y: number } {
+    if (!this.canvas) return { x: 0, y: 0 };
+    const rect = this.canvas.getBoundingClientRect();
+    return { x: clientX - rect.left, y: clientY - rect.top };
+  }
+
   private readonly handleTouch = (e: TouchEvent) => {
     if (this.paused) return;
     Array.from(e.changedTouches).forEach(touch => {
-      this.hitTest(touch.clientX, touch.clientY);
+      const pos = this.getCanvasPos(touch.clientX, touch.clientY);
+      this.hitTest(pos.x, pos.y);
     });
   };
 
   private readonly handleMouse = (e: MouseEvent) => {
     if (this.paused) return;
-    this.hitTest(e.clientX, e.clientY);
+    const pos = this.getCanvasPos(e.clientX, e.clientY);
+    this.hitTest(pos.x, pos.y);
   };
 
   private hitTest(x: number, y: number) {
@@ -109,37 +118,7 @@ export class SoundBoardGame implements Game {
   private triggerPad(pad: SoundPad) {
     pad.active = 1.0;
     this.haptics.lightTap();
-    this.playTone(pad.frequency, pad.waveType);
-  }
-
-  private playTone(frequency: number, waveType: OscillatorType) {
-    if (!this.audioCtx) return;
-    if (this.audioCtx.state === 'suspended') {
-      this.audioCtx.resume();
-    }
-    const osc = this.audioCtx.createOscillator();
-    const gain = this.audioCtx.createGain();
-
-    osc.type = waveType;
-    osc.frequency.setValueAtTime(frequency, this.audioCtx.currentTime);
-
-    // Quick pitch sweep for fun effect
-    osc.frequency.exponentialRampToValueAtTime(
-      frequency * 1.5,
-      this.audioCtx.currentTime + 0.1
-    );
-    osc.frequency.exponentialRampToValueAtTime(
-      frequency,
-      this.audioCtx.currentTime + 0.2
-    );
-
-    gain.gain.setValueAtTime(0.3, this.audioCtx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, this.audioCtx.currentTime + 0.4);
-
-    osc.connect(gain);
-    gain.connect(this.audioCtx.destination);
-    osc.start();
-    osc.stop(this.audioCtx.currentTime + 0.4);
+    this.audio.play(`synth:${pad.instrument}`, pad.note);
   }
 
   update(dt: number): void {
@@ -193,7 +172,7 @@ export class SoundBoardGame implements Game {
       this.ctx.translate(cx, cy);
       this.ctx.scale(scale, scale);
       this.ctx.fillStyle = '#2F3061';
-      this.ctx.font = `600 ${Math.min(pad.width, pad.height) * 0.2}px Fredoka, sans-serif`;
+      this.ctx.font = `600 ${Math.min(pad.width, pad.height) * 0.18}px Fredoka, sans-serif`;
       this.ctx.textAlign = 'center';
       this.ctx.textBaseline = 'middle';
       this.ctx.fillText(pad.label, 0, 0);
@@ -222,9 +201,6 @@ export class SoundBoardGame implements Game {
 
   resume(): void {
     this.paused = false;
-    if (this.audioCtx?.state === 'suspended') {
-      this.audioCtx.resume();
-    }
   }
 
   destroy(): void {
@@ -232,9 +208,6 @@ export class SoundBoardGame implements Game {
       this.canvas.removeEventListener('mousedown', this.handleMouse);
       this.canvas.removeEventListener('touchstart', this.handleTouch);
     }
-    if (this.audioCtx) {
-      this.audioCtx.close();
-      this.audioCtx = null;
-    }
   }
 }
+

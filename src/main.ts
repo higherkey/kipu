@@ -7,6 +7,8 @@ import type { Game } from './core/Game';
 import { GameLoop } from './core/GameLoop';
 import { Router } from './core/Router';
 import { LoadingOverlay } from './ui/LoadingOverlay';
+import { AudioController } from './core/AudioController';
+import { GameRegistry } from './core/GameRegistry';
 
 // PWA Support
 registerSW({
@@ -25,23 +27,12 @@ let gameUI: GameUI | null = null;
 let idleManager: IdleManager | null = null;
 let router: Router | null = null;
 let loadingOverlay: LoadingOverlay | null = null;
+let currentResizeHandler: (() => void) | null = null;
 
 // Settings State (persisted in localStorage)
 let soundEnabled = localStorage.getItem('soundEnabled') !== 'false';
 let vibrationEnabled = localStorage.getItem('vibrationEnabled') !== 'false';
 
-// Game Name Mapping — Kipu spec names (Quechua short name + descriptive)
-const gameNames: Record<string, string> = {
-  noButton: 'Eeno',
-  bubbleWrap: 'Poka',
-  balloonPop: 'Tapa',
-  colorMixer: 'Maka',
-  bugCatcher: 'Nuko',
-  soundMemory: 'Sound Memory',
-  marblePipe: 'Marble Pipe',
-  soundBoard: 'Sound Board',
-  particlePhysics: 'Particle Play',
-};
 
 // Featured Games list for rotating banner
 const featuredGames = [
@@ -224,9 +215,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   router.addRoute('/game/:id', (params) => {
     const gameId = params?.id;
-    const validGames = ['noButton', 'bubbleWrap', 'balloonPop', 'colorMixer', 'bugCatcher', 'soundMemory', 'marblePipe', 'soundBoard', 'particlePhysics'];
-
-    if (!gameId || !validGames.includes(gameId)) {
+    const registry = GameRegistry.getInstance();
+    
+    if (!gameId || !registry.get(gameId)) {
       router?.navigate('*', false);
       return;
     }
@@ -248,7 +239,17 @@ document.addEventListener('DOMContentLoaded', () => {
     gameCanvas?.classList.add('with-hud');
 
     resizeCanvas(gameCanvas);
-    window.addEventListener('resize', () => resizeCanvas(gameCanvas));
+    
+    if (currentResizeHandler) {
+      window.removeEventListener('resize', currentResizeHandler);
+    }
+    currentResizeHandler = () => {
+      resizeCanvas(gameCanvas);
+      if (activeGame && activeGame.resize) {
+        activeGame.resize(gameCanvas.width, gameCanvas.height);
+      }
+    };
+    window.addEventListener('resize', currentResizeHandler);
 
     startGame(gameId, gameCanvas);
 
@@ -280,22 +281,19 @@ document.addEventListener('DOMContentLoaded', () => {
   router.init();
 });
 
-import { NoButtonGame } from './games/noButton/NoButtonGame';
-import { BubbleWrapGame } from './games/bubbleWrap/BubbleWrapGame';
-import { BalloonPopGame } from './games/balloonPop/BalloonPopGame';
-import { ColorMixerGame } from './games/colorMixer/ColorMixerGame';
-import { BugCatcherGame } from './games/bugCatcher/BugCatcherGame';
-import { SoundMemoryGame } from './games/soundMemory/SoundMemoryGame';
-import { MarblePipeGame } from './games/marblePipe/MarblePipeGame';
-import { SoundBoardGame } from './games/soundBoard/SoundBoardGame';
-import { ParticlePhysicsGame } from './games/particlePhysics/ParticlePhysicsGame';
-
 function startGame(gameId: string, canvas: HTMLCanvasElement) {
   // Clear previous game if any
   if (activeGame) activeGame.destroy();
   if (gameUI) gameUI.unmount();
 
-  const gameName = gameNames[gameId] || 'Game';
+  const registry = GameRegistry.getInstance();
+  const gameInfo = registry.get(gameId);
+  if (!gameInfo) {
+    console.warn(`Unknown game: ${gameId}`);
+    return;
+  }
+
+  const gameName = gameInfo.name;
 
   // Create the unified Game UI
   gameUI = new GameUI({
@@ -310,54 +308,25 @@ function startGame(gameId: string, canvas: HTMLCanvasElement) {
       soundEnabled = enabled;
       localStorage.setItem('soundEnabled', String(enabled));
       // Notify active game of sound setting change
-      if (activeGame && 'setSoundEnabled' in activeGame) {
-        (activeGame as any).setSoundEnabled(enabled);
+      if (activeGame && activeGame.setSoundEnabled) {
+        activeGame.setSoundEnabled(enabled);
       }
+      // Update global audio controller mute state
+      AudioController.getInstance().updateMuteState();
     },
     onVibrationToggle: (enabled) => {
       vibrationEnabled = enabled;
       localStorage.setItem('vibrationEnabled', String(enabled));
       // Notify active game of vibration setting change
-      if (activeGame && 'setVibrationEnabled' in activeGame) {
-        (activeGame as any).setVibrationEnabled(enabled);
+      if (activeGame && activeGame.setVibrationEnabled) {
+        activeGame.setVibrationEnabled(enabled);
       }
     },
   });
   gameUI.mount();
 
   // Instantiate selected game
-  switch (gameId) {
-    case 'noButton':
-      activeGame = new NoButtonGame();
-      break;
-    case 'bubbleWrap':
-      activeGame = new BubbleWrapGame();
-      break;
-    case 'balloonPop':
-      activeGame = new BalloonPopGame();
-      break;
-    case 'colorMixer':
-      activeGame = new ColorMixerGame();
-      break;
-    case 'bugCatcher':
-      activeGame = new BugCatcherGame();
-      break;
-    case 'soundMemory':
-      activeGame = new SoundMemoryGame();
-      break;
-    case 'marblePipe':
-      activeGame = new MarblePipeGame();
-      break;
-    case 'soundBoard':
-      activeGame = new SoundBoardGame();
-      break;
-    case 'particlePhysics':
-      activeGame = new ParticlePhysicsGame();
-      break;
-    default:
-      console.warn(`Unknown game: ${gameId}`);
-      return;
-  }
+  activeGame = new gameInfo.constructorRef();
 
   activeGame.init(canvas);
   
@@ -402,6 +371,11 @@ function cleanupActiveGame() {
   gameUI?.unmount();
   gameUI = null;
   idleManager?.stop();
+  
+  if (currentResizeHandler) {
+    window.removeEventListener('resize', currentResizeHandler);
+    currentResizeHandler = null;
+  }
 }
 
 function resizeCanvas(canvas: HTMLCanvasElement) {
@@ -409,3 +383,4 @@ function resizeCanvas(canvas: HTMLCanvasElement) {
   // Account for HUD height
   canvas.height = window.innerHeight - 60;
 }
+

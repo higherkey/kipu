@@ -10,7 +10,8 @@ interface SoundButton {
   y: number;
   radius: number;
   isActive: boolean;
-  soundFile: string;
+  instrument: string;
+  note: string;
 }
 
 type GamePhase = 'ready' | 'show' | 'wait' | 'play' | 'won' | 'lost';
@@ -31,21 +32,17 @@ export class SoundMemoryGame implements Game {
   private phase: GamePhase = 'ready';
   private level = 0;
   private highlightDuration = 400; // ms per highlight
+  private activeTimeouts: any[] = [];
 
   constructor() {
     this.audio = AudioController.getInstance();
     this.haptics = HapticController.getInstance();
-
-    // Register sound files (using same pop sound for now, in production these would be distinct pitches)
-    this.audio.registerSound('sound1', '/sounds/pop.ogg');
-    this.audio.registerSound('sound2', '/sounds/pop.ogg');
-    this.audio.registerSound('sound3', '/sounds/pop.ogg');
-    this.audio.registerSound('sound4', '/sounds/pop.ogg');
   }
 
   init(canvas: HTMLCanvasElement): void {
     this.canvas = canvas;
     this.ctx = canvas.getContext('2d');
+    this.activeTimeouts = [];
 
     this.createButtons();
     this.startNewRound();
@@ -71,7 +68,8 @@ export class SoundMemoryGame implements Game {
         y: centerY - spacing,
         radius,
         isActive: false,
-        soundFile: 'sound1'
+        instrument: 'bell',
+        note: 'C4'
       },
       {
         id: 1,
@@ -81,7 +79,8 @@ export class SoundMemoryGame implements Game {
         y: centerY - spacing,
         radius,
         isActive: false,
-        soundFile: 'sound2'
+        instrument: 'bell',
+        note: 'D4'
       },
       {
         id: 2,
@@ -91,7 +90,8 @@ export class SoundMemoryGame implements Game {
         y: centerY + spacing,
         radius,
         isActive: false,
-        soundFile: 'sound3'
+        instrument: 'bell',
+        note: 'E4'
       },
       {
         id: 3,
@@ -101,9 +101,24 @@ export class SoundMemoryGame implements Game {
         y: centerY + spacing,
         radius,
         isActive: false,
-        soundFile: 'sound4'
+        instrument: 'bell',
+        note: 'G4'
       }
     ];
+  }
+
+  private setGameTimeout(callback: () => void, delay: number) {
+    const timer = setTimeout(() => {
+      this.activeTimeouts = this.activeTimeouts.filter(t => t !== timer);
+      callback();
+    }, delay);
+    this.activeTimeouts.push(timer);
+    return timer;
+  }
+
+  private clearAllTimeouts() {
+    this.activeTimeouts.forEach(t => clearTimeout(t));
+    this.activeTimeouts = [];
   }
 
   private startNewRound() {
@@ -145,12 +160,12 @@ export class SoundMemoryGame implements Game {
     const button = this.buttons[buttonId];
     button.isActive = true;
 
-    this.audio.play(button.soundFile);
+    this.audio.play(`synth:${button.instrument}`, button.note);
     this.haptics.lightTap();
 
     this.playerSequence.push(buttonId);
 
-    setTimeout(() => {
+    this.setGameTimeout(() => {
       button.isActive = false;
       
       // Check if player made a mistake
@@ -169,20 +184,20 @@ export class SoundMemoryGame implements Game {
   private playSequence() {
     let delay = 0;
     for (const buttonId of this.sequence) {
-      setTimeout(() => {
+      this.setGameTimeout(() => {
         const button = this.buttons[buttonId];
         button.isActive = true;
-        this.audio.play(button.soundFile);
+        this.audio.play(`synth:${button.instrument}`, button.note);
         this.haptics.lightTap();
 
-        setTimeout(() => {
+        this.setGameTimeout(() => {
           button.isActive = false;
         }, 150);
       }, delay);
       delay += this.highlightDuration + 200;
     }
 
-    setTimeout(() => {
+    this.setGameTimeout(() => {
       this.phase = 'play';
     }, delay);
   }
@@ -195,7 +210,7 @@ export class SoundMemoryGame implements Game {
 
     if (this.phase === 'won') {
       // After a brief pause, start the next round
-      setTimeout(() => {
+      this.setGameTimeout(() => {
         this.startNewRound();
       }, 1000);
       this.phase = 'wait';
@@ -293,5 +308,7 @@ export class SoundMemoryGame implements Game {
       this.canvas.removeEventListener('touchstart', this.handleTouch);
       this.canvas.removeEventListener('mousedown', this.handleMouseDown);
     }
+    this.clearAllTimeouts();
   }
 }
+
