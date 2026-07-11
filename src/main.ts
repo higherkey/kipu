@@ -189,6 +189,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Show/hide correct views for homepage
     document.getElementById('portal-list')?.classList.remove('hidden');
     document.getElementById('hero-banner')?.classList.remove('hidden');
+    document.getElementById('portal-instruction')?.classList.remove('hidden');
     document.getElementById('game-list')?.classList.add('hidden');
     document.getElementById('back-to-portals-btn')?.classList.add('hidden');
 
@@ -230,6 +231,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Toggle views: hide hero, hide portals list, show games list
     document.getElementById('hero-banner')?.classList.add('hidden');
+    document.getElementById('portal-instruction')?.classList.add('hidden');
     document.getElementById('portal-list')?.classList.add('hidden');
     
     const gameListEl = document.getElementById('game-list');

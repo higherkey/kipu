@@ -408,6 +408,18 @@ html, body {
   }
 }
 
+/* ---- Portal Choice Instruction ---- */
+.portal-instruction {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 1.35rem;
+  font-weight: 600;
+  color: var(--accent);
+  text-align: center;
+  margin: 0 0 1.5rem 0;
+  z-index: 2;
+  position: relative;
+}
+
 /* ---- Play Portals Grid ---- */
 .portals-grid {
   display: grid;
