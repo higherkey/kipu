@@ -1,4 +1,5 @@
 import './style.css';
+import './ui/NotFound.css';
 import { registerSW } from 'virtual:pwa-register';
 import { Icons } from './ui/Icons';
 import { IdleManager } from './core/IdleManager';
@@ -22,6 +23,7 @@ registerSW({
 
 // Game State
 let activeGame: Game | null = null;
+let activeGameId: string | null = null;
 let gameLoop: GameLoop | null = null;
 let gameUI: GameUI | null = null;
 let idleManager: IdleManager | null = null;
@@ -95,30 +97,6 @@ document.addEventListener('DOMContentLoaded', () => {
         iconContainer.innerHTML = Icons[iconKey as keyof typeof Icons];
       }
     }
-  });
-
-  // Setup Category Filters
-  const filterPills = document.querySelectorAll('#category-filters .filter-pill');
-  filterPills.forEach(pill => {
-    pill.addEventListener('click', () => {
-      filterPills.forEach(p => {
-        p.classList.remove('active');
-        p.setAttribute('aria-selected', 'false');
-      });
-      pill.classList.add('active');
-      pill.setAttribute('aria-selected', 'true');
-
-      const cat = (pill as HTMLElement).getAttribute('data-category');
-      const cards = document.querySelectorAll('#game-list a');
-      cards.forEach(card => {
-        const cardCat = (card as HTMLElement).getAttribute('data-category');
-        if (cat === 'all' || cardCat === cat) {
-          card.classList.remove('hidden');
-        } else {
-          card.classList.add('hidden');
-        }
-      });
-    });
   });
 
   // Setup Hero Banner dots indicators
@@ -208,9 +186,92 @@ document.addEventListener('DOMContentLoaded', () => {
     gameCanvas?.classList.add('hidden');
     gameCanvas?.classList.remove('with-hud');
 
+    // Show/hide correct views for homepage
+    document.getElementById('portal-list')?.classList.remove('hidden');
+    document.getElementById('hero-banner')?.classList.remove('hidden');
+    document.getElementById('game-list')?.classList.add('hidden');
+    document.getElementById('back-to-portals-btn')?.classList.add('hidden');
+
+    // Restore default header
+    const mainTitle = document.getElementById('main-title');
+    const mainTagline = document.getElementById('main-tagline');
+    if (mainTitle) mainTitle.textContent = 'Kipu';
+    if (mainTagline) mainTagline.textContent = 'Playful Games and Interactive Experiences for Kids';
+
+    // Reset portal-specific class
+    navShell?.classList.remove('portal-sandbox', 'portal-workshop', 'portal-lab');
+
     // Start hero rotation
     updateHeroBanner();
     startHeroRotation();
+  });
+
+  router.addRoute('/portal/:portalId', (params) => {
+    const portalId = params?.portalId;
+    if (portalId !== 'sandbox' && portalId !== 'workshop' && portalId !== 'lab') {
+      router?.navigate('*', false);
+      return;
+    }
+
+    const notFound = document.getElementById('not-found-screen');
+    notFound?.classList.add('hidden');
+
+    cleanupActiveGame();
+
+    navShell?.classList.remove('hidden');
+    gameCanvas?.classList.add('hidden');
+    gameCanvas?.classList.remove('with-hud');
+
+    // Stop hero rotation
+    if (heroInterval) {
+      clearInterval(heroInterval);
+      heroInterval = null;
+    }
+
+    // Toggle views: hide hero, hide portals list, show games list
+    document.getElementById('hero-banner')?.classList.add('hidden');
+    document.getElementById('portal-list')?.classList.add('hidden');
+    
+    const gameListEl = document.getElementById('game-list');
+    if (gameListEl) {
+      gameListEl.classList.remove('hidden');
+    }
+
+    // Filter games by portal
+    const gameCards = document.querySelectorAll('#game-list a');
+    gameCards.forEach(card => {
+      const cardPortal = (card as HTMLElement).getAttribute('data-portal');
+      if (cardPortal === portalId) {
+        card.classList.remove('hidden');
+      } else {
+        card.classList.add('hidden');
+      }
+    });
+
+    // Update Header and show Back Button
+    const mainTitle = document.getElementById('main-title');
+    const mainTagline = document.getElementById('main-tagline');
+    const backBtn = document.getElementById('back-to-portals-btn');
+
+    if (backBtn) backBtn.classList.remove('hidden');
+
+    const portalTitles: Record<string, string> = {
+      sandbox: 'Sandbox',
+      workshop: 'Workshop',
+      lab: 'Lab'
+    };
+    const portalTaglines: Record<string, string> = {
+      sandbox: 'Sensory & Kinetic Exploration',
+      workshop: 'Guided Creation & Sequencing',
+      lab: 'Physics & Logic Challenges'
+    };
+
+    if (mainTitle) mainTitle.textContent = portalTitles[portalId];
+    if (mainTagline) mainTagline.textContent = portalTaglines[portalId];
+
+    // Set portal class
+    navShell?.classList.remove('portal-sandbox', 'portal-workshop', 'portal-lab');
+    navShell?.classList.add(`portal-${portalId}`);
   });
 
   router.addRoute('/game/:id', (params) => {
@@ -282,6 +343,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function startGame(gameId: string, canvas: HTMLCanvasElement) {
+  activeGameId = gameId;
   // Clear previous game if any
   if (activeGame) activeGame.destroy();
   if (gameUI) gameUI.unmount();
@@ -358,6 +420,14 @@ function restartGame(gameId: string, canvas: HTMLCanvasElement) {
 }
 
 function exitToHome() {
+  if (activeGameId) {
+    const registry = GameRegistry.getInstance();
+    const gameInfo = registry.get(activeGameId);
+    if (gameInfo && gameInfo.portal) {
+      router?.navigate(`/portal/${gameInfo.portal}`);
+      return;
+    }
+  }
   router?.navigate('/');
 }
 
@@ -366,6 +436,7 @@ function cleanupActiveGame() {
     activeGame.destroy();
     activeGame = null;
   }
+  activeGameId = null;
   gameLoop?.stop();
   gameLoop = null;
   gameUI?.unmount();
