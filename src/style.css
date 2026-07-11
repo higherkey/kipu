@@ -129,7 +129,7 @@ html, body {
   align-items: center;
   width: 100%;
   max-width: 800px;
-  background-color: var(--primary);
+  background-color: #F1948A;
   border: 3px solid var(--fg);
   border-radius: 24px;
   padding: 24px 32px;
@@ -157,8 +157,8 @@ html, body {
 }
 
 .featured-badge {
-  background-color: var(--fg);
-  color: var(--color-parchment);
+  background-color: var(--accent);
+  color: white;
   font-family: 'Fredoka', sans-serif;
   font-weight: 700;
   font-size: 0.75rem;
@@ -166,14 +166,14 @@ html, body {
   border-radius: 20px;
   margin-bottom: 0.75rem;
   letter-spacing: 0.5px;
-  border: 2px solid var(--color-parchment);
+  border: 2px solid var(--fg);
 }
 
 .hero-card h2 {
   font-family: 'Fredoka', sans-serif;
   font-size: 2.2rem;
   font-weight: 700;
-  color: var(--color-parchment);
+  color: var(--fg);
   margin: 0 0 0.25rem 0;
 }
 
@@ -181,22 +181,22 @@ html, body {
   font-family: 'Fredoka', sans-serif;
   font-size: 1.2rem;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.95);
+  color: rgba(43, 45, 94, 0.85);
   margin: 0 0 0.75rem 0;
 }
 
 .hero-card p#hero-desc {
   font-family: 'Fredoka', sans-serif;
   font-size: 0.95rem;
-  color: rgba(255, 255, 255, 0.8);
+  color: rgba(43, 45, 94, 0.65);
   margin: 0 0 1.5rem 0;
   max-width: 450px;
   line-height: 1.4;
 }
 
 .hero-btn-play {
-  background-color: var(--color-parchment);
-  color: var(--fg);
+  background-color: var(--primary);
+  color: white;
   font-family: 'Fredoka', sans-serif;
   font-weight: 700;
   font-size: 1.1rem;
@@ -221,7 +221,7 @@ html, body {
   height: 120px;
   border-radius: 50%;
   background-color: rgba(255, 255, 255, 0.4);
-  border: 3px solid var(--fg);
+  border: 3px dashed var(--fg);
   margin-left: 2rem;
   animation: hero-float 6s ease-in-out infinite;
 }
@@ -235,7 +235,7 @@ html, body {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--fg);
+  color: var(--primary);
 }
 
 #hero-icon-container svg {
@@ -257,7 +257,7 @@ html, body {
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background-color: rgba(255, 255, 255, 0.4);
+  background-color: rgba(43, 45, 94, 0.2);
   border: 1.5px solid var(--fg);
   cursor: pointer;
   padding: 0;
@@ -265,7 +265,7 @@ html, body {
 }
 
 .hero-dots .dot.active {
-  background-color: var(--color-parchment);
+  background-color: var(--accent);
   transform: scale(1.2);
 }
 
