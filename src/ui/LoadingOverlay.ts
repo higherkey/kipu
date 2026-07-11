@@ -2,6 +2,8 @@
  * LoadingOverlay provides a visual transition during game loading.
  * Implements a "grace period" to avoid flickering for fast loads.
  */
+import './LoadingOverlay.css';
+
 export class LoadingOverlay {
   private element: HTMLElement;
   private timeoutId: number | null = null;

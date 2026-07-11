@@ -11,8 +11,12 @@
       <!-- Navigation Shell -->
       <nav id="navigation-shell" class="hidden" aria-label="Main Menu">
         <div class="menu-header">
-          <h1>Kipu</h1>
-          <p class="tagline">Playful Games and Interactive Experiences for Kids</p>
+          <a href="/" id="back-to-portals-btn" class="back-btn hidden" aria-label="Back to Portals">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+            <span>Back to Portals</span>
+          </a>
+          <h1 id="main-title">Kipu</h1>
+          <p id="main-tagline" class="tagline">Playful Games and Interactive Experiences for Kids</p>
         </div>
 
         <!-- Featured Rotating Hero Banner -->
@@ -30,73 +34,104 @@
           <div class="hero-dots" id="hero-dots"></div>
         </div>
 
-        <!-- Category Filters -->
-        <div class="category-filters" id="category-filters" role="tablist">
-          <button class="filter-pill active" data-category="all" role="tab" aria-selected="true">All Games</button>
-          <button class="filter-pill" data-category="sensory" role="tab" aria-selected="false">Sensory & Sound</button>
-          <button class="filter-pill" data-category="brain" role="tab" aria-selected="false">Logic & Brain</button>
-          <button class="filter-pill" data-category="action" role="tab" aria-selected="false">Action & Play</button>
+        <div id="portal-instruction" class="portal-instruction">
+          <span>Choose a portal to start playing!</span>
+          <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" class="bouncing-arrow" aria-hidden="true">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <polyline points="19 12 12 19 5 12"></polyline>
+          </svg>
+        </div>
+
+        <!-- Play Portals -->
+        <div id="portal-list" class="portals-grid" role="menu">
+          <a href="/portal/sandbox" id="portal-card-sandbox" class="portal-card portal-sandbox" role="menuitem">
+            <span class="icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z"/><circle cx="12" cy="15" r="2"/></svg>
+            </span>
+            <span class="portal-label">
+              <span class="portal-title">Sandbox</span>
+              <span class="portal-subtitle">Sensory & Kinetic Exploration</span>
+            </span>
+          </a>
+          <a href="/portal/workshop" id="portal-card-workshop" class="portal-card portal-workshop" role="menuitem">
+            <span class="icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+            </span>
+            <span class="portal-label">
+              <span class="portal-title">Workshop</span>
+              <span class="portal-subtitle">Guided Creation & Sequencing</span>
+            </span>
+          </a>
+          <a href="/portal/lab" id="portal-card-lab" class="portal-card portal-lab" role="menuitem">
+            <span class="icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2v7.586a1 1 0 0 1-.293.707l-4.414 4.414A2 2 0 0 0 7 18h10a2 2 0 0 0 1.707-3.293L14.293 10.3A1 1 0 0 1 14 9.586V2"/><path d="M6 2h12"/><path d="M8.5 2v5"/><path d="M15.5 2v5"/><path d="M6 14h12"/></svg>
+            </span>
+            <span class="portal-label">
+              <span class="portal-title">Lab</span>
+              <span class="portal-subtitle">Physics & Logic Challenges</span>
+            </span>
+          </a>
         </div>
 
         <!-- Games Grid (Cards) -->
-        <div id="game-list" class="cards-grid" role="menu">
-          <a href="/game/bubbleWrap" data-game="bubbleWrap" data-category="sensory" role="menuitem">
+        <div id="game-list" class="cards-grid hidden" role="menu">
+          <a href="/game/bubbleWrap" data-game="bubbleWrap" data-portal="sandbox" data-category="sensory" role="menuitem">
             <span class="icon"></span>
             <span class="game-label">
               <span class="game-title">Poka</span>
               <span class="game-subtitle">Bubble Wrap</span>
             </span>
           </a>
-          <a href="/game/noButton" data-game="noButton" data-category="sensory" role="menuitem">
+          <a href="/game/noButton" data-game="noButton" data-portal="sandbox" data-category="sensory" role="menuitem">
             <span class="icon"></span>
             <span class="game-label">
               <span class="game-title">Eeno</span>
               <span class="game-subtitle">The "No" Button</span>
             </span>
           </a>
-          <a href="/game/balloonPop" data-game="balloonPop" data-category="sensory" role="menuitem">
+          <a href="/game/balloonPop" data-game="balloonPop" data-portal="workshop" data-category="sensory" role="menuitem">
             <span class="icon"></span>
             <span class="game-label">
               <span class="game-title">Tapa</span>
               <span class="game-subtitle">Balloon Pop</span>
             </span>
           </a>
-          <a href="/game/colorMixer" data-game="colorMixer" data-category="brain" role="menuitem">
+          <a href="/game/colorMixer" data-game="colorMixer" data-portal="workshop" data-category="brain" role="menuitem">
             <span class="icon"></span>
             <span class="game-label">
               <span class="game-title">Maka</span>
               <span class="game-subtitle">Color Mixer</span>
             </span>
           </a>
-          <a href="/game/bugCatcher" data-game="bugCatcher" data-category="action" role="menuitem">
+          <a href="/game/bugCatcher" data-game="bugCatcher" data-portal="workshop" data-category="action" role="menuitem">
             <span class="icon"></span>
             <span class="game-label">
               <span class="game-title">Nuko</span>
               <span class="game-subtitle">Bug Catcher</span>
             </span>
           </a>
-          <a href="/game/soundMemory" data-game="soundMemory" data-category="brain" role="menuitem">
+          <a href="/game/soundMemory" data-game="soundMemory" data-portal="workshop" data-category="brain" role="menuitem">
             <span class="icon"></span>
             <span class="game-label">
               <span class="game-title">Sound Memory</span>
               <span class="game-subtitle">Pattern Recognition</span>
             </span>
           </a>
-          <a href="/game/marblePipe" data-game="marblePipe" data-category="brain" role="menuitem">
+          <a href="/game/marblePipe" data-game="marblePipe" data-portal="lab" data-category="brain" role="menuitem">
             <span class="icon"></span>
             <span class="game-label">
               <span class="game-title">Marble Pipe</span>
               <span class="game-subtitle">Logic Puzzle</span>
             </span>
           </a>
-          <a href="/game/soundBoard" data-game="soundBoard" data-category="sensory" role="menuitem">
+          <a href="/game/soundBoard" data-game="soundBoard" data-portal="sandbox" data-category="sensory" role="menuitem">
             <span class="icon"></span>
             <span class="game-label">
               <span class="game-title">Sound Board</span>
               <span class="game-subtitle">Audio Patterns</span>
             </span>
           </a>
-          <a href="/game/particlePhysics" data-game="particlePhysics" data-category="action" role="menuitem">
+          <a href="/game/particlePhysics" data-game="particlePhysics" data-portal="sandbox" data-category="action" role="menuitem">
             <span class="icon"></span>
             <span class="game-label">
               <span class="game-title">Particle Play</span>

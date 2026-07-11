@@ -1,0 +1,74 @@
+/* ========================================
+   Loading Overlay
+   ======================================== */
+.loading-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  transition: opacity 0.3s ease;
+  opacity: 0;
+  pointer-events: none;
+  /* Same fibrous texture as nav shell */
+  background-image:
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 60px,
+      rgba(160, 82, 45, 0.04) 60px,
+      rgba(160, 82, 45, 0.04) 61px
+    );
+}
+
+.loading-overlay.fade-in {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.loader-content {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.loader-content p {
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: var(--primary);
+  letter-spacing: -0.5px;
+}
+
+/* Pendulum knot instead of bouncy ball */
+.bouncy-ball {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background-color: var(--primary);
+  border: 3px solid var(--fg);
+  box-shadow: 0 4px 0px var(--fg);
+  animation: knot-bounce 0.55s infinite alternate cubic-bezier(0.28, 0.84, 0.42, 1);
+  position: relative;
+}
+
+/* Hanging string above the knot */
+.bouncy-ball::before {
+  content: '';
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 2px;
+  height: 32px;
+  background: var(--cord);
+  border-radius: 1px;
+}
+
+@keyframes knot-bounce {
+  from { transform: translateY(0) rotate(-5deg); }
+  to   { transform: translateY(-28px) rotate(5deg); }
+}

@@ -1,5 +1,6 @@
 import { AudioController } from '../core/AudioController';
 import { HapticController } from '../core/HapticController';
+import './WinScreen.css';
 
 export class WinScreen {
   private static overlay: HTMLDivElement | null = null;

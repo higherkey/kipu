@@ -79,6 +79,18 @@ export class Router {
       }
     }
 
+    // Dynamic portal route: /portal/[id]
+    if (path.startsWith('/portal/')) {
+      const portalId = path.substring(8); // Remove '/portal/'
+      if (portalId) {
+        const handler = this.routes.get('/portal/:portalId');
+        if (handler) {
+          handler({ portalId: portalId });
+          return;
+        }
+      }
+    }
+
     // Default: Fallback to Not Found if no match
     const notFoundHandler = this.routes.get('*');
     if (notFoundHandler) {

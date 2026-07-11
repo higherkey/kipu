@@ -1,0 +1,110 @@
+/* ---- Win Screen Overlay ---- */
+.win-screen-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(47, 48, 97, 0.6); /* Translucent indigo overlay */
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.win-card {
+  background-color: var(--color-parchment);
+  border: 4px solid var(--color-cord);
+  border-radius: var(--border-radius);
+  padding: 40px;
+  width: 90%;
+  max-width: 450px;
+  text-align: center;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  position: relative;
+  z-index: 1010;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.star-burst {
+  margin-bottom: 20px;
+  animation: pulseStar 2s infinite ease-in-out;
+}
+
+.win-card h2 {
+  font-family: 'Fredoka', sans-serif;
+  color: var(--color-indigo);
+  font-size: 2.5rem;
+  margin: 0 0 10px 0;
+}
+
+.win-card p {
+  color: var(--color-sienna);
+  font-size: 1.2rem;
+  margin: 0 0 30px 0;
+}
+
+.win-actions {
+  display: flex;
+  gap: 16px;
+  width: 100%;
+}
+
+.win-btn {
+  flex: 1;
+  padding: 16px;
+  border: none;
+  border-radius: var(--border-radius-sm);
+  font-family: 'Fredoka', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+  user-select: none;
+}
+
+.win-btn-primary {
+  background-color: var(--color-red);
+  color: white;
+  box-shadow: 0 6px 0px #7B241C, 0 6px 15px rgba(192, 57, 43, 0.3);
+}
+
+.win-btn-primary:active {
+  transform: translateY(4px);
+  box-shadow: 0 2px 0px #7B241C, 0 2px 5px rgba(192, 57, 43, 0.2);
+}
+
+.win-btn-secondary {
+  background-color: var(--color-indigo);
+  color: white;
+  box-shadow: 0 6px 0px #1A1A3A, 0 6px 15px rgba(43, 45, 94, 0.3);
+}
+
+.win-btn-secondary:active {
+  transform: translateY(4px);
+  box-shadow: 0 2px 0px #1A1A3A, 0 2px 5px rgba(43, 45, 94, 0.2);
+}
+
+.confetti-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1005;
+}
+
+@keyframes popIn {
+  0% { transform: scale(0.8); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes pulseStar {
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  50% { transform: scale(1.15) rotate(15deg); }
+}

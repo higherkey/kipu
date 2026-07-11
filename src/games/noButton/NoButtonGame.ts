@@ -1,6 +1,7 @@
 import type { Game } from '../../core/Game';
 import { AudioController } from '../../core/AudioController';
 import { LANGUAGES, TranslationManager } from '../../core/TranslationManager';
+import './NoButtonGame.css';
 
 export class NoButtonGame implements Game {
   private canvas: HTMLCanvasElement | null = null;
