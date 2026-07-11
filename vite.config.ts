@@ -14,7 +14,8 @@ export default defineConfig(({ mode }) => {
       VitePWA({
         registerType: 'autoUpdate',
         devOptions: {
-          enabled: true
+          enabled: true,
+          suppressWarnings: true
         },
         manifest: {
           name: 'Kipu',
