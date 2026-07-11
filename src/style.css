@@ -157,7 +157,7 @@ html, body {
 }
 
 .featured-badge {
-  background-color: var(--accent);
+  background-color: var(--primary);
   color: white;
   font-family: 'Fredoka', sans-serif;
   font-weight: 700;
@@ -195,7 +195,7 @@ html, body {
 }
 
 .hero-btn-play {
-  background-color: var(--primary);
+  background-color: var(--fg);
   color: white;
   font-family: 'Fredoka', sans-serif;
   font-weight: 700;
@@ -204,7 +204,7 @@ html, body {
   border: 3px solid var(--fg);
   border-radius: var(--radius-sm);
   text-decoration: none;
-  box-shadow: 0 4px 0px var(--fg);
+  box-shadow: 0 4px 0px var(--accent);
   transition: transform 0.08s ease, box-shadow 0.08s ease;
 }
 
