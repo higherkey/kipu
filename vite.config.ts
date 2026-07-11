@@ -3,7 +3,7 @@ import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig(({ mode }) => {
   return {
-    base: process.env.GITHUB_ACTIONS === 'true' ? '/kipu/' : '/',
+    base: '/',
     test: {
       environment: 'jsdom',
       globals: true,
