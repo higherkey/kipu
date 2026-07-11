@@ -12,6 +12,7 @@
   - [x] Update `src/main.ts` to handle portal route navigation, header updates, and game filtering
   - [x] Extract monolithic styles from `src/style.css` into 6 separate component-local stylesheets and import them in TypeScript
   - [x] Implement enhanced portal selection card flairs & Tier 2 portal background animations in `src/style.css`
+  - [x] Add portal choice instructional message to lobby homepage and manage its visibility dynamically
   - [x] Verify implementation using Vitest, type checks, and visual validation
 - **File List**:
   - [src/core/Router.ts](file:///c:/Programming/kipu%20-%20kids%20games/src/core/Router.ts): Add dynamic portal routing support
@@ -34,8 +35,8 @@
 - **Summary**:
   - [src/core/Router.ts](file:///c:/Programming/kipu%20-%20kids%20games/src/core/Router.ts): Added dynamic portal routing support (`/portal/:portalId`) and parameter extraction.
   - [test/Router.test.ts](file:///c:/Programming/kipu%20-%20kids%20games/test/Router.test.ts): Added unit tests verifying dynamic portal routing and parameter extraction.
-  - [index.html](file:///c:/Programming/kipu%20-%20kids%20games/index.html): Replaced category pills with 3 Portal Cards, added data-portal attributes, header back button and IDs.
-  - [src/main.ts](file:///c:/Programming/kipu%20-%20kids%20games/src/main.ts): Purged dead filter-pills logic, added route handlers for `/` and `/portal/:portalId`, added game list filtering and header updating. Added imports for 404 screen styles.
+  - [index.html](file:///c:/Programming/kipu%20-%20kids%20games/index.html): Replaced category pills with 3 Portal Cards, added data-portal attributes, header back button, IDs, and a portal choice instructional message.
+  - [src/main.ts](file:///c:/Programming/kipu%20-%20kids%20games/src/main.ts): Purged dead filter-pills logic, added route handlers for `/` and `/portal/:portalId`, added game list filtering, header updating, and route-based visibility toggling for the portal instruction text. Added imports for 404 screen styles.
   - [src/games/noButton/NoButtonGame.ts](file:///c:/Programming/kipu%20-%20kids%20games/src/games/noButton/NoButtonGame.ts) & [NoButtonGame.css](file:///c:/Programming/kipu%20-%20kids%20games/src/games/noButton/NoButtonGame.css): Added import and migrated all custom voices dropdowns and giant yes/no button styles.
   - [src/ui/GameHeader.ts](file:///c:/Programming/kipu%20-%20kids%20games/src/ui/GameHeader.ts) & [GameHeader.css](file:///c:/Programming/kipu%20-%20kids%20games/src/ui/GameHeader.ts): Added import and migrated HUD navigation layout styles.
   - [src/ui/GameUI.ts](file:///c:/Programming/kipu%20-%20kids%20games/src/ui/GameUI.ts) & [GameUI.css](file:///c:/Programming/kipu%20-%20kids%20games/src/ui/GameUI.css): Added import and migrated legacy HUD, settings slide menu, settings toggle panels, and overlays.
