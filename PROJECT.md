@@ -20,21 +20,8 @@ The application delivers a highly responsive, near-native mobile experience thro
 
 ## 2. Planned Work (Roadmap & Milestones)
 
-### Phase 1: Proof of Concept (The Foundation)
-- [x] **Milestone 1 - Infrastructure**: Initialize Vite + TS repository, establish PWA manifest, create central navigation shell.
-- [x] **Milestone 2 - The Sensory Baseline**: Implement Poka (Bubble Wrap), Eeno (The "No" Button), and Tapa (Balloon Pop) with a unified Pause/Idle system.
-- [ ] **Milestone 3 - Basic Physics and Logic**: Implement Maka (Color Mixer).
-- [ ] **Milestone 4 - Exploratory UI**: Implement Nuko (Bug Catcher).
-
-### Phase 2: Minimum Viable Product (The Core Suite)
-- [ ] **Milestone 5 - Advanced Physics & Math**: Equation Tower and Marble Pipe Run.
-- [ ] **Milestone 6 - Memory & Generative Content**: Sound Memory and Cloud Shape Finder.
-- [ ] **Milestone 7 - Fast-Paced Mechanics**: Trash Sorcerer.
-- [ ] **Milestone 8 - Polish & Persistence**: Unified Win States (particle confetti), celebratory audio cues, and final LocalStorage tracking.
-
-### Phase 3: Post-Launch Expansion
-- [ ] Digital Lite-Brite tracing application.
-- [ ] 3D physics-based Pizza game.
+Please refer to the master plan document in the codebase for the current roadmap phases and status:
+- [Kipu v4: Master Implementation Plan](file:///c:/Programming/kipu%20-%20kids%20games/docs/kipu_v4_implementation_plan.md)
 
 ## 3. Target File Structure
 
