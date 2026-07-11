@@ -63,6 +63,7 @@
 - **[NEW] EquationTower**: Matter.js stacking blocks for arithmetic sums.
 - **[NEW] TrashSorcerer**: Physics-based flick sorting.
 - **[NEW] VibeCoder**: Block-based logic pathfinding.
+- **[NEW] KhipuSynth**: A loop-based synthesizer and song maker game. Leverages the Sound Board concept into an interactive grid sequencer. Features multiple instrument tracks/synths (bell, pluck, drum, chime, click), custom BPM controls, real-time audio recording, and local WAV/audio download capability (no server-side requirements).
 
 ---
 
