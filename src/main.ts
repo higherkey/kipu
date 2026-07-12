@@ -91,6 +91,9 @@ document.addEventListener('DOMContentLoaded', () => {
         marblePipe: 'pipe',
         soundBoard: 'sound',
         particlePhysics: 'particle',
+        switchboard: 'settings',
+        luminaryBoard: 'bulb',
+        mechanicalWorkshop: 'settings',
       };
       const iconKey = iconMap[gameId];
       if (iconKey && iconKey in Icons) {
@@ -200,16 +203,18 @@ document.addEventListener('DOMContentLoaded', () => {
     if (mainTagline) mainTagline.textContent = 'Playful Games and Interactive Experiences for Kids';
 
     // Reset portal-specific class
-    navShell?.classList.remove('portal-sandbox', 'portal-workshop', 'portal-lab');
+    navShell?.classList.remove('portal-sandbox', 'portal-workshop', 'portal-lab', 'portal-busyBoard');
 
     // Start hero rotation
     updateHeroBanner();
     startHeroRotation();
+
+    updateTabBarActiveState('/');
   });
 
   router.addRoute('/portal/:portalId', (params) => {
     const portalId = params?.portalId;
-    if (portalId !== 'sandbox' && portalId !== 'workshop' && portalId !== 'lab') {
+    if (portalId !== 'sandbox' && portalId !== 'workshop' && portalId !== 'lab' && portalId !== 'busyBoard') {
       router?.navigate('*', false);
       return;
     }
@@ -260,20 +265,24 @@ document.addEventListener('DOMContentLoaded', () => {
     const portalTitles: Record<string, string> = {
       sandbox: 'Sandbox',
       workshop: 'Workshop',
-      lab: 'Lab'
+      lab: 'Lab',
+      busyBoard: 'Busy Board'
     };
     const portalTaglines: Record<string, string> = {
       sandbox: 'Sensory & Kinetic Exploration',
       workshop: 'Guided Creation & Sequencing',
-      lab: 'Physics & Logic Challenges'
+      lab: 'Physics & Logic Challenges',
+      busyBoard: 'Tactile Switchboards'
     };
 
     if (mainTitle) mainTitle.textContent = portalTitles[portalId];
     if (mainTagline) mainTagline.textContent = portalTaglines[portalId];
 
     // Set portal class
-    navShell?.classList.remove('portal-sandbox', 'portal-workshop', 'portal-lab');
+    navShell?.classList.remove('portal-sandbox', 'portal-workshop', 'portal-lab', 'portal-busyBoard');
     navShell?.classList.add(`portal-${portalId}`);
+
+    updateTabBarActiveState(`/portal/${portalId}`);
   });
 
   router.addRoute('/game/:id', (params) => {
@@ -317,6 +326,8 @@ document.addEventListener('DOMContentLoaded', () => {
     startGame(gameId, gameCanvas);
 
     setTimeout(() => loadingOverlay?.hide(), 500);
+
+    updateTabBarActiveState(`/game/${gameId}`);
   });
 
   router.addRoute('*', () => {
@@ -339,7 +350,40 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
       notFound.classList.remove('hidden');
     }
+
+    updateTabBarActiveState('*');
   });
+
+  function updateTabBarActiveState(currentPath: string) {
+    const tabBar = document.getElementById('mobile-tab-bar');
+    if (!tabBar) return;
+
+    const isGame = currentPath.startsWith('/game/');
+    const notFoundEl = document.getElementById('not-found-screen');
+    const isNotFound = notFoundEl && !notFoundEl.classList.contains('hidden');
+    
+    if (isGame || isNotFound || currentPath === '*') {
+      tabBar.classList.add('hidden');
+    } else {
+      tabBar.classList.remove('hidden');
+    }
+
+    let activeTab = 'home';
+    if (currentPath.startsWith('/portal/')) {
+      activeTab = currentPath.substring(8);
+    } else if (currentPath !== '/') {
+      activeTab = '';
+    }
+
+    tabBar.querySelectorAll('.tab-item').forEach(item => {
+      const tabName = (item as HTMLElement).getAttribute('data-tab');
+      if (tabName === activeTab) {
+        item.classList.add('active');
+      } else {
+        item.classList.remove('active');
+      }
+    });
+  }
 
   router.init();
 });

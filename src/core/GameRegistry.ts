@@ -8,12 +8,15 @@ import { SoundMemoryGame } from '../games/soundMemory/SoundMemoryGame';
 import { MarblePipeGame } from '../games/marblePipe/MarblePipeGame';
 import { SoundBoardGame } from '../games/soundBoard/SoundBoardGame';
 import { ParticlePhysicsGame } from '../games/particlePhysics/ParticlePhysicsGame';
+import { SwitchboardGame } from '../games/busyBoard/SwitchboardGame';
+import { LuminaryBoardGame } from '../games/busyBoard/LuminaryBoardGame';
+import { MechanicalWorkshopGame } from '../games/busyBoard/MechanicalWorkshopGame';
 
 export interface GameRegistration {
   id: string;
   name: string;
   subtitle: string;
-  portal: 'sandbox' | 'workshop' | 'lab';
+  portal: 'sandbox' | 'workshop' | 'lab' | 'busyBoard';
   icon: string;
   category: 'sensory' | 'brain' | 'action'; // Legacy v3 categories
   desc: string;
@@ -126,6 +129,36 @@ export class GameRegistry {
         category: 'action',
         desc: 'Draw particle fields and watch gravity and physics react to your touch!',
         constructorRef: ParticlePhysicsGame
+      },
+      {
+        id: 'switchboard',
+        name: 'The Switchboard',
+        subtitle: 'Toggles & Swaps',
+        portal: 'busyBoard',
+        icon: 'settings',
+        category: 'sensory',
+        desc: 'Explore toggles, dials, breakers, and switches with rich sounds and haptic responses!',
+        constructorRef: SwitchboardGame
+      },
+      {
+        id: 'luminaryBoard',
+        name: 'The Luminary Board',
+        subtitle: 'Dimmers & Color Matrices',
+        portal: 'busyBoard',
+        icon: 'bulb',
+        category: 'sensory',
+        desc: 'Interact with dimmers, strobe patterns, halos, and multi-finger color gradients!',
+        constructorRef: LuminaryBoardGame
+      },
+      {
+        id: 'mechanicalWorkshop',
+        name: 'The Mechanical Workshop',
+        subtitle: 'Latches, Links, & Gears',
+        portal: 'busyBoard',
+        icon: 'settings', // Reusing settings icon
+        category: 'sensory',
+        desc: 'Spin interlocking gears, plug stereo cords, drag latches, and twist combination tumblers!',
+        constructorRef: MechanicalWorkshopGame
       }
     ];
 
@@ -144,7 +177,7 @@ export class GameRegistry {
     return Array.from(this.registry.keys());
   }
 
-  public getByPortal(portal: 'sandbox' | 'workshop' | 'lab'): GameRegistration[] {
+  public getByPortal(portal: 'sandbox' | 'workshop' | 'lab' | 'busyBoard'): GameRegistration[] {
     return this.getAll().filter(game => game.portal === portal);
   }
 
