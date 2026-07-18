@@ -101,10 +101,48 @@ html, body {
   text-align: center;
   margin-bottom: 2rem;
   z-index: 1;
+  width: 100%;
+  max-width: 800px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.nav-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  position: relative;
+  min-height: 80px;
+  margin-bottom: 0.5rem;
+}
+
+.nav-left {
+  flex: 1 1 0%;
+  display: flex;
+  justify-content: flex-start;
+}
+
+.nav-center {
+  flex: 2 1 0%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.nav-right {
+  flex: 1 1 0%;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.nav-bar .back-btn {
+  margin-bottom: 0;
 }
 
 #navigation-shell h1 {
-  margin-bottom: 0.2rem;
+  margin: 0;
   font-size: 3.5rem;
   font-weight: 600;
   color: var(--primary);
@@ -113,13 +151,15 @@ html, body {
   text-shadow: 3px 3px 0px rgba(192, 57, 43, 0.18);
   position: relative;
   z-index: 1;
+  line-height: 1;
 }
 
 .tagline {
   font-family: 'Fredoka', sans-serif;
   font-size: 1.1rem;
   color: rgba(43, 45, 94, 0.6);
-  margin-top: 0;
+  margin-top: 0.5rem;
+  text-align: center;
 }
 
 /* ---- Rotating Hero Banner ---- */
@@ -271,142 +311,9 @@ html, body {
 
 
 
-@media (max-width: 600px) {
-  /* Navigation shell padding */
-  #navigation-shell {
-    padding: 24px 12px;
-  }
 
-  /* ---- Hero Card ---- */
-  .hero-card {
-    padding: 16px 20px 24px 20px;
-    margin-bottom: 1.5rem;
-    border-width: 2px;
-    border-radius: 16px;
-  }
-  .featured-badge {
-    font-size: 0.65rem;
-    padding: 2px 6px;
-    margin-bottom: 0.5rem;
-    border-width: 1.5px;
-  }
-  .hero-card h2 {
-    font-size: 1.5rem;
-    margin-bottom: 0.15rem;
-  }
-  .hero-card p#hero-subtitle {
-    font-size: 0.95rem;
-    margin-bottom: 0.5rem;
-  }
-  .hero-card p#hero-desc {
-    font-size: 0.8rem;
-    margin-bottom: 1rem;
-    line-height: 1.3;
-  }
-  .hero-btn-play {
-    font-size: 0.9rem;
-    padding: 6px 16px;
-    border-width: 2px;
-    border-radius: 8px;
-    box-shadow: 0 3px 0 var(--fg);
-  }
-  .hero-interactive-preview {
-    width: 80px;
-    height: 80px;
-    margin-left: 1.25rem;
-    border-width: 2px;
-  }
-  #hero-icon-container svg {
-    width: 40px;
-    height: 40px;
-  }
-  .hero-dots {
-    bottom: 8px;
-    gap: 6px;
-  }
-  .hero-dots .dot {
-    width: 8px;
-    height: 8px;
-    border-width: 1px;
-  }
+/* Mobile media query block moved to end of file */
 
-  /* ---- Portals Mobile ---- */
-  .portals-grid {
-    grid-template-columns: 1fr;
-    gap: 16px;
-    padding: 0 12px;
-    margin-bottom: 1.5rem;
-  }
-  .portal-card {
-    flex-direction: row;
-    justify-content: flex-start;
-    padding: 16px 20px;
-    border-radius: 16px;
-    gap: 16px;
-  }
-  .portal-card .icon {
-    width: 48px;
-    height: 48px;
-  }
-  .portal-card .icon svg {
-    width: 28px;
-    height: 28px;
-  }
-  .portal-label {
-    text-align: left;
-    align-items: flex-start;
-  }
-  .portal-title {
-    font-size: 1.25rem;
-  }
-  .portal-subtitle {
-    font-size: 0.75rem;
-    text-align: left;
-  }
-  .back-btn {
-    margin-bottom: 1rem;
-    padding: 6px 12px;
-    font-size: 0.85rem;
-  }
-
-  /* ---- Cards Grid ---- */
-  .cards-grid {
-    grid-template-columns: repeat(auto-fill, minmax(100px, 120px));
-    justify-content: center;
-    gap: 8px;
-    padding-bottom: 24px;
-  }
-  .cards-grid a {
-    padding: 12px 6px;
-    border-width: 2px;
-    border-radius: 12px;
-    gap: 4px;
-    aspect-ratio: 1.05;
-    box-shadow: 0 3px 0 var(--fg);
-  }
-  .cards-grid a .icon {
-    width: 28px;
-    height: 28px;
-    margin-bottom: 0;
-  }
-  .cards-grid a .icon svg {
-    width: 22px;
-    height: 22px;
-  }
-  .cards-grid a .game-title {
-    font-size: 0.95rem;
-  }
-  .cards-grid a .game-subtitle {
-    font-size: 0.72rem;
-  }
-  .cards-grid a::before {
-    width: 3px;
-  }
-  .cards-grid a::after {
-    height: 5px;
-    bottom: -5px;
-  }
-}
 
 /* ---- Portal Choice Instruction ---- */
 .portal-instruction {
@@ -437,7 +344,7 @@ html, body {
 /* ---- Play Portals Grid ---- */
 .portals-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 24px;
   width: 100%;
   max-width: 800px;
@@ -605,6 +512,18 @@ html, body {
   box-shadow: 0 2px 0px var(--fg);
 }
 
+/* Busy Board: Industrial Steel & Mechanical Toggle/Spring Hover */
+.portal-card.portal-busyBoard {
+  background: linear-gradient(135deg, #F2F3F4 0%, #D5D8DC 100%);
+}
+.portal-card.portal-busyBoard:hover {
+  transform: scale(1.02) rotate(-1deg);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15), 0 var(--shadow-depth) 0px var(--fg);
+}
+.portal-card.portal-busyBoard:hover .icon {
+  transform: translateY(2px) scale(1.05);
+}
+
 /* ---- Playful Wooden/Parchment Back Button Tag ---- */
 .back-btn {
   display: inline-flex;
@@ -667,6 +586,18 @@ html, body {
   background-image: linear-gradient(to right, rgba(52, 152, 219, 0.06) 1px, transparent 1px),
                     linear-gradient(to bottom, rgba(52, 152, 219, 0.06) 1px, transparent 1px);
   background-color: #EBF5FB;
+}
+
+/* Busy Board theme: physical rivets / brushed metal plate feeling */
+#navigation-shell.portal-busyBoard {
+  background: radial-gradient(circle at 10px 10px, rgba(189, 195, 199, 0.25) 2px, transparent 3px),
+              radial-gradient(circle at calc(100% - 10px) 10px, rgba(189, 195, 199, 0.25) 2px, transparent 3px),
+              radial-gradient(circle at 10px calc(100% - 10px), rgba(189, 195, 199, 0.25) 2px, transparent 3px),
+              radial-gradient(circle at calc(100% - 10px) calc(100% - 10px), rgba(189, 195, 199, 0.25) 2px, transparent 3px),
+              linear-gradient(180deg, rgba(229, 232, 235, 0.1) 0%, transparent 100%),
+              var(--bg);
+  background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, auto;
+  background-color: #F8F9F9;
 }
 
 /* ---- Cards Grid ---- */
@@ -783,6 +714,19 @@ html, body {
   box-shadow: -4px 8px 0px var(--fg);
 }
 
+/* Busy Board view: mechanical pressed down clicky offset */
+.portal-busyBoard .cards-grid a {
+  transition: transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.portal-busyBoard .cards-grid a:hover {
+  transform: scale(1.03);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1), 0 var(--shadow-depth) 0px var(--fg);
+}
+.portal-busyBoard .cards-grid a:active {
+  transform: translateY(var(--shadow-depth));
+  box-shadow: 0 2px 0px var(--fg);
+}
+
 /* ---- Per-game card colors ---- */
 
 /* Poka (Bubble Wrap) */
@@ -828,6 +772,21 @@ html, body {
 /* Particle Physics */
 .cards-grid a[data-game="particlePhysics"] {
   background-color: #C8E6C9;
+}
+
+/* The Switchboard */
+.cards-grid a[data-game="switchboard"] {
+  background-color: #BDC3C7; /* Sleek steel/aluminum */
+}
+
+/* The Luminary Board */
+.cards-grid a[data-game="luminaryBoard"] {
+  background-color: #FFE082; /* Warm glowing amber */
+}
+
+/* The Mechanical Workshop */
+.cards-grid a[data-game="mechanicalWorkshop"] {
+  background-color: #D7CCC8; /* Warm light wood/cork */
 }
 
 /* Game name label */
@@ -876,4 +835,217 @@ html, body {
   display: block;
   background-color: #1a1a2e;
 }
+
+@media (max-width: 600px) {
+  /* Navigation shell padding */
+  #navigation-shell {
+    padding: 24px 12px 100px 12px;
+  }
+
+  /* ---- Hero Card ---- */
+  .hero-card {
+    padding: 16px 20px 24px 20px;
+    margin-bottom: 1.5rem;
+    border-width: 2px;
+    border-radius: 16px;
+  }
+  .featured-badge {
+    font-size: 0.65rem;
+    padding: 2px 6px;
+    margin-bottom: 0.5rem;
+    border-width: 1.5px;
+  }
+  .hero-card h2 {
+    font-size: 1.5rem;
+    margin-bottom: 0.15rem;
+  }
+  .hero-card p#hero-subtitle {
+    font-size: 0.95rem;
+    margin-bottom: 0.5rem;
+  }
+  .hero-card p#hero-desc {
+    font-size: 0.8rem;
+    margin-bottom: 1rem;
+    line-height: 1.3;
+  }
+  .hero-btn-play {
+    font-size: 0.9rem;
+    padding: 6px 16px;
+    border-width: 2px;
+    border-radius: 8px;
+    box-shadow: 0 3px 0 var(--fg);
+  }
+  .hero-interactive-preview {
+    width: 80px;
+    height: 80px;
+    margin-left: 1.25rem;
+    border-width: 2px;
+  }
+  #hero-icon-container svg {
+    width: 40px;
+    height: 40px;
+  }
+  .hero-dots {
+    bottom: 8px;
+    gap: 6px;
+  }
+  .hero-dots .dot {
+    width: 8px;
+    height: 8px;
+    border-width: 1px;
+  }
+
+  /* ---- Portals Mobile ---- */
+  .portals-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    padding: 0 12px;
+    margin-bottom: 1.5rem;
+  }
+  .portal-card {
+    flex-direction: row;
+    justify-content: flex-start;
+    padding: 16px 20px;
+    border-radius: 16px;
+    gap: 16px;
+  }
+  .portal-card .icon {
+    width: 48px;
+    height: 48px;
+  }
+  .portal-card .icon svg {
+    width: 28px;
+    height: 28px;
+  }
+  .portal-label {
+    text-align: left;
+    align-items: flex-start;
+  }
+  .portal-title {
+    font-size: 1.25rem;
+  }
+  .portal-subtitle {
+    font-size: 0.75rem;
+    text-align: left;
+  }
+  .nav-bar {
+    min-height: 52px;
+  }
+  .nav-bar .back-btn {
+    margin-bottom: 0;
+    padding: 6px 12px;
+    font-size: 0.8rem;
+  }
+  #navigation-shell h1 {
+    font-size: 2.2rem;
+  }
+  .tagline {
+    font-size: 0.95rem;
+    margin-top: 0.25rem;
+  }
+
+  /* ---- Cards Grid ---- */
+  .cards-grid {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 120px));
+    justify-content: center;
+    gap: 8px;
+    padding-bottom: 24px;
+  }
+  .cards-grid a {
+    padding: 12px 6px;
+    border-width: 2px;
+    border-radius: 12px;
+    gap: 4px;
+    aspect-ratio: 1.05;
+    box-shadow: 0 3px 0 var(--fg);
+  }
+  .cards-grid a .icon {
+    width: 28px;
+    height: 28px;
+    margin-bottom: 0;
+  }
+  .cards-grid a .icon svg {
+    width: 22px;
+    height: 22px;
+  }
+  .cards-grid a .game-title {
+    font-size: 0.95rem;
+  }
+  .cards-grid a .game-subtitle {
+    font-size: 0.72rem;
+  }
+  .cards-grid a::before {
+    width: 3px;
+  }
+  .cards-grid a::after {
+    height: 5px;
+    bottom: -5px;
+  }
+
+  /* ---- Mobile Bottom Tab Bar ---- */
+  .mobile-tab-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 64px;
+    background-color: var(--color-parchment);
+    border-top: 3px solid var(--fg);
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    z-index: 100;
+    padding-bottom: env(safe-area-inset-bottom);
+    box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.05);
+  }
+
+  .mobile-tab-bar.hidden {
+    display: none !important;
+  }
+
+  .tab-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    flex: 1;
+    height: 100%;
+    color: var(--fg);
+    text-decoration: none;
+    font-size: 0.72rem;
+    font-weight: 500;
+    opacity: 0.6;
+    transition: opacity 0.2s ease, transform 0.1s ease;
+  }
+
+  .tab-item:active {
+    transform: scale(0.92);
+  }
+
+  .tab-item.active {
+    opacity: 1;
+    color: var(--primary);
+    font-weight: 600;
+  }
+
+  .tab-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+  }
+
+  .tab-icon svg {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+/* Fallback default desktop styles */
+.mobile-tab-bar {
+  display: none;
+}
+
 
