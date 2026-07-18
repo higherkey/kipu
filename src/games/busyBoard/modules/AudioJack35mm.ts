@@ -15,6 +15,7 @@ export class AudioJack35mm implements BusyBoardModule {
   private plugY = 0;
   private initialSetupDone = false;
   private soundWaveAngle = 0;
+  private loopInterval: any = null;
 
   private audio: AudioController;
   private haptics: HapticController;
@@ -30,6 +31,25 @@ export class AudioJack35mm implements BusyBoardModule {
   }
 
   public init(): void {}
+
+  private startLoop() {
+    if (this.loopInterval) return;
+    const melody = ['c4', 'e4', 'g4', 'c5', 'g4', 'e4'];
+    let index = 0;
+    this.loopInterval = setInterval(() => {
+      if (this.isPluggedIn) {
+        this.audio.play('synth:pluck', melody[index]);
+        index = (index + 1) % melody.length;
+      }
+    }, 450);
+  }
+
+  private stopLoop() {
+    if (this.loopInterval) {
+      clearInterval(this.loopInterval);
+      this.loopInterval = null;
+    }
+  }
 
   public setPowerState(_hasPower: boolean): void {}
 
@@ -301,6 +321,7 @@ export class AudioJack35mm implements BusyBoardModule {
         this.plugY = y;
         this.audio.play('synth:click', 250); // Unplug crackle
         this.haptics.lightTap();
+        this.stopLoop();
       }
       this.isDragging = true;
       return true;
@@ -343,6 +364,7 @@ export class AudioJack35mm implements BusyBoardModule {
       }, 200);
 
       this.haptics.success();
+      this.startLoop();
     }
   }
 
@@ -350,7 +372,9 @@ export class AudioJack35mm implements BusyBoardModule {
     this.isDragging = false;
   }
 
-  public destroy(): void {}
+  public destroy(): void {
+    this.stopLoop();
+  }
 
   private roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
     if (w < 2 * r) r = w / 2;

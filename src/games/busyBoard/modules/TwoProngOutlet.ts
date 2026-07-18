@@ -14,6 +14,8 @@ export class TwoProngOutlet implements BusyBoardModule {
   private plugX = 0;
   private plugY = 0;
   private initialSetupDone = false;
+  private batteryCharge = 0.1;
+  private lastTime = 0;
 
   private audio: AudioController;
   private haptics: HapticController;
@@ -83,6 +85,64 @@ export class TwoProngOutlet implements BusyBoardModule {
     ctx.textAlign = 'center';
     ctx.textBaseline = 'top';
     ctx.fillText('TWO-PRONG OUTLET', centerX, my + 15);
+    ctx.restore();
+
+    // --- UPDATE BATTERY CHARGE ---
+    const now = performance.now();
+    const dt = this.lastTime === 0 ? 0 : (now - this.lastTime) / 1000;
+    this.lastTime = now;
+
+    if (this.isPluggedIn) {
+      // Charge battery from 0.1 to 1.0 in ~6 seconds
+      this.batteryCharge = Math.min(1.0, this.batteryCharge + dt * 0.15);
+    } else {
+      // Discharge when unplugged
+      this.batteryCharge = 0.1;
+    }
+
+    // --- DRAW BATTERY GAUGE ---
+    const batW = 40;
+    const batH = 20;
+    const batX = mx + mw - batW - 20;
+    const batY = my + 12;
+
+    ctx.save();
+    // Battery Outer Outline
+    ctx.strokeStyle = '#CCD1D9';
+    ctx.lineWidth = 2;
+    this.roundRect(ctx, batX, batY, batW, batH, 4);
+    ctx.stroke();
+
+    // Battery Cap
+    ctx.fillStyle = '#CCD1D9';
+    ctx.fillRect(batX + batW, batY + batH / 2 - 4, 3, 8);
+
+    // Charge level fill
+    let fillStyle = '#E74C3C'; // Red for low charge
+    if (this.batteryCharge > 0.5) fillStyle = '#2ECC71'; // Green
+    else if (this.batteryCharge > 0.2) fillStyle = '#F1C40F'; // Yellow
+
+    ctx.fillStyle = fillStyle;
+    const padding = 2;
+    const maxFillWidth = batW - padding * 2;
+    const fillWidth = maxFillWidth * this.batteryCharge;
+    if (fillWidth > 0) {
+      ctx.fillRect(batX + padding, batY + padding, fillWidth, batH - padding * 2);
+    }
+
+    // Lightning bolt charging icon
+    if (this.isPluggedIn) {
+      ctx.fillStyle = '#FFFFFF';
+      ctx.beginPath();
+      ctx.moveTo(batX + batW / 2 + 2, batY + 3);
+      ctx.lineTo(batX + batW / 2 - 4, batY + batH / 2 + 1);
+      ctx.lineTo(batX + batW / 2 + 1, batY + batH / 2 + 1);
+      ctx.lineTo(batX + batW / 2 - 2, batY + batH - 3);
+      ctx.lineTo(batX + batW / 2 + 4, batY + batH / 2 - 1);
+      ctx.lineTo(batX + batW / 2 - 1, batY + batH / 2 - 1);
+      ctx.closePath();
+      ctx.fill();
+    }
     ctx.restore();
 
     // --- DRAW OUTLET ---

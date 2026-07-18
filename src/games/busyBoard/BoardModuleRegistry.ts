@@ -19,6 +19,7 @@ import { StrobeFrequency } from './modules/StrobeFrequency';
 import { HaloExpander } from './modules/HaloExpander';
 import { ContrastInverter } from './modules/ContrastInverter';
 import { DualFingerGradient } from './modules/DualFingerGradient';
+import { RGBCanvasBlock } from './modules/RGBCanvasBlock';
 
 // Board 3 Modules
 import { GearTrainTrio } from './modules/GearTrainTrio';
@@ -59,6 +60,7 @@ export const BoardModuleRegistry: Record<string, BusyBoardModuleConstructor> = {
   '012': ColorSlider,
   '013': ColorSlider,
   '014': ColorSlider,
+  '012b': RGBCanvasBlock,
   '015': RainbowCrossfader,
   '016': ShadowProjection,
   '017': StrobeFrequency,

@@ -122,6 +122,14 @@ describe('LuminaryBoardGame', () => {
     expect(game.getRGB().r).toBe(0.8);
   });
 
+  it('should instantiate RGBCanvasBlock (012b) in modules list', () => {
+    const modules = (game as any).modules;
+    const rgbBlock = modules.find((m: any) => m.id === '012b');
+    expect(rgbBlock).toBeDefined();
+    expect(rgbBlock.w).toBe(1);
+    expect(rgbBlock.h).toBe(2);
+  });
+
   it('should update and render without errors', () => {
     expect(() => game.update(16)).not.toThrow();
   });

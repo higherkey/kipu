@@ -11,7 +11,7 @@ export class LuminaryBoardGame implements Game {
   private activeDragModule: BusyBoardModule | null = null;
 
   // Layout parameters
-  private cols = 4;
+  private cols = 5;
   private rows = 3;
   private cellW = 0;
   private cellH = 0;
@@ -58,7 +58,7 @@ export class LuminaryBoardGame implements Game {
 
   private setupLayout() {
     if (!this.canvas) return;
-    this.cols = 4;
+    this.cols = 5;
     this.rows = 3;
 
     // Minimum column width of 300px prevents squishing
@@ -83,11 +83,13 @@ export class LuminaryBoardGame implements Game {
       { id: '015', col: 1, row: 1, w: 1, h: 1 }, // RainbowCrossfader
       { id: '018', col: 1, row: 2, w: 1, h: 1 }, // HaloExpander
 
-      { id: '016', col: 2, row: 0, w: 1, h: 2 }, // ShadowProjection (Double height)
+      { id: '012b', col: 2, row: 0, w: 1, h: 2 }, // RGBCanvasBlock (Double height)
       { id: '017', col: 2, row: 2, w: 1, h: 1 }, // StrobeFrequency
 
-      { id: '020', col: 3, row: 0, w: 1, h: 2 }, // DualFingerGradient (Double height)
+      { id: '016', col: 3, row: 0, w: 1, h: 2 }, // ShadowProjection (Double height)
       { id: '019', col: 3, row: 2, w: 1, h: 1 }, // ContrastInverter
+
+      { id: '020', col: 4, row: 0, w: 1, h: 2 }, // DualFingerGradient (Double height)
     ];
 
     layouts.forEach(layout => {

@@ -268,7 +268,7 @@ export class GearTrainTrio implements BusyBoardModule {
       const direction = this.angle1 > this.lastTickAngle ? 1 : -1;
       this.lastTickAngle = this.angle1;
       
-      this.audio.play('synth:click', 800 + direction * 100);
+      this.audio.play('synth:click', 180 + direction * 20);
       this.haptics.lightTap();
     }
   }

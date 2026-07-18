@@ -12,10 +12,10 @@ export class DualFingerGradient implements BusyBoardModule {
   private game: LuminaryBoardGame;
 
   private isDragging = false;
+  private draggedNode: 'p1' | 'p2' | null = null;
   private p1 = { x: 0, y: 0 };
   private p2 = { x: 0, y: 0 };
   private setupDone = false;
-  private autoOrbitAngle = 0;
 
   private audio: AudioController;
   private haptics: HapticController;
@@ -51,21 +51,9 @@ export class DualFingerGradient implements BusyBoardModule {
     const padH = mh - 55;
 
     if (!this.setupDone) {
-      this.p1 = { x: centerX - 30, y: centerY };
-      this.p2 = { x: centerX + 30, y: centerY };
+      this.p1 = { x: centerX - 35, y: centerY };
+      this.p2 = { x: centerX + 35, y: centerY };
       this.setupDone = true;
-    }
-
-    // Orbit secondary point automatically if dragging to show fluid movement
-    if (this.isDragging) {
-      this.autoOrbitAngle += 0.05;
-      const radius = 45;
-      this.p2.x = this.p1.x + Math.cos(this.autoOrbitAngle) * radius;
-      this.p2.y = this.p1.y + Math.sin(this.autoOrbitAngle) * radius;
-
-      // Clamp point B inside pad
-      this.p2.x = Math.max(padX + 15, Math.min(padX + padW - 15, this.p2.x));
-      this.p2.y = Math.max(padY + 15, Math.min(padY + padH - 15, this.p2.y));
     }
 
     // Faceplate
@@ -148,12 +136,35 @@ export class DualFingerGradient implements BusyBoardModule {
     ctx.stroke();
 
     // Draw Node Points
-    ctx.fillStyle = '#FFFFFF';
-    ctx.shadowColor = theme === 'paper' ? 'rgba(0,0,0,0.1)' : '#00FFCC';
-    ctx.shadowBlur = theme === 'paper' ? 2 : 6;
+    ctx.shadowBlur = 0;
+    ctx.shadowColor = 'transparent';
+
+    // Draw handle 1 (p1)
     ctx.beginPath();
-    ctx.arc(this.p1.x, this.p1.y, 8, 0, Math.PI * 2);
-    ctx.arc(this.p2.x, this.p2.y, 6, 0, Math.PI * 2);
+    ctx.arc(this.p1.x, this.p1.y, 12, 0, Math.PI * 2);
+    ctx.fillStyle = theme === 'paper' ? 'rgba(90, 86, 76, 0.2)' : 'rgba(0, 255, 204, 0.3)';
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(this.p1.x, this.p1.y, 7, 0, Math.PI * 2);
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(this.p1.x, this.p1.y, 3, 0, Math.PI * 2);
+    ctx.fillStyle = theme === 'paper' ? '#FFA585' : '#FF007F';
+    ctx.fill();
+
+    // Draw handle 2 (p2)
+    ctx.beginPath();
+    ctx.arc(this.p2.x, this.p2.y, 12, 0, Math.PI * 2);
+    ctx.fillStyle = theme === 'paper' ? 'rgba(90, 86, 76, 0.2)' : 'rgba(0, 255, 204, 0.3)';
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(this.p2.x, this.p2.y, 7, 0, Math.PI * 2);
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(this.p2.x, this.p2.y, 3, 0, Math.PI * 2);
+    ctx.fillStyle = theme === 'paper' ? '#FFE29A' : '#00FFCC';
     ctx.fill();
 
     ctx.restore();
@@ -172,12 +183,25 @@ export class DualFingerGradient implements BusyBoardModule {
     const padW = mw - padMargin * 2;
     const padH = mh - 55;
 
+    const d1 = Math.hypot(x - this.p1.x, y - this.p1.y);
+    const d2 = Math.hypot(x - this.p2.x, y - this.p2.y);
+    const hitRadius = 25;
+
+    if (d1 <= hitRadius || d2 <= hitRadius) {
+      this.isDragging = true;
+      this.draggedNode = d1 <= d2 ? 'p1' : 'p2';
+      this.audio.play('synth:pluck', this.draggedNode === 'p1' ? 350 : 450);
+      this.haptics.lightTap();
+      return true;
+    }
+
     if (x >= padX && x <= padX + padW && y >= padY && y <= padY + padH) {
       this.isDragging = true;
-      this.p1.x = x;
-      this.p1.y = y;
+      this.draggedNode = d1 <= d2 ? 'p1' : 'p2';
+      this[this.draggedNode].x = x;
+      this[this.draggedNode].y = y;
       
-      this.audio.play('synth:pluck', 350);
+      this.audio.play('synth:pluck', this.draggedNode === 'p1' ? 350 : 450);
       this.haptics.lightTap();
       return true;
     }
@@ -185,7 +209,7 @@ export class DualFingerGradient implements BusyBoardModule {
   }
 
   public handlePointerMove(x: number, y: number, px: number, py: number, pw: number, ph: number): void {
-    if (!this.isDragging) return;
+    if (!this.isDragging || !this.draggedNode) return;
 
     const margin = 12;
     const mx = px + margin;
@@ -199,13 +223,11 @@ export class DualFingerGradient implements BusyBoardModule {
     const padW = mw - padMargin * 2;
     const padH = mh - 55;
 
-    // Drag point A
-    this.p1.x = Math.max(padX + 15, Math.min(padX + padW - 15, x));
-    this.p1.y = Math.max(padY + 15, Math.min(padY + padH - 15, y));
+    this[this.draggedNode].x = Math.max(padX + 15, Math.min(padX + padW - 15, x));
+    this[this.draggedNode].y = Math.max(padY + 15, Math.min(padY + padH - 15, y));
 
-    if (Math.random() < 0.2) {
-      // Harmonic tone based on coordinates
-      const pitch = 200 + ((this.p1.x - padX) / padW) * 400;
+    if (Math.random() < 0.15) {
+      const pitch = 200 + ((this[this.draggedNode].x - padX) / padW) * 400;
       this.audio.play('synth:pluck', pitch);
       this.haptics.lightTap();
     }
@@ -214,6 +236,7 @@ export class DualFingerGradient implements BusyBoardModule {
   public handlePointerUp(): void {
     if (this.isDragging) {
       this.isDragging = false;
+      this.draggedNode = null;
       this.audio.play('synth:pluck', 440);
     }
   }
