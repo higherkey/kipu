@@ -1,7 +1,7 @@
 export type RouteHandler = (params?: Record<string, string>) => void;
 
 /**
- * Simple client-side router for the Kids Games Suite.
+ * Simple client-side router for Kipu.
  * Handles URL navigation using the History API.
  */
 export class Router {
@@ -74,6 +74,18 @@ export class Router {
         const handler = this.routes.get('/game/:id');
         if (handler) {
           handler({ id: gameId });
+          return;
+        }
+      }
+    }
+
+    // Dynamic portal route: /portal/[id]
+    if (path.startsWith('/portal/')) {
+      const portalId = path.substring(8); // Remove '/portal/'
+      if (portalId) {
+        const handler = this.routes.get('/portal/:portalId');
+        if (handler) {
+          handler({ portalId: portalId });
           return;
         }
       }

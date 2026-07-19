@@ -1,4 +1,4 @@
-# Kids Web Games Suite: Project Plan & Architecture
+# Kipu: Project Plan & Architecture
 
 This document supplements the `README.md` and serves as our running work trace and architectural blueprint, following the project's adapted `/feature-tracking` workflow.
 
@@ -20,21 +20,8 @@ The application delivers a highly responsive, near-native mobile experience thro
 
 ## 2. Planned Work (Roadmap & Milestones)
 
-### Phase 1: Proof of Concept (The Foundation)
-- [x] **Milestone 1 - Infrastructure**: Initialize Vite + TS repository, establish PWA manifest, create central navigation shell.
-- [x] **Milestone 2 - The Sensory Baseline**: Implement "Bubble Wrap", "The 'No' Button", and "Balloon Pop" with a unified Pause/Idle system.
-- [ ] **Milestone 3 - Basic Physics and Logic**: Implement "Color Mixer".
-- [ ] **Milestone 4 - Exploratory UI**: Implement "Bug Catcher".
-
-### Phase 2: Minimum Viable Product (The Core Suite)
-- [ ] **Milestone 5 - Advanced Physics & Math**: "Equation Tower" and "Marble Pipe Run".
-- [ ] **Milestone 6 - Memory & Generative Content**: "Sound Memory" and "Cloud Shape Finder".
-- [ ] **Milestone 7 - Fast-Paced Mechanics**: "Trash Sorcerer".
-- [ ] **Milestone 8 - Polish & Persistence**: Unified Win States (particle confetti), celebratory audio cues, and final LocalStorage tracking.
-
-### Phase 3: Post-Launch Expansion
-- [ ] Digital Lite-Brite tracing application.
-- [ ] 3D physics-based Pizza game.
+Please refer to the master plan document in the codebase for the current roadmap phases and status:
+- [Kipu v4: Master Implementation Plan](file:///c:/Programming/kipu%20-%20kids%20games/docs/kipu_v4_implementation_plan.md)
 
 ## 3. Target File Structure
 
@@ -72,7 +59,8 @@ src/
 ## 5. Work Trace: Completed Work
 
 - **Phase 1, Milestone 1**: Initialized Vite + TS repository. Set up `vite-plugin-pwa`, `matter-js`, and `howler`. Scaffolded core UI and architecture classes (`AudioController`, `HapticController`, `StateManager`, `Preloader`). Established central navigation shell in `index.html` and `main.ts`.
-- **Phase 1, Milestone 2**: Implemented `GameLoop`, `IdleManager` (60s timeout), and `PauseMenu`. Integrated **Lucide SVG icons** and established CC0 audio pipeline. Completed three sensory games: **The "No" Button** (DOM/shake), **Bubble Wrap** (Canvas/multi-touch), and **Balloon Pop** (Canvas/scaling/multi-layer). Ensured **iOS 12/13 compatibility** with CSS fallbacks and visual feedback.
+- **Phase 1, Milestone 2**: Implemented `GameLoop`, `IdleManager` (60s timeout), and `PauseMenu`. Integrated **Lucide SVG icons** and established CC0 audio pipeline. Completed three sensory games: **Eeno** / The "No" Button (DOM/shake), **Poka** / Bubble Wrap (Canvas/multi-touch), and **Tapa** / Balloon Pop (Canvas/scaling/multi-layer). Ensured **iOS 12/13 compatibility** with CSS fallbacks and visual feedback.
+- **Rebranding**: Renamed repo from `kids-games-site` to `kipu`. Applied V3 design system: parchment/indigo/cochineal-red palette, khipu-inspired fibrous cord motifs (Tier 1), Quechua short names for games (Poka, Eeno, Tapa, Maka, Nuko), updated PWA manifest, favicon, and all documentation.
 
 ## 6. Issues and Out of Scope
 

@@ -1,3 +1,5 @@
+import { Haptics, ImpactStyle, NotificationType } from '@capacitor/haptics';
+
 export class HapticController {
   private static instance: HapticController;
 
@@ -10,26 +12,40 @@ export class HapticController {
     return HapticController.instance;
   }
 
+  private isEnabled(): boolean {
+    return localStorage.getItem('vibrationEnabled') !== 'false';
+  }
+
   /**
-   * Triggers a haptic feedback pattern.
-   * @param pattern Array of durations (ms) or a single duration for vibration.
+   * Triggers a generic haptic vibration.
    */
-  public vibrate(pattern: number | number[]) {
-    if (navigator.vibrate) {
-      navigator.vibrate(pattern);
-    }
+  public vibrate(duration = 200) {
+    if (!this.isEnabled()) return;
+    Haptics.vibrate({ duration }).catch(err => {
+      console.warn('Haptics vibrate failed', err);
+    });
   }
 
   // Pre-defined haptic patterns
   public lightTap() {
-    this.vibrate(20);
+    if (!this.isEnabled()) return;
+    Haptics.impact({ style: ImpactStyle.Light }).catch(err => {
+      console.warn('Haptics lightTap failed', err);
+    });
   }
 
   public heavyImpact() {
-    this.vibrate(50);
+    if (!this.isEnabled()) return;
+    Haptics.impact({ style: ImpactStyle.Heavy }).catch(err => {
+      console.warn('Haptics heavyImpact failed', err);
+    });
   }
 
   public success() {
-    this.vibrate([30, 50, 30]);
+    if (!this.isEnabled()) return;
+    Haptics.notification({ type: NotificationType.Success }).catch(err => {
+      console.warn('Haptics success notification failed', err);
+    });
   }
 }
+

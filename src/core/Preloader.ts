@@ -4,8 +4,7 @@ export class Preloader {
       if (asset.type === 'image') {
         return this.loadImage(asset.url);
       } else if (asset.type === 'audio') {
-        // Audio preloading typically handled via Howler initialization
-        return Promise.resolve();
+        return this.loadAudio(asset.url);
       }
       return Promise.resolve();
     });
@@ -14,11 +13,23 @@ export class Preloader {
   }
 
   private static loadImage(url: string): Promise<HTMLImageElement> {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       const img = new Image();
       img.onload = () => resolve(img);
-      img.onerror = reject;
+      img.onerror = () => resolve(img); // Resolve on error to not block game initialization
       img.src = url;
     });
   }
+
+
+  private static async loadAudio(url: string): Promise<void> {
+    try {
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+      await res.blob();
+    } catch (err) {
+      console.warn(`Preloader failed to cache audio: ${url}`, err);
+    }
+  }
 }
+

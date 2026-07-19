@@ -1,5 +1,6 @@
 import { Icons } from './Icons';
 import { GameHeader } from './GameHeader';
+import './GameUI.css';
 
 export interface GameUIConfig {
   gameName: string;

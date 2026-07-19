@@ -1,61 +1,84 @@
-@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&display=swap');
+/* ========================================
+   Kipu Design System — Tier 1 Global Shell
+   Inspired by the Andean khipu: warm parchment,
+   cochineal red, deep indigo, fibrous string motifs.
+   ======================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600&display=swap');
 
 /* ========================================
-   KIPU — Design System V3
-   Inspired by the Andean khipu (knot records)
-   Parchment warmth · Cochineal red · Indigo depth
+   Kipu Design System — Tier 1 Global Shell
+   Inspired by the Andean khipu: warm parchment,
+   cochineal red, deep indigo, fibrous string motifs.
    ======================================== */
 :root {
-  /* Primary Cord — Warm Parchment */
-  --bg-color: #F5EDD8;
-  --bg-warm: #EDE0C4;
+  /* Color palette — 5 tokens */
+  --color-parchment:  #F5EDD8;   /* warm off-white background  */
+  --color-red:        #B5342A;   /* cochineal red — primary    */
+  --color-indigo:     #2D3875;   /* deep indigo — text/borders */
+  --color-sienna:     #C98B2F;   /* sienna/tan — accent        */
+  --color-cord:       #D4B896;   /* natural cord — decorative  */
 
-  /* Cochineal Red (Primary Brand) */
-  --primary-color: #B5342A;
-  --primary-light: #E05C4A;
+  /* Semantic tokens */
+  --bg:               var(--color-parchment);
+  --fg:               var(--color-indigo);
+  --primary:          var(--color-red);
+  --accent:           var(--color-sienna);
+  --cord:             var(--color-cord);
 
-  /* Indigo (Secondary) */
-  --secondary-color: #2D3875;
-  --secondary-light: #4A5BAD;
-
-  /* Accent — Amber/Wool */
-  --accent-color: #C98B2F;
-  --accent-light: #F2C46D;
-
-  /* Neutral Text */
-  --text-color: #1E1A14;
-  --text-muted: #6B5E4B;
+  /* Legacy brand variables for compatibility */
+  --bg-color:         var(--bg);
+  --bg-warm:          #EDE0C4;
+  --primary-color:    var(--primary);
+  --primary-light:    #E05C4A;
+  --secondary-color:  var(--fg);
+  --secondary-light:  #4A5BAD;
+  --accent-color:     var(--accent);
+  --accent-light:     #F2C46D;
+  --text-color:       var(--fg);
+  --text-muted:       #6B5E4B;
 
   /* String fiber tones */
-  --fiber-1: #8B6914;
-  --fiber-2: #6B3D2E;
+  --fiber-1:          #8B6914;
+  --fiber-2:          #6B3D2E;
 
   /* Category tints */
-  --sensory-color: #C98B2F;
-  --stem-color: #2D3875;
-  --music-color: #6B2E6B;
+  --sensory-color:    var(--accent-color);
+  --stem-color:       var(--secondary-color);
+  --music-color:      #6B2E6B;
 
-  --radius: 20px;
-  --radius-sm: 12px;
+  /* Layout tokens */
+  --radius:           20px;
+  --radius-sm:        12px;
+  --radius-pill:      999px;
+
+  /* Shadow depth (press-down buttons) */
+  --shadow-depth:     4px;
+  --shadow-depth-lg:  6px;
+
+  /* String border — the signature Tier 1 decorative element */
+  --string-border:    3px solid var(--cord);
 }
 
-* {
+/* ----------------------------------------
+   Reset & Base
+   ---------------------------------------- */
+*, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
   -webkit-tap-highlight-color: transparent;
 }
 
-body, html {
+html, body {
   width: 100%;
   height: 100%;
   overflow: hidden;
-  background-color: #F5EDD8;
-  background-color: var(--bg-color);
-  color: #1E1A14;
-  color: var(--text-color);
+  background-color: var(--bg);
+  color: var(--fg);
   font-family: 'Fredoka', sans-serif;
   touch-action: none;
+  -webkit-font-smoothing: antialiased;
 }
 
 #app {
@@ -79,29 +102,22 @@ body, html {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: flex-start;
+  padding: 40px 24px;
   overflow-y: auto;
-  background-color: var(--bg-color);
-  /* Fibrous texture via repeating linear gradient */
+  background-color: var(--bg);
   background-image:
     repeating-linear-gradient(
       90deg,
       transparent,
-      transparent 48px,
-      rgba(139, 105, 20, 0.04) 48px,
-      rgba(139, 105, 20, 0.04) 50px
+      transparent 60px,
+      rgba(160, 82, 45, 0.04) 60px,
+      rgba(160, 82, 45, 0.04) 61px
     );
-  padding-bottom: 2rem;
-}
-
-.nav-header {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 2.5rem 2rem 1.5rem;
   position: relative;
 }
 
+/* Khipu Cord Line aesthetics */
 .cord-line {
   width: 90%;
   height: 4px;
@@ -119,7 +135,6 @@ body, html {
   position: relative;
 }
 
-/* Hanging knot decorations */
 .cord-line::before,
 .cord-line::after {
   content: '';
@@ -133,102 +148,341 @@ body, html {
 .cord-line::before { left: 20%; }
 .cord-line::after  { right: 20%; }
 
+/* ---- Home Page Header ---- */
+.menu-header {
+  text-align: center;
+  margin-bottom: 2rem;
+  z-index: 1;
+  width: 100%;
+  max-width: 800px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.nav-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  position: relative;
+  min-height: 80px;
+  margin-bottom: 0.5rem;
+}
+
+.nav-left {
+  flex: 1 1 0%;
+  display: flex;
+  justify-content: flex-start;
+}
+
+.nav-center {
+  flex: 2 1 0%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.nav-right {
+  flex: 1 1 0%;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.nav-bar .back-btn {
+  margin-bottom: 0;
+}
+
 #navigation-shell h1 {
-  font-size: clamp(2.5rem, 8vw, 4rem);
+  margin: 0;
+  font-size: 3.5rem;
   font-weight: 600;
-  color: var(--primary-color);
-  letter-spacing: 0.05em;
-  text-shadow: 3px 3px 0px var(--bg-warm);
+  color: var(--primary);
+  letter-spacing: -0.5px;
+  text-align: center;
+  text-shadow: 3px 3px 0px rgba(192, 57, 43, 0.18);
+  position: relative;
+  z-index: 1;
   line-height: 1;
 }
 
-.nav-subtitle {
-  font-size: 1rem;
-  font-weight: 400;
-  color: var(--text-muted);
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  margin-top: 0.4rem;
+.tagline {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 1.1rem;
+  color: rgba(43, 45, 94, 0.6);
+  margin-top: 0.5rem;
+  text-align: center;
 }
 
-/* ========================================
-   Game Sections (Tier 2 "String Families")
-   ======================================== */
-.game-section {
+/* ---- Rotating Hero Banner ---- */
+.hero-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   width: 100%;
-  max-width: 560px;
-  padding: 0 1.25rem;
-  margin-bottom: 1.5rem;
+  max-width: 800px;
+  background-color: #F1948A;
+  border: 3px solid var(--fg);
+  border-radius: 24px;
+  padding: 24px 32px;
+  margin-bottom: 2.5rem;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 var(--shadow-depth-lg) 0px var(--fg);
+  z-index: 2;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+  flex-shrink: 0;
 }
 
-.section-label {
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--text-muted);
-  margin-bottom: 0.75rem;
-  padding-left: 0.25rem;
-  border-left: 3px solid var(--accent-color);
-  padding-left: 0.6rem;
+.hero-card.fade-transition {
+  opacity: 0;
+  transform: scale(0.98);
 }
 
-.game-list {
+.hero-content {
+  flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  align-items: flex-start;
+  text-align: left;
+  z-index: 2;
 }
 
-.game-list a {
-  padding: 1rem 1.25rem;
-  font-size: 1.35rem;
-  font-weight: 600;
-  border: 3px solid var(--text-color);
-  border-radius: var(--radius);
-  background-color: var(--bg-warm);
-  color: var(--text-color);
-  box-shadow: 0 5px 0px var(--text-color);
-  cursor: pointer;
-  transition: all 0.1s ease;
+.featured-badge {
+  background-color: var(--primary);
+  color: white;
   font-family: 'Fredoka', sans-serif;
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  text-decoration: none;
-  position: relative;
+  font-weight: 700;
+  font-size: 0.75rem;
+  padding: 4px 10px;
+  border-radius: 20px;
+  margin-bottom: 0.75rem;
+  letter-spacing: 0.5px;
+  border: 2px solid var(--fg);
 }
 
-.game-list a .icon {
-  width: 32px;
-  height: 32px;
-  flex-shrink: 0;
+.hero-card h2 {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: var(--fg);
+  margin: 0 0 0.25rem 0;
+}
+
+.hero-card p#hero-subtitle {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: rgba(43, 45, 94, 0.85);
+  margin: 0 0 0.75rem 0;
+}
+
+.hero-card p#hero-desc {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 0.95rem;
+  color: rgba(43, 45, 94, 0.65);
+  margin: 0 0 1.5rem 0;
+  max-width: 450px;
+  line-height: 1.4;
+}
+
+.hero-btn-play {
+  background-color: var(--fg);
+  color: white;
+  font-family: 'Fredoka', sans-serif;
+  font-weight: 700;
+  font-size: 1.1rem;
+  padding: 10px 24px;
+  border: 3px solid var(--fg);
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  box-shadow: 0 4px 0px var(--accent);
+  transition: transform 0.08s ease, box-shadow 0.08s ease;
+}
+
+.hero-btn-play:active {
+  transform: translateY(4px);
+  box-shadow: none;
+}
+
+.hero-interactive-preview {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.4);
+  border: 3px dashed var(--fg);
+  margin-left: 2rem;
+  animation: hero-float 6s ease-in-out infinite;
+}
+
+@keyframes hero-float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-8px) rotate(5deg); }
+}
+
+#hero-icon-container {
+  display: flex;
+  justify-content: center;
+  color: var(--primary);
+}
+
+#hero-icon-container svg {
+  width: 60px;
+  height: 60px;
+}
+
+.hero-dots {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+  z-index: 3;
+}
+
+.hero-dots .dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: rgba(43, 45, 94, 0.2);
+  border: 1.5px solid var(--fg);
+  cursor: pointer;
+  padding: 0;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.hero-dots .dot.active {
+  background-color: var(--accent);
+  transform: scale(1.2);
+}
+
+
+
+
+/* Mobile media query block moved to end of file */
+
+
+/* ---- Portal Choice Instruction ---- */
+.portal-instruction {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 1.45rem;
+  font-weight: 700;
+  color: var(--accent);
+  text-align: center;
+  margin: 0 0 1rem 0;
+  z-index: 2;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.portal-instruction .bouncing-arrow {
+  color: var(--accent);
+  animation: arrow-bounce 0.8s infinite alternate ease-in-out;
+}
+
+@keyframes arrow-bounce {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(6px); }
+}
+
+/* ---- Play Portals Grid ---- */
+.portals-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+  width: 100%;
+  max-width: 800px;
+  margin-bottom: 2.5rem;
+  z-index: 2;
+}
+
+/* ---- Portal Card Base Style ---- */
+.portal-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 32px 24px;
+  border: 3px solid var(--fg);
+  border-radius: 24px;
+  text-decoration: none;
+  color: var(--fg);
+  box-shadow: 0 var(--shadow-depth-lg) 0px var(--fg);
+  cursor: pointer;
+  overflow: hidden;
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease, background-color 0.3s ease;
+}
+
+/* Fibrous top string overlay on cards */
+.portal-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background: repeating-linear-gradient(
+    90deg,
+    rgba(255,255,255,0.5) 0px,
+    rgba(255,255,255,0.5) 3px,
+    transparent 3px,
+    transparent 6px
+  );
+  border-radius: 24px 24px 0 0;
+}
+
+/* Icon Container */
+.portal-card .icon {
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.4);
+  border: 2.5px dashed var(--fg);
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-.game-list a .icon svg {
-  width: 28px;
-  height: 28px;
+.portal-card .icon svg {
+  width: 36px;
+  height: 36px;
+  color: var(--fg);
 }
 
-.game-subtitle {
-  font-size: 0.75rem;
+/* Portal Labels */
+.portal-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.portal-title {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 1.6rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.portal-subtitle {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 0.85rem;
   font-weight: 400;
-  color: var(--text-muted);
-  margin-left: auto;
-  white-space: nowrap;
+  color: rgba(43, 45, 94, 0.6);
+  text-align: center;
+  line-height: 1.3;
 }
 
-.game-list a:active {
-  transform: translateY(3px);
-  box-shadow: 0 2px 0px var(--text-color);
-}
-
-/* Sensory category — warm amber */
-.game-list a[data-category="sensory"] {
-  border-left: 6px solid var(--sensory-color);
-}
 .game-list a[data-game="poka"]  { background-color: #FBECD4; }
 .game-list a[data-game="eeno"]  { background-color: #FDDDD8; }
 .game-list a[data-game="maka"]  { background-color: #D9EDD4; }
@@ -250,10 +504,408 @@ body, html {
 .game-list a[data-category="music"] {
   border-left: 6px solid var(--music-color);
 }
-.game-list a[data-game="soundMemory"] { background-color: #EDD9ED; }
+
+/* ---- Portal Card Colors & Micro-Animations ---- */
+
+/* Sandbox: Warm Golden Sand & Squishy Elastic Hover */
+.portal-card.portal-sandbox {
+  background: linear-gradient(135deg, #FDEBD0 0%, #F5CBA7 100%);
+  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.45, 1.4), box-shadow 0.4s ease, background-color 0.4s ease;
+}
+.portal-card.portal-sandbox:hover {
+  transform: scale(1.04, 0.96);
+  box-shadow: 0 var(--shadow-depth) 0px var(--fg);
+}
+.portal-card.portal-sandbox:hover .icon {
+  transform: scale(1.1) rotate(5deg);
+}
+
+/* Workshop: Pastel Lavender/Purple & Glowing Pulse hover */
+.portal-card.portal-workshop {
+  background: linear-gradient(135deg, #D5F5E3 0%, #E8F8F5 100%);
+}
+.portal-card.portal-workshop:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 0 20px rgba(46, 204, 113, 0.8), 0 var(--shadow-depth-lg) 0px var(--fg);
+}
+.portal-card.portal-workshop:hover .icon {
+  animation: workshop-icon-bounce 0.45s ease infinite;
+}
+
+@keyframes workshop-icon-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+/* Lab: Blueprint Corner Brackets & Rigid Isometric Offset hover */
+.portal-card.portal-lab {
+  background: linear-gradient(135deg, #AED6F1 0%, #EBF5FB 100%);
+}
+
+/* Lab Blueprint corner tick marks overriding string layout */
+.portal-card.portal-lab::before {
+  content: '';
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  width: 12px;
+  height: 12px;
+  background: none;
+  border-top: 3px solid var(--fg);
+  border-left: 3px solid var(--fg);
+  border-radius: 0;
+}
+.portal-card.portal-lab::after {
+  content: '';
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  width: 12px;
+  height: 12px;
+  background: none;
+  border-bottom: 3px solid var(--fg);
+  border-right: 3px solid var(--fg);
+  border-radius: 0;
+  top: auto;
+  left: auto;
+  transform: none;
+  opacity: 1;
+}
+
+.portal-card.portal-lab:hover {
+  transform: translate(8px, -8px);
+  box-shadow: -8px 8px 0px var(--fg);
+}
+.portal-card.portal-lab:hover .icon {
+  transform: scale(1.1);
+}
+
+.portal-card:active {
+  transform: translateY(var(--shadow-depth));
+  box-shadow: 0 2px 0px var(--fg);
+}
+
+/* Busy Board: Industrial Steel & Mechanical Toggle/Spring Hover */
+.portal-card.portal-busyBoard {
+  background: linear-gradient(135deg, #F2F3F4 0%, #D5D8DC 100%);
+}
+.portal-card.portal-busyBoard:hover {
+  transform: scale(1.02) rotate(-1deg);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15), 0 var(--shadow-depth) 0px var(--fg);
+}
+.portal-card.portal-busyBoard:hover .icon {
+  transform: translateY(2px) scale(1.05);
+}
+
+/* ---- Playful Wooden/Parchment Back Button Tag ---- */
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background-color: var(--color-parchment);
+  color: var(--fg);
+  border: 2px solid var(--fg);
+  border-radius: var(--radius-sm);
+  padding: 8px 16px;
+  font-family: 'Fredoka', sans-serif;
+  font-weight: 600;
+  font-size: 0.95rem;
+  text-decoration: none;
+  box-shadow: 0 var(--shadow-depth) 0px var(--fg);
+  cursor: pointer;
+  transition: transform 0.08s ease, box-shadow 0.08s ease;
+  margin-bottom: 1.5rem;
+}
+
+.back-btn svg {
+  transition: transform 0.15s ease;
+}
+
+.back-btn:hover svg {
+  transform: translateX(-4px);
+}
+
+.back-btn:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0px var(--fg);
+}
+
+/* ---- Tier 2 Portal Theme Backgrounds ---- */
+
+/* Sandbox theme: warm shifting sand dune shapes */
+#navigation-shell.portal-sandbox {
+  background: radial-gradient(circle at 10% 20%, rgba(253, 235, 208, 0.45), transparent 45%),
+              radial-gradient(circle at 90% 80%, rgba(245, 203, 167, 0.4), transparent 45%),
+              radial-gradient(circle at 50% 50%, rgba(250, 215, 160, 0.3), transparent 50%),
+              var(--bg);
+}
+
+/* Workshop theme: rhythmic glowing threads with a subtle pulse */
+#navigation-shell.portal-workshop {
+  background: linear-gradient(180deg, rgba(169, 223, 191, 0.12) 0%, transparent 100%),
+              repeating-linear-gradient(45deg, transparent, transparent 40px, rgba(46, 204, 113, 0.02) 40px, rgba(46, 204, 113, 0.02) 41px),
+              var(--bg);
+  animation: workshop-bg-pulse 4s ease-in-out infinite alternate;
+}
+
+@keyframes workshop-bg-pulse {
+  0%, 100% { filter: brightness(1.0); }
+  50% { filter: brightness(1.03); }
+}
+
+/* Lab theme: precise technical grid paper layout */
+#navigation-shell.portal-lab {
+  background-size: 24px 24px;
+  background-image: linear-gradient(to right, rgba(52, 152, 219, 0.06) 1px, transparent 1px),
+                    linear-gradient(to bottom, rgba(52, 152, 219, 0.06) 1px, transparent 1px);
+  background-color: #EBF5FB;
+}
+
+/* Busy Board theme: physical rivets / brushed metal plate feeling */
+#navigation-shell.portal-busyBoard {
+  background: radial-gradient(circle at 10px 10px, rgba(189, 195, 199, 0.25) 2px, transparent 3px),
+              radial-gradient(circle at calc(100% - 10px) 10px, rgba(189, 195, 199, 0.25) 2px, transparent 3px),
+              radial-gradient(circle at 10px calc(100% - 10px), rgba(189, 195, 199, 0.25) 2px, transparent 3px),
+              radial-gradient(circle at calc(100% - 10px) calc(100% - 10px), rgba(189, 195, 199, 0.25) 2px, transparent 3px),
+              linear-gradient(180deg, rgba(229, 232, 235, 0.1) 0%, transparent 100%),
+              var(--bg);
+  background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, auto;
+  background-color: #F8F9F9;
+}
+
+/* ---- Cards Grid ---- */
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 175px);
+  justify-content: center;
+  gap: 24px;
+  width: 100%;
+  max-width: 800px;
+  position: relative;
+  z-index: 1;
+  padding-bottom: 40px;
+}
+
+/* ---- Game Card — base style ---- */
+.cards-grid a {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 24px 16px;
+  aspect-ratio: 1.15;
+  font-size: 1.5rem;
+  font-weight: 600;
+  font-family: 'Fredoka', sans-serif;
+  color: var(--fg);
+  text-decoration: none;
+  border: 3px solid var(--fg);
+  border-radius: 20px;
+  background-color: var(--cord);
+  box-shadow: 0 var(--shadow-depth-lg) 0px var(--fg);
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  overflow: hidden;
+}
+
+.cards-grid a.hidden {
+  display: none !important;
+}
+
+/* Fibrous left-edge string accent */
+.cards-grid a::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 6px;
+  background: repeating-linear-gradient(
+    180deg,
+    rgba(255,255,255,0.5) 0px,
+    rgba(255,255,255,0.5) 3px,
+    transparent 3px,
+    transparent 6px
+  );
+  border-radius: 20px 0 0 20px;
+}
+
+.cards-grid a:hover {
+  transform: translateY(-4px);
+}
+
+.cards-grid a:active {
+  transform: translateY(var(--shadow-depth));
+  box-shadow: 0 2px 0px var(--fg);
+}
+
+/* Icon container */
+.cards-grid a .icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  margin-bottom: 4px;
+}
+
+.cards-grid a .icon svg {
+  width: 38px;
+  height: 38px;
+}
+
+/* ---- Portal Specific Game Card Hover Customizations ---- */
+
+/* Sandbox view: shifting/settling grains effect */
+.portal-sandbox .cards-grid a {
+  transition: transform 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+.portal-sandbox .cards-grid a:hover {
+  transform: translate(3px, 3px);
+  box-shadow: 0 2px 0px var(--fg);
+}
+
+/* Workshop view: vibrating musical glow */
+.portal-workshop .cards-grid a:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 0 15px rgba(46, 204, 113, 0.8), 0 var(--shadow-depth-lg) 0px var(--fg);
+  border-color: #A9DFBF;
+}
+
+/* Lab view: blueprint rigid grid isometric offset */
+.portal-lab .cards-grid a {
+  border-radius: 4px; /* precise square corner */
+}
+.portal-lab .cards-grid a::before {
+  border-radius: 4px 0 0 4px;
+}
+.portal-lab .cards-grid a:hover {
+  transform: translate(4px, -4px);
+  box-shadow: -4px 8px 0px var(--fg);
+}
+
+/* Busy Board view: mechanical pressed down clicky offset */
+.portal-busyBoard .cards-grid a {
+  transition: transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.portal-busyBoard .cards-grid a:hover {
+  transform: scale(1.03);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1), 0 var(--shadow-depth) 0px var(--fg);
+}
+.portal-busyBoard .cards-grid a:active {
+  transform: translateY(var(--shadow-depth));
+  box-shadow: 0 2px 0px var(--fg);
+}
+
+/* ---- Per-game card colors ---- */
+
+/* Poka (Bubble Wrap) */
+.cards-grid a[data-game="bubbleWrap"] {
+  background-color: #AED6F1;
+}
+
+/* Eeno (No Button) */
+.cards-grid a[data-game="noButton"] {
+  background-color: #F1948A;
+}
+
+/* Tapa (Balloon Pop) */
+.cards-grid a[data-game="balloonPop"] {
+  background-color: #A9DFBF;
+}
+
+/* Sutuy (Color Dropper) */
+.cards-grid a[data-game="colorDropper"] {
+  background-color: #FADBD8;
+}
+
+/* Maka (Color Mixer) */
+.cards-grid a[data-game="colorMixer"] {
+  background-color: #D7BDE2;
+}
+
+/* Nuko (Bug Catcher) */
+.cards-grid a[data-game="bugCatcher"] {
+  background-color: #FCF3CF;
+}
+
+/* Sound Memory */
+.cards-grid a[data-game="soundMemory"] {
+  background-color: #D5F5E3;
+}
+
+/* Marble Pipe */
+.cards-grid a[data-game="marblePipe"] {
+  background-color: #F5CBA7;
+}
+
+/* Sound Board */
+.cards-grid a[data-game="soundBoard"] {
+  background-color: #F9E4B7;
+}
+
+/* Particle Physics */
+.cards-grid a[data-game="particlePhysics"] {
+  background-color: #C8E6C9;
+}
+
+/* The Switchboard */
+.cards-grid a[data-game="switchboard"] {
+  background-color: #BDC3C7; /* Sleek steel/aluminum */
+}
+
+/* The Luminary Board */
+.cards-grid a[data-game="luminaryBoard"] {
+  background-color: #FFE082; /* Warm glowing amber */
+}
+
+/* The Mechanical Workshop */
+.cards-grid a[data-game="mechanicalWorkshop"] {
+  background-color: #D7CCC8; /* Warm light wood/cork */
+}
+
+/* Game name label */
+.cards-grid a .game-label {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  align-items: center;
+  text-align: center;
+}
+
+.cards-grid a .game-title {
+  font-size: 1.4rem;
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--fg);
+}
+
+.cards-grid a .game-subtitle {
+  font-size: 0.85rem;
+  font-weight: 400;
+  color: rgba(43, 45, 94, 0.6);
+  line-height: 1.3;
+}
+
+/* ---- Decorative hanging string ---- */
+.cards-grid a::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 2px;
+  height: 10px;
+  background: var(--cord);
+  border-radius: 1px;
+  opacity: 0.5;
+}
 
 /* ========================================
-   Canvas
+   Game Canvas
    ======================================== */
 #game-canvas {
   width: 100%;
@@ -971,4 +1623,216 @@ body, html {
 body.menu-open #game-canvas {
   filter: brightness(0.7);
   transition: filter 0.3s ease;
+}
+
+@media (max-width: 600px) {
+  /* Navigation shell padding */
+  #navigation-shell {
+    padding: 24px 12px 100px 12px;
+  }
+
+  /* ---- Hero Card ---- */
+  .hero-card {
+    padding: 16px 20px 24px 20px;
+    margin-bottom: 1.5rem;
+    border-width: 2px;
+    border-radius: 16px;
+  }
+  .featured-badge {
+    font-size: 0.65rem;
+    padding: 2px 6px;
+    margin-bottom: 0.5rem;
+    border-width: 1.5px;
+  }
+  .hero-card h2 {
+    font-size: 1.5rem;
+    margin-bottom: 0.15rem;
+  }
+  .hero-card p#hero-subtitle {
+    font-size: 0.95rem;
+    margin-bottom: 0.5rem;
+  }
+  .hero-card p#hero-desc {
+    font-size: 0.8rem;
+    margin-bottom: 1rem;
+    line-height: 1.3;
+  }
+  .hero-btn-play {
+    font-size: 0.9rem;
+    padding: 6px 16px;
+    border-width: 2px;
+    border-radius: 8px;
+    box-shadow: 0 3px 0 var(--fg);
+  }
+  .hero-interactive-preview {
+    width: 80px;
+    height: 80px;
+    margin-left: 1.25rem;
+    border-width: 2px;
+  }
+  #hero-icon-container svg {
+    width: 40px;
+    height: 40px;
+  }
+  .hero-dots {
+    bottom: 8px;
+    gap: 6px;
+  }
+  .hero-dots .dot {
+    width: 8px;
+    height: 8px;
+    border-width: 1px;
+  }
+
+  /* ---- Portals Mobile ---- */
+  .portals-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    padding: 0 12px;
+    margin-bottom: 1.5rem;
+  }
+  .portal-card {
+    flex-direction: row;
+    justify-content: flex-start;
+    padding: 16px 20px;
+    border-radius: 16px;
+    gap: 16px;
+  }
+  .portal-card .icon {
+    width: 48px;
+    height: 48px;
+  }
+  .portal-card .icon svg {
+    width: 28px;
+    height: 28px;
+  }
+  .portal-label {
+    text-align: left;
+    align-items: flex-start;
+  }
+  .portal-title {
+    font-size: 1.25rem;
+  }
+  .portal-subtitle {
+    font-size: 0.75rem;
+    text-align: left;
+  }
+  .nav-bar {
+    min-height: 52px;
+  }
+  .nav-bar .back-btn {
+    margin-bottom: 0;
+    padding: 6px 12px;
+    font-size: 0.8rem;
+  }
+  #navigation-shell h1 {
+    font-size: 2.2rem;
+  }
+  .tagline {
+    font-size: 0.95rem;
+    margin-top: 0.25rem;
+  }
+
+  /* ---- Cards Grid ---- */
+  .cards-grid {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 120px));
+    justify-content: center;
+    gap: 8px;
+    padding-bottom: 24px;
+  }
+  .cards-grid a {
+    padding: 12px 6px;
+    border-width: 2px;
+    border-radius: 12px;
+    gap: 4px;
+    aspect-ratio: 1.05;
+    box-shadow: 0 3px 0 var(--fg);
+  }
+  .cards-grid a .icon {
+    width: 28px;
+    height: 28px;
+    margin-bottom: 0;
+  }
+  .cards-grid a .icon svg {
+    width: 22px;
+    height: 22px;
+  }
+  .cards-grid a .game-title {
+    font-size: 0.95rem;
+  }
+  .cards-grid a .game-subtitle {
+    font-size: 0.72rem;
+  }
+  .cards-grid a::before {
+    width: 3px;
+  }
+  .cards-grid a::after {
+    height: 5px;
+    bottom: -5px;
+  }
+
+  /* ---- Mobile Bottom Tab Bar ---- */
+  .mobile-tab-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 64px;
+    background-color: var(--color-parchment);
+    border-top: 3px solid var(--fg);
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    z-index: 100;
+    padding-bottom: env(safe-area-inset-bottom);
+    box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.05);
+  }
+
+  .mobile-tab-bar.hidden {
+    display: none !important;
+  }
+
+  .tab-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    flex: 1;
+    height: 100%;
+    color: var(--fg);
+    text-decoration: none;
+    font-size: 0.72rem;
+    font-weight: 500;
+    opacity: 0.6;
+    transition: opacity 0.2s ease, transform 0.1s ease;
+  }
+
+  .tab-item:active {
+    transform: scale(0.92);
+  }
+
+  .tab-item.active {
+    opacity: 1;
+    color: var(--primary);
+    font-weight: 600;
+  }
+
+  .tab-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+  }
+
+  .tab-icon svg {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+/* Fallback default desktop styles */
+.mobile-tab-bar {
+  display: none;
 }

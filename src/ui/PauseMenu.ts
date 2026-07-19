@@ -1,9 +1,9 @@
 import { Icons } from './Icons';
 
 export class PauseMenu {
-  private element: HTMLElement;
-  private onResume: () => void;
-  private onHome: () => void;
+  private readonly element: HTMLElement;
+  private readonly onResume: () => void;
+  private readonly onHome: () => void;
 
   constructor(onResume: () => void, onHome: () => void) {
     this.onResume = onResume;

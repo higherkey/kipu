@@ -1,7 +1,7 @@
 export class IdleManager {
   private timeoutId: number | null = null;
   private readonly timeoutMs: number;
-  private onIdle: () => void;
+  private readonly onIdle: () => void;
 
   constructor(timeoutMs: number, onIdle: () => void) {
     this.timeoutMs = timeoutMs;

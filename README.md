@@ -2,6 +2,8 @@
 
 > A tactile, sensory, and educational mini-game suite for children — inspired by the Andean khipu, the knot-based recording system of the Incan Empire.
 
+[![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen.svg?style=flat-square)](https://github.com/richardlitt/standard-readme)
+[![Live Demo](https://img.shields.io/badge/Live-Demo-brightgreen?style=flat-square)](https://kipu-games.vercel.app/)
 [![Build Status](https://github.com/higherkey/kipu/actions/workflows/build.yml/badge.svg)](https://github.com/higherkey/kipu/actions/workflows/build.yml)
 [![Vite 8](https://img.shields.io/badge/Vite-8-646CFF?style=flat-square&logo=vite)](https://vite.dev/)
 [![TypeScript 6](https://img.shields.io/badge/TypeScript-6-007ACC?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
@@ -9,7 +11,7 @@
 [![Matter.js](https://img.shields.io/badge/Matter.js-0.20-EF5350?style=flat-square)](#)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)](LICENSE)
 
-**Kipu** (from Quechua *khipu*, "knot") is a mobile-first web platform hosting high-performance, tactile mini-games designed for children ages 2–10. The design honors the khipu as an intellectual achievement — emphasizing that touch and connection are vehicles for meaning.
+**Kipu** (from Quechua *khipu*, "knot") is a mobile-first web platform hosting high-performance, tactile mini-games designed for children ages 2–10. The design honors the khipu as an intellectual achievement — emphasizing that touch and connection are vehicles for meaning. Our primary focus is **immediate tactile engagement**—ensuring zero perceptible latency between touch events and their corresponding audio/haptic responses.
 
 ## Table of Contents
 
@@ -101,12 +103,15 @@ Kipu uses a three-tier design framework:
 - npm
 
 ### Installation
-
-```bash
-git clone https://github.com/higherkey/kipu.git
-cd kipu
-npm install
-```
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/higherkey/kipu.git
+   cd kipu
+   ```
+2. **Install dependencies:**
+   ```bash
+   npm install
+   ```
 
 ---
 
@@ -135,7 +140,7 @@ npm run test
 
 ## Contributing
 
-Please review `KidsGames_Web_Technical_Specification.md` for architecture and coding standards before making changes. Ensure any testing changes align with our `testing-kids-games` plugin workflow.
+Please review [PROJECT.md](file:///c:/Programming/kipu%20-%20kids%20games/PROJECT.md) and [KidsGames_Web_Technical_Specification.md](file:///c:/Programming/kipu%20-%20kids%20games/docs/KidsGames_Web_Technical_Specification.md) for our sensory-first coding standards and architecture before making changes. Ensure any testing changes align with our `testing-kipu` plugin workflow.
 
 ### Project Roadmap
 

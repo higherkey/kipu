@@ -25,4 +25,20 @@ export interface Game {
    * Cleans up resources, event listeners, etc.
    */
   destroy(): void;
+
+  /**
+   * Optional callback when canvas/container is resized.
+   */
+  resize?(width: number, height: number): void;
+
+  /**
+   * Optional callback when sound settings change.
+   */
+  setSoundEnabled?(enabled: boolean): void;
+
+  /**
+   * Optional callback when vibration settings change.
+   */
+  setVibrationEnabled?(enabled: boolean): void;
 }
+

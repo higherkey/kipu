@@ -1,0 +1,240 @@
+import type { BusyBoardModule } from '../BusyBoardModule';
+import type { LuminaryBoardGame } from '../LuminaryBoardGame';
+import { AudioController } from '../../../core/AudioController';
+import { HapticController } from '../../../core/HapticController';
+
+export class RainbowCrossfader implements BusyBoardModule {
+  public id: string;
+  public x: number;
+  public y: number;
+  public w: number;
+  public h: number;
+  private game: LuminaryBoardGame;
+  private value = 0.5; // 0.0 to 1.0 (maps to HSL 0-360)
+  private isDragging = false;
+  private audio: AudioController;
+  private haptics: HapticController;
+  private lastTickValue = 0.5;
+  private trailPoints: { x: number; y: number; color: string; alpha: number }[] = [];
+
+  constructor(id: string, x: number, y: number, w: number, h: number, game: LuminaryBoardGame) {
+    this.id = id;
+    this.x = x;
+    this.y = y;
+    this.w = w;
+    this.h = h;
+    this.game = game;
+    this.audio = AudioController.getInstance();
+    this.haptics = HapticController.getInstance();
+  }
+
+  public init(): void {}
+
+  public render(ctx: CanvasRenderingContext2D, px: number, py: number, pw: number, ph: number): void {
+    const theme = this.game.getTheme();
+    const margin = 12;
+    const mx = px + margin;
+    const my = py + margin;
+    const mw = pw - margin * 2;
+    const mh = ph - margin * 2;
+
+    // Faceplate
+    ctx.save();
+    ctx.shadowColor = theme === 'paper' ? 'rgba(0, 0, 0, 0.08)' : 'rgba(255, 0, 255, 0.15)';
+    ctx.shadowBlur = 8;
+    ctx.shadowOffsetX = 2;
+    ctx.shadowOffsetY = 4;
+
+    if (theme === 'paper') {
+      ctx.fillStyle = '#FAF8F5';
+      ctx.strokeStyle = '#D5C3A6';
+    } else {
+      ctx.fillStyle = '#1A1D24';
+      ctx.strokeStyle = '#FF007F';
+    }
+    ctx.lineWidth = 3;
+    this.roundRect(ctx, mx, my, mw, mh, 16);
+    ctx.fill();
+    ctx.shadowColor = 'transparent';
+    ctx.stroke();
+    ctx.restore();
+
+    // Title
+    ctx.save();
+    ctx.font = 'bold 13px Fredoka, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    if (theme === 'paper') {
+      ctx.fillStyle = '#5A564C';
+    } else {
+      ctx.fillStyle = '#FF00FF';
+      ctx.shadowColor = '#FF00FF';
+      ctx.shadowBlur = 4;
+    }
+    ctx.fillText('RAINBOW CROSSFADER', mx + mw / 2, my + 12);
+    ctx.restore();
+
+    // Track coordinates (Horizontal fader)
+    const trackStartY = my + mh * 0.6;
+    const trackStartX = mx + mw * 0.15;
+    const trackEndX = mx + mw * 0.85;
+    const trackWidth = trackEndX - trackStartX;
+
+    // Draw neon trail path if any points exist
+    this.updateTrail();
+    ctx.save();
+    this.trailPoints.forEach(pt => {
+      ctx.fillStyle = pt.color;
+      ctx.globalAlpha = pt.alpha;
+      ctx.beginPath();
+      ctx.arc(pt.x, pt.y, 6, 0, Math.PI * 2);
+      ctx.fill();
+    });
+    ctx.restore();
+
+    // Draw the spectrum track background
+    ctx.save();
+    const spectrumGrad = ctx.createLinearGradient(trackStartX, trackStartY, trackEndX, trackStartY);
+    spectrumGrad.addColorStop(0, 'hsl(0, 100%, 50%)');
+    spectrumGrad.addColorStop(0.17, 'hsl(60, 100%, 50%)');
+    spectrumGrad.addColorStop(0.33, 'hsl(120, 100%, 50%)');
+    spectrumGrad.addColorStop(0.5, 'hsl(180, 100%, 50%)');
+    spectrumGrad.addColorStop(0.67, 'hsl(240, 100%, 50%)');
+    spectrumGrad.addColorStop(0.83, 'hsl(300, 100%, 50%)');
+    spectrumGrad.addColorStop(1, 'hsl(360, 100%, 50%)');
+
+    ctx.strokeStyle = spectrumGrad;
+    ctx.lineWidth = 10;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(trackStartX, trackStartY);
+    ctx.lineTo(trackEndX, trackStartY);
+    ctx.stroke();
+    ctx.restore();
+
+    // Slider knob
+    const knobX = trackStartX + this.value * trackWidth;
+    const activeColor = `hsl(${this.value * 360}, 100%, 50%)`;
+
+    ctx.save();
+    ctx.shadowColor = 'rgba(0,0,0,0.2)';
+    ctx.shadowBlur = 6;
+    ctx.shadowOffsetY = 3;
+
+    ctx.beginPath();
+    ctx.arc(knobX, trackStartY, 14, 0, Math.PI * 2);
+    if (theme === 'paper') {
+      ctx.fillStyle = '#EAE6DF';
+      ctx.strokeStyle = '#BCAE97';
+    } else {
+      ctx.fillStyle = '#282D37';
+      ctx.strokeStyle = activeColor;
+    }
+    ctx.lineWidth = 3;
+    ctx.fill();
+    ctx.stroke();
+
+    // Inner glowing dot
+    ctx.beginPath();
+    ctx.arc(knobX, trackStartY, 6, 0, Math.PI * 2);
+    ctx.fillStyle = activeColor;
+    ctx.fill();
+
+    ctx.restore();
+  }
+
+  public handlePointerDown(x: number, y: number, px: number, py: number, pw: number, ph: number): boolean {
+    const margin = 12;
+    const mx = px + margin;
+    const my = py + margin;
+    const mw = pw - margin * 2;
+    const mh = ph - margin * 2;
+
+    const trackStartY = my + mh * 0.6;
+    const trackStartX = mx + mw * 0.15;
+    const trackEndX = mx + mw * 0.85;
+    const trackWidth = trackEndX - trackStartX;
+
+    const knobX = trackStartX + this.value * trackWidth;
+
+    const dx = x - knobX;
+    const dy = y - trackStartY;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+
+    if (dist <= 25) {
+      this.isDragging = true;
+      this.haptics.lightTap();
+      return true;
+    }
+    return false;
+  }
+
+  public handlePointerMove(x: number, _y: number, px: number, py: number, pw: number, ph: number): void {
+    if (!this.isDragging) return;
+
+    const margin = 12;
+    const mx = px + margin;
+    const my = py + margin;
+    const mw = pw - margin * 2;
+    const mh = ph - margin * 2;
+
+    const trackStartY = my + mh * 0.6;
+    const trackStartX = mx + mw * 0.15;
+    const trackEndX = mx + mw * 0.85;
+    const trackWidth = trackEndX - trackStartX;
+
+    let pct = (x - trackStartX) / trackWidth;
+    pct = Math.max(0, Math.min(1, pct));
+
+    this.value = pct;
+
+    // Add trail point
+    const knobX = trackStartX + this.value * trackWidth;
+    const color = `hsl(${this.value * 360}, 100%, 50%)`;
+    this.trailPoints.push({
+      x: knobX,
+      y: trackStartY,
+      color,
+      alpha: 1.0
+    });
+
+    // Play chord sweeps using synth:pluck
+    if (Math.abs(this.value - this.lastTickValue) >= 0.05) {
+      const pitch = 250 + this.value * 450;
+      this.audio.play('synth:pluck', pitch);
+      this.haptics.lightTap();
+      this.lastTickValue = this.value;
+    }
+  }
+
+  public handlePointerUp(): void {
+    if (this.isDragging) {
+      this.isDragging = false;
+      this.audio.play('synth:click', 350);
+    }
+  }
+
+  public destroy(): void {}
+
+  private updateTrail() {
+    // Fade out and remove old trail points
+    this.trailPoints.forEach(pt => {
+      pt.alpha -= 0.05;
+      // Add a slight jitter/drift for visual flare
+      pt.y += (Math.random() - 0.5) * 1.5;
+    });
+    this.trailPoints = this.trailPoints.filter(pt => pt.alpha > 0);
+  }
+
+  private roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
+    if (w < 2 * r) r = w / 2;
+    if (h < 2 * r) r = h / 2;
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+  }
+}

@@ -27,6 +27,15 @@ describe('Router', () => {
     expect(handler).toHaveBeenCalledWith({ id: 'bubbleWrap' });
   });
 
+  it('should parse dynamic portal route parameters', () => {
+    const handler = vi.fn();
+    router.addRoute('/portal/:portalId', handler);
+    
+    router.navigate('/portal/sandbox');
+
+    expect(handler).toHaveBeenCalledWith({ portalId: 'sandbox' });
+  });
+
   it('should fall back to wildcard route if no matches found', () => {
     const exactHandler = vi.fn();
     const wildHandler = vi.fn();

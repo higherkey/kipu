@@ -1,14 +1,14 @@
 ---
-name: testing-kids-games
-description: Test the Kids Games Suite app end-to-end. Use when verifying new game implementations or checking for regressions in existing games.
+name: testing-kipu
+description: Test the Kipu app end-to-end. Use when verifying new game implementations or checking for regressions in existing games.
 ---
 
-# Testing Kids Games Suite
+# Testing Kipu
 
 ## Dev Server
 
 ```bash
-cd /home/ubuntu/repos/kids-games-site
+cd /home/ubuntu/repos/kipu
 npm install --legacy-peer-deps   # needed due to vite-plugin-pwa peer dep range
 npm run dev -- --host 0.0.0.0
 ```
@@ -27,7 +27,7 @@ Both must pass before creating a PR.
 ## Navigation Test
 
 - Open `http://localhost:5173`
-- Verify the title "Kids Games Suite" is visible
+- Verify the title "Kipu" is visible
 - Verify all game buttons are present with correct labels, icons (SVG), and background colors
 - Each game button has a `data-game` attribute matching its game key
 

@@ -1,6 +1,6 @@
 export class Navigation {
-  private navShell: HTMLElement;
-  private gameCanvas: HTMLCanvasElement;
+  private readonly navShell: HTMLElement;
+  private readonly gameCanvas: HTMLCanvasElement;
 
   constructor() {
     this.navShell = document.getElementById('navigation-shell')!;
