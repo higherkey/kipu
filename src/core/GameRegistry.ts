@@ -3,6 +3,7 @@ import { NoButtonGame } from '../games/noButton/NoButtonGame';
 import { BubbleWrapGame } from '../games/bubbleWrap/BubbleWrapGame';
 import { BalloonPopGame } from '../games/balloonPop/BalloonPopGame';
 import { ColorMixerGame } from '../games/colorMixer/ColorMixerGame';
+import { ColorDropperGame } from '../games/colorDropper/ColorDropperGame';
 import { BugCatcherGame } from '../games/bugCatcher/BugCatcherGame';
 import { SoundMemoryGame } from '../games/soundMemory/SoundMemoryGame';
 import { MarblePipeGame } from '../games/marblePipe/MarblePipeGame';
@@ -71,13 +72,23 @@ export class GameRegistry {
         constructorRef: BalloonPopGame
       },
       {
+        id: 'colorDropper',
+        name: 'Sutuy',
+        subtitle: 'Color Dropper',
+        portal: 'workshop',
+        icon: 'droplet',
+        category: 'brain',
+        desc: 'Drop and merge paint drops to mix new colors programmatically!',
+        constructorRef: ColorDropperGame
+      },
+      {
         id: 'colorMixer',
         name: 'Maka',
         subtitle: 'Color Mixer',
         portal: 'workshop', // Maka is Workshop
         icon: 'palette',
         category: 'brain',
-        desc: 'Drop and merge paint drops to mix new colors with voice speech!',
+        desc: 'Drop paint and mix colors by hand in a satisfying open space!',
         constructorRef: ColorMixerGame
       },
       {

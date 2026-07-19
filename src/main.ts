@@ -63,8 +63,15 @@ const featuredGames = [
     id: 'colorMixer',
     title: 'Maka',
     subtitle: 'Color Mixer',
-    desc: 'Drop and merge paint drops to mix new colors with voice speech!',
+    desc: 'Drop paint and mix colors by hand in a satisfying open space!',
     icon: 'palette'
+  },
+  {
+    id: 'colorDropper',
+    title: 'Sutuy',
+    subtitle: 'Color Dropper',
+    desc: 'Drop and merge paint drops to mix new colors programmatically!',
+    icon: 'droplet'
   }
 ];
 
@@ -86,6 +93,7 @@ document.addEventListener('DOMContentLoaded', () => {
         bubbleWrap: 'bubble',
         balloonPop: 'balloon',
         colorMixer: 'palette',
+        colorDropper: 'droplet',
         bugCatcher: 'bug',
         soundMemory: 'music',
         marblePipe: 'pipe',
