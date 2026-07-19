@@ -40,7 +40,9 @@ const mockCtx = {
   stroke: vi.fn(),
   fill: vi.fn(),
   arc: vi.fn(),
+  clip: vi.fn(),
   closePath: vi.fn(),
+  drawImage: vi.fn(),
   createRadialGradient: vi.fn().mockReturnValue({
     addColorStop: vi.fn()
   }),
@@ -50,9 +52,6 @@ const mockCtx = {
   fillStyle: '',
   strokeStyle: '',
   lineWidth: 1,
-  shadowColor: '',
-  shadowBlur: 0,
-  shadowOffsetY: 0,
   font: '',
   textAlign: '',
   textBaseline: '',
@@ -65,11 +64,19 @@ describe('ColorMixerGame', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    
+    // Spy on document.createElement to intercept offscreen canvas creation
+    vi.spyOn(document, 'createElement').mockImplementation((tagName: string) => {
+      const el = Document.prototype.createElement.call(document, tagName);
+      if (tagName === 'canvas') {
+        (el as HTMLCanvasElement).getContext = vi.fn().mockReturnValue(mockCtx);
+      }
+      return el;
+    });
+
     canvas = document.createElement('canvas');
     canvas.width = 800;
     canvas.height = 600;
-    
-    // Mock getContext to return our mock context
     canvas.getContext = vi.fn().mockReturnValue(mockCtx);
     
     // Initialize TranslationManager dummy
@@ -78,80 +85,51 @@ describe('ColorMixerGame', () => {
     game = new ColorMixerGame();
   });
 
-  it('should initialize successfully and create color pots', () => {
+  it('should initialize successfully and create paint wells', () => {
     game.init(canvas);
     expect(canvas.getContext).toHaveBeenCalledWith('2d');
     
-    const pots = (game as any).pots;
-    expect(pots.length).toBe(3); // Red, Yellow, Blue
-    expect(pots[0].labelKey).toBe('red');
-    expect(pots[1].labelKey).toBe('yellow');
-    expect(pots[2].labelKey).toBe('blue');
+    const wells = (game as any).wells;
+    expect(wells.length).toBe(6); // Red, Yellow, Blue, White, Black, Finger
+    expect(wells[0].id).toBe('red');
+    expect(wells[1].id).toBe('yellow');
+    expect(wells[2].id).toBe('blue');
+    expect(wells[3].id).toBe('white');
+    expect(wells[4].id).toBe('black');
+    expect(wells[5].id).toBe('finger');
   });
 
-  it('should spawn a color blob', () => {
+  it('should switch active tools when selecting wells', () => {
     game.init(canvas);
-    expect((game as any).blobs.length).toBe(0);
+    expect((game as any).activeTool).toBe('red');
 
-    // Spawn a red blob
-    (game as any).spawnBlob('red', 100, 200);
-    expect((game as any).blobs.length).toBe(1);
-    
-    const blob = (game as any).blobs[0];
-    expect(blob.colorName).toBe('red');
-    expect(blob.components.red).toBe(1);
-    expect(blob.components.yellow).toBe(0);
-    expect(blob.components.blue).toBe(0);
+    // Simulate clicking Yellow well
+    const yellowWell = (game as any).wells[1];
+    (game as any).startPress(yellowWell.x + 10, (game as any).potsY + 20);
+    expect((game as any).activeTool).toBe('yellow');
+
+    // Simulate clicking Finger well
+    const fingerWell = (game as any).wells[5];
+    (game as any).startPress(fingerWell.x + 10, (game as any).potsY + 20);
+    expect((game as any).activeTool).toBe('finger');
   });
 
-  it('should merge two primary blobs and announce the blended color', () => {
+  it('should start drawing and place drops below the header boundary', () => {
     game.init(canvas);
-    
-    // Spawn red and yellow blobs overlapping
-    (game as any).spawnBlob('red', 200, 200);
-    (game as any).spawnBlob('yellow', 210, 200);
+    expect((game as any).isDrawing).toBe(false);
 
-    expect((game as any).blobs.length).toBe(2);
-
-    // Run merge check
-    (game as any).checkBlobMerges();
-
-    // They should merge into one orange blob
-    expect((game as any).blobs.length).toBe(1);
-    
-    const merged = (game as any).blobs[0];
-    expect(merged.colorName).toBe('orange');
-    expect(merged.components.red).toBe(1);
-    expect(merged.components.yellow).toBe(1);
+    // Tap in drawing area
+    const drawY = (game as any).potsY + (game as any).potsHeight + 100;
+    (game as any).startPress(300, drawY);
+    expect((game as any).isDrawing).toBe(true);
   });
 
-  it('should split a secondary blob back to its primaries when requested', () => {
+  it('should clear canvas and reset buffer when clear button is clicked', () => {
     game.init(canvas);
-
-    // 1. Manually add an orange mixed blob (Red: 1, Yellow: 1)
-    const orangeBlob = {
-      id: 99,
-      x: 300,
-      y: 300,
-      vx: 0,
-      vy: 0,
-      radius: 50,
-      colorName: 'orange',
-      components: { red: 1, yellow: 1, blue: 0 },
-      isDragging: false
-    };
-    (game as any).blobs.push(orangeBlob);
-
-    expect((game as any).blobs.length).toBe(1);
-
-    // 2. Trigger split
-    (game as any).trySplitBlob(orangeBlob);
-
-    // Should have removed orange, and added two blobs (red and yellow)
-    expect((game as any).blobs.length).toBe(2);
     
-    const colors = (game as any).blobs.map((b: any) => b.colorName).sort();
-    expect(colors).toEqual(['red', 'yellow']);
+    // Click clear button (far right top)
+    (game as any).startPress(canvas.width - 40, (game as any).potsY + 20);
+    expect(mockCtx.fillRect).toHaveBeenCalled();
   });
 
   it('should clean up event listeners on destroy', () => {

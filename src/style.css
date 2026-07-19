@@ -744,6 +744,11 @@ html, body {
   background-color: #A9DFBF;
 }
 
+/* Sutuy (Color Dropper) */
+.cards-grid a[data-game="colorDropper"] {
+  background-color: #FADBD8;
+}
+
 /* Maka (Color Mixer) */
 .cards-grid a[data-game="colorMixer"] {
   background-color: #D7BDE2;
