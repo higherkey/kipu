@@ -208,7 +208,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const mainTitle = document.getElementById('main-title');
     const mainTagline = document.getElementById('main-tagline');
     if (mainTitle) mainTitle.textContent = 'Kipu';
-    if (mainTagline) mainTagline.textContent = 'Playful Games and Interactive Experiences for Kids';
+    if (mainTagline) mainTagline.textContent = 'Touch. Play. Learn.';
 
     // Reset portal-specific class
     navShell?.classList.remove('portal-sandbox', 'portal-workshop', 'portal-lab', 'portal-busyBoard');
