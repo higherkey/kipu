@@ -12,7 +12,7 @@ describe('GameRegistry', () => {
     const registry = GameRegistry.getInstance();
     const allGames = registry.getAll();
 
-    expect(allGames.length).toBe(23);
+    expect(allGames.length).toBe(26);
   });
 
   it('should retrieve registered games by ID', () => {
