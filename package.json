@@ -12,7 +12,6 @@
     "preview": "vite preview"
   },
   "devDependencies": {
-    "@rolldown/binding-win32-x64-msvc": "^1.0.2",
     "@types/howler": "^2.2.12",
     "@types/matter-js": "^0.20.2",
     "@vitest/coverage-v8": "^4.1.5",
