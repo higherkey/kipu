@@ -32,6 +32,12 @@ describe('BoardModuleRegistry', () => {
     board5Ids.forEach(id => {
       expect(BoardModuleRegistry[id], `Missing Board 5 module ${id}`).toBeDefined();
     });
+
+    // Board 6 IDs (The Kinetic Sandbox)
+    const board6Ids = ['051', '052', '054', '055', '057', '058'];
+    board6Ids.forEach(id => {
+      expect(BoardModuleRegistry[id], `Missing Board 6 module ${id}`).toBeDefined();
+    });
   });
 
   it('should instantiate each registered module cleanly', () => {
