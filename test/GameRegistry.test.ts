@@ -12,7 +12,7 @@ describe('GameRegistry', () => {
     const registry = GameRegistry.getInstance();
     const allGames = registry.getAll();
 
-    expect(allGames.length).toBe(23);
+    expect(allGames.length).toBe(25);
   });
 
   it('should retrieve registered games by ID', () => {
@@ -22,6 +22,18 @@ describe('GameRegistry', () => {
     expect(balloonPop).toBeDefined();
     expect(balloonPop?.name).toBe('Tapa');
     expect(balloonPop?.portal).toBe('workshop');
+
+    const soundMemory = registry.get('soundMemory');
+    expect(soundMemory).toBeDefined();
+    expect(soundMemory?.name).toBe('Yuyay');
+    expect(soundMemory?.subtitle).toBe('Sound Memory');
+    expect(soundMemory?.portal).toBe('workshop');
+
+    const pawana = registry.get('pawana');
+    expect(pawana).toBeDefined();
+    expect(pawana?.name).toBe('Pawana');
+    expect(pawana?.portal).toBe('lab');
+    expect(pawana?.category).toBe('brain');
   });
 
   it('should return undefined for unregistered game IDs', () => {

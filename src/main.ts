@@ -113,6 +113,8 @@ document.addEventListener('DOMContentLoaded', () => {
         luminaryBoard: 'bulb',
         luminaryBoardTone: 'bulb',
         mechanicalWorkshop: 'settings',
+        kineticSandbox: 'particle',
+        pawana: 'feather',
       };
       const iconKey = iconMap[gameId];
       if (iconKey && iconKey in Icons) {
