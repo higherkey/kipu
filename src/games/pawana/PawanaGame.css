@@ -10,10 +10,10 @@
 
 .pawana-overlay-container {
   position: absolute;
-  top: 0;
+  top: 60px;
   left: 0;
   width: 100%;
-  height: 100%;
+  height: calc(100% - 60px);
   pointer-events: none;
   display: flex;
   flex-direction: column;
@@ -111,6 +111,10 @@
   border-color: #0284C7;
   box-shadow: 0 3px 0 #0369A1;
   color: #075985;
+}
+
+.pawana-wind-banner.hidden {
+  display: none;
 }
 
 @keyframes pawana-wind-pulse {

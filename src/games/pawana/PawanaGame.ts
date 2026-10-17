@@ -109,6 +109,11 @@ export class PawanaGame extends BaseGame {
   private onPointerDownBound: ((e: PointerEvent) => void) | null = null;
   private prefersReducedMotion = false;
 
+  constructor() {
+    super();
+    this.audio.registerSound('pop', '/sounds/pop.ogg');
+  }
+
   protected onInit(): void {
     if (!this.canvas) return;
 
@@ -220,14 +225,16 @@ export class PawanaGame extends BaseGame {
   private spawnGate(x: number): void {
     if (!this.canvas) return;
     const h = this.canvas.height;
-    const gapHeight = this.currentDifficulty === 'easy' ? 135 : this.currentDifficulty === 'normal' ? 120 : 105;
     const groundH = 26;
+    const availableH = h - groundH - 50;
+    const baseGapHeight = this.currentDifficulty === 'easy' ? 135 : this.currentDifficulty === 'normal' ? 120 : 105;
+    const gapHeight = Math.min(baseGapHeight, Math.max(75, availableH * 0.36));
+    const minMiddlePillar = Math.max(24, availableH * 0.12);
     const maxBottomEnd = h - groundH - 15;
-    const minMiddlePillar = 45;
 
-    // Safe top gap: starts at minimum 40, ends before (h * 0.44)
-    const maxTopY = Math.max(40, (h * 0.44) - gapHeight);
-    const topGapY = 40 + Math.random() * (maxTopY - 40);
+    // Safe top gap: starts at minimum 30, ends before (h * 0.44)
+    const maxTopY = Math.max(30, (h * 0.44) - gapHeight);
+    const topGapY = 30 + Math.random() * Math.max(10, maxTopY - 30);
 
     // Safe bottom gap: starts after topGapY + gapHeight + minMiddlePillar, ends before ground
     const minBottomY = topGapY + gapHeight + minMiddlePillar;
@@ -481,8 +488,9 @@ export class PawanaGame extends BaseGame {
       // Check progression unlocks
       this.checkUnlocks();
 
-      // Check victory for bounded rounds (e.g., 10 gates in a mode)
-      if (this.score >= 10 && !this.hasWonRound && this.state === 'playing') {
+      // Check victory for bounded rounds (8 on easy, 10 on normal, 12 on hard)
+      const targetScore = this.currentDifficulty === 'easy' ? 8 : this.currentDifficulty === 'normal' ? 10 : 12;
+      if (this.score >= targetScore && !this.hasWonRound && this.state === 'playing') {
         this.hasWonRound = true;
         this.triggerVictory();
       }
@@ -670,9 +678,13 @@ export class PawanaGame extends BaseGame {
       const g1 = Math.round(38 + (27 - 38) * t);
       const b1 = Math.round(211 + (75 - 211) * t);
 
+      const r2 = Math.round(249 + (49 - 249) * t);
+      const g2 = Math.round(115 + (46 - 115) * t);
+      const b2 = Math.round(22 + (129 - 22) * t);
+
       skyGrad.addColorStop(0, `rgb(${r0}, ${g0}, ${b0})`);
       skyGrad.addColorStop(0.6, `rgb(${r1}, ${g1}, ${b1})`);
-      skyGrad.addColorStop(1, '#312E81');
+      skyGrad.addColorStop(1, `rgb(${r2}, ${g2}, ${b2})`);
     }
 
     this.ctx.fillStyle = skyGrad;
@@ -738,11 +750,11 @@ export class PawanaGame extends BaseGame {
       this.ctx.lineWidth = 4;
       this.ctx.setLineDash([16, 12]);
 
-      const offset = (this.windGust.timer * 0.2) % 40;
+      const offset = this.prefersReducedMotion ? 0 : (this.windGust.timer * 0.2) % 40;
       this.ctx.lineDashOffset = offset;
 
       for (let i = 0; i < 4; i++) {
-        const streamY = (h * 0.2) + i * (h * 0.18) + (isUp ? -offset * 0.5 : offset * 0.5);
+        const streamY = (h * 0.2) + i * (h * 0.18) + (this.prefersReducedMotion ? 0 : (isUp ? -offset * 0.5 : offset * 0.5));
         this.ctx.beginPath();
         this.ctx.moveTo(0, streamY);
         // Gentle wave curve
@@ -1157,7 +1169,7 @@ export class PawanaGame extends BaseGame {
           </div>
         </div>
 
-        <div class="pawana-hud-prompt" aria-live="polite">
+        <div class="pawana-hud-prompt" role="status" aria-live="polite">
           <span class="pawana-hud-prompt-main">${mainPrompt}</span>
           <span class="pawana-hud-prompt-sub">${subPrompt}</span>
         </div>
@@ -1246,6 +1258,7 @@ export class PawanaGame extends BaseGame {
     this.overlayContainer.querySelector('#pawana-btn-menu')?.addEventListener('click', () => {
       this.resetToMenu();
     });
+    this.overlayContainer.querySelector<HTMLButtonElement>('#pawana-btn-retry')?.focus();
   }
 
   private renderVictoryModal(): void {
@@ -1276,6 +1289,7 @@ export class PawanaGame extends BaseGame {
     this.overlayContainer.querySelector('#pawana-btn-menu')?.addEventListener('click', () => {
       this.resetToMenu();
     });
+    this.overlayContainer.querySelector<HTMLButtonElement>('#pawana-btn-continue')?.focus();
   }
 
   public pause(): void {
@@ -1293,6 +1307,7 @@ export class PawanaGame extends BaseGame {
         `;
         this.overlayContainer.appendChild(pauseNotice);
         pauseNotice.querySelector('#pawana-btn-resume')?.addEventListener('click', () => this.resume());
+        pauseNotice.querySelector<HTMLButtonElement>('#pawana-btn-resume')?.focus();
       }
     }
   }

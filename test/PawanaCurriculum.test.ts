@@ -47,4 +47,18 @@ describe('PawanaCurriculum', () => {
     const emptyOpt = q.topOption.isEmpty ? q.topOption : q.bottomOption;
     expect(emptyOpt.isCorrect).toBe(true);
   });
+
+  it('should advance smoothly across multi-word boundaries in spelling without character desynchronization', () => {
+    // LLAMA is 5 letters (indices 0..4)
+    const qLlamaEnd = PawanaCurriculum.generateQuestion('spelling', 'normal', 4, 0.2);
+    expect(qLlamaEnd.prompt).toContain('LLAMA');
+    const opt4 = qLlamaEnd.topOption.isCorrect ? qLlamaEnd.topOption : qLlamaEnd.bottomOption;
+    expect(opt4.text).toBe('A');
+
+    // Step index 5 must cleanly transition to CONDOR (first letter 'C')
+    const qCondorStart = PawanaCurriculum.generateQuestion('spelling', 'normal', 5, 0.2);
+    expect(qCondorStart.prompt).toContain('CONDOR');
+    const opt5 = qCondorStart.topOption.isCorrect ? qCondorStart.topOption : qCondorStart.bottomOption;
+    expect(opt5.text).toBe('C');
+  });
 });

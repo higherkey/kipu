@@ -226,6 +226,16 @@ describe('PawanaGame', () => {
     expect((game as any).skyCycleProgress).toBeLessThanOrEqual(8 / 15);
   });
 
+  it('should register pop audio sound and configure accessible HUD prompt', () => {
+    game.init(canvas);
+    (game as any).startFlight();
+
+    const promptEl = document.querySelector('.pawana-hud-prompt');
+    expect(promptEl).not.toBeNull();
+    expect(promptEl?.getAttribute('role')).toBe('status');
+    expect(promptEl?.getAttribute('aria-live')).toBe('polite');
+  });
+
   it('should cleanly remove listeners and tear down DOM overlay on destroy', () => {
     const windowRemoveSpy = vi.spyOn(window, 'removeEventListener');
     const canvasRemoveSpy = vi.spyOn(canvas, 'removeEventListener');

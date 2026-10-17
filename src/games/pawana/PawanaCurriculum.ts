@@ -206,11 +206,21 @@ export class PawanaCurriculum {
     stepIndex: number,
     seed: number
   ): GateQuestion {
-    // Pick word based on seed / step progression
-    const wordIndex = Math.floor((stepIndex / 6) % SPELLING_WORDS.length);
-    const wordObj = SPELLING_WORDS[wordIndex];
+    // Map stepIndex dynamically across cumulative word lengths so word boundaries never desynchronize
+    const totalChars = SPELLING_WORDS.reduce((sum, w) => sum + w.word.length, 0);
+    const normalizedStep = stepIndex % totalChars;
+    let accumulated = 0;
+    let wordObj = SPELLING_WORDS[0];
+    let charIndex = 0;
+    for (const item of SPELLING_WORDS) {
+      if (normalizedStep < accumulated + item.word.length) {
+        wordObj = item;
+        charIndex = normalizedStep - accumulated;
+        break;
+      }
+      accumulated += item.word.length;
+    }
     const word = wordObj.word;
-    const charIndex = stepIndex % word.length;
     const targetChar = word[charIndex];
     const isTopCorrect = seed > 0.5;
 
