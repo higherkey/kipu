@@ -26,6 +26,7 @@
   "dependencies": {
     "@capacitor/core": "^8.4.1",
     "@capacitor/haptics": "^8.0.2",
+    "@neondatabase/serverless": "^1.2.0",
     "howler": "^2.2.4",
     "matter-js": "^0.20.0",
     "tone": "^15.1.22"
