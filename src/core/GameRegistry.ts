@@ -114,12 +114,12 @@ export class GameRegistry {
       },
       {
         id: 'soundMemory',
-        name: 'Sound Memory',
-        subtitle: 'Pattern Recognition',
+        name: 'Yuyay',
+        subtitle: 'Sound Memory',
         portal: 'workshop',
         icon: 'music',
         category: 'brain',
-        desc: 'Repeat the pattern of musical tones played by the game!',
+        desc: 'Listen to the musical tones and repeat the sequence from memory!',
         constructorRef: SoundMemoryGame
       },
       {
