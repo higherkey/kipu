@@ -22,6 +22,7 @@ import { TrashSorcererGame } from '../games/trashSorcerer/TrashSorcererGame';
 import { KhipuSynthGame } from '../games/khipuSynth/KhipuSynthGame';
 import { SoundWaveStudioGame } from '../games/busyBoard/SoundWaveStudioGame';
 import { TypographyBoardGame } from '../games/busyBoard/TypographyBoardGame';
+import { KineticSandboxGame } from '../games/busyBoard/KineticSandboxGame';
 
 export interface GameRegistration {
   id: string;
@@ -113,12 +114,12 @@ export class GameRegistry {
       },
       {
         id: 'soundMemory',
-        name: 'Sound Memory',
-        subtitle: 'Pattern Recognition',
+        name: 'Yuyay',
+        subtitle: 'Sound Memory',
         portal: 'workshop',
         icon: 'music',
         category: 'brain',
-        desc: 'Repeat the pattern of musical tones played by the game!',
+        desc: 'Listen to the musical tones and repeat the sequence from memory!',
         constructorRef: SoundMemoryGame
       },
       {
@@ -280,6 +281,16 @@ export class GameRegistry {
         category: 'sensory',
         desc: 'Interact with odometer tumblers, font weight sliders, word gravity, and case toggles!',
         constructorRef: TypographyBoardGame
+      },
+      {
+        id: 'kineticSandbox',
+        name: 'Kinetic Sandbox',
+        subtitle: 'Physics-Lite Vectors',
+        portal: 'busyBoard',
+        icon: 'particle',
+        category: 'sensory',
+        desc: 'Explore pendulums, pinwheels, hourglass sand, plinko pegs, Newton\'s cradle, and pneumatic bellows!',
+        constructorRef: KineticSandboxGame
       }
     ];
 

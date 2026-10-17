@@ -889,7 +889,7 @@ canvas.hidden,
   background-color: #FCF3CF;
 }
 
-/* Sound Memory */
+/* Yuyay (Sound Memory) */
 .cards-grid a[data-game="soundMemory"] {
   background-color: #D5F5E3;
 }
@@ -922,6 +922,11 @@ canvas.hidden,
 /* The Mechanical Workshop */
 .cards-grid a[data-game="mechanicalWorkshop"] {
   background-color: #D7CCC8; /* Warm light wood/cork */
+}
+
+/* The Kinetic Sandbox */
+.cards-grid a[data-game="kineticSandbox"] {
+  background-color: var(--color-cord); /* Andean tactile stone/natural cord */
 }
 
 /* Game name label */
