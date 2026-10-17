@@ -88,6 +88,36 @@
   font-weight: 500;
 }
 
+/* Wind Gust Indicator Pill */
+.pawana-wind-banner {
+  background: rgba(254, 243, 199, 0.95);
+  border: 2px solid #D97706;
+  border-radius: 9999px;
+  padding: 6px 14px;
+  box-shadow: 0 3px 0 #B45309;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #92400E;
+  min-height: 44px;
+  box-sizing: border-box;
+  animation: pawana-wind-pulse 1s infinite alternate ease-in-out;
+}
+
+.pawana-wind-banner.active {
+  background: rgba(224, 242, 254, 0.95);
+  border-color: #0284C7;
+  box-shadow: 0 3px 0 #0369A1;
+  color: #075985;
+}
+
+@keyframes pawana-wind-pulse {
+  0% { transform: scale(0.98); }
+  100% { transform: scale(1.02); }
+}
+
 .pawana-heart-icon {
   width: 20px;
   height: 20px;
@@ -324,7 +354,8 @@
 @media (prefers-reduced-motion: reduce) {
   .pawana-tab-btn,
   .pawana-btn,
-  .pawana-card {
+  .pawana-card,
+  .pawana-wind-banner {
     transition: none;
     animation: none;
   }

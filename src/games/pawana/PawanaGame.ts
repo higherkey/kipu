@@ -33,6 +33,17 @@ interface Particle {
   maxLife: number;
 }
 
+export type WindState = 'idle' | 'warning' | 'active';
+
+export interface WindGust {
+  state: WindState;
+  direction: 'up' | 'down';
+  timer: number; // Duration countdown in ms
+  warningDuration: number; // Lead time in ms (e.g. 1800ms)
+  activeDuration: number; // Active gust time in ms (e.g. 2400ms)
+  force: number; // Vertical acceleration in px/frame^2
+}
+
 const STORAGE_UNLOCKED_KEY = 'kipu_pawana_unlocked_v1';
 const STORAGE_HIGHSCORE_KEY = 'kipu_pawana_highscores_v1';
 
@@ -78,9 +89,20 @@ export class PawanaGame extends BaseGame {
   private hasWonRound = false;
   private particles: Particle[] = [];
 
-  // Parallax Background
+  // Parallax Background & Sky Cycle
   private bgCloudOffset = 0;
   private bgMountainOffset = 0;
+  private skyCycleProgress = 0; // 0 (morning) -> 0.33 (midday) -> 0.66 (sunset) -> 1.0 (night)
+
+  // Andean Wind Gust Hazards (Wayra draft mechanics)
+  private windGust: WindGust = {
+    state: 'idle',
+    direction: 'up',
+    timer: 5000,
+    warningDuration: 1800,
+    activeDuration: 2400,
+    force: 0
+  };
 
   // Event Listeners references for deterministic teardown
   private onKeyDownBound: ((e: KeyboardEvent) => void) | null = null;
@@ -152,6 +174,15 @@ export class PawanaGame extends BaseGame {
     this.gates = [];
     this.particles = [];
     this.invulnerableTimer = 0;
+    this.skyCycleProgress = 0;
+    this.windGust = {
+      state: 'idle',
+      direction: 'up',
+      timer: 5000 + Math.random() * 4000,
+      warningDuration: 2000,
+      activeDuration: 2500,
+      force: 0
+    };
 
     // Apply difficulty parameters
     if (this.currentDifficulty === 'easy') {
@@ -263,8 +294,11 @@ export class PawanaGame extends BaseGame {
   public update(dt: number): void {
     // Clamp delta-time to avoid tunneling
     const clampedDt = Math.min(dt, 100) / 16.666;
+    const rawDtMs = Math.min(dt, 100);
 
     if (this.state === 'playing') {
+      this.updateSkyCycle(rawDtMs);
+      this.updateWindGust(rawDtMs);
       this.updatePhysics(clampedDt);
       this.updateGates(clampedDt);
       this.updateParticles(clampedDt);
@@ -273,11 +307,76 @@ export class PawanaGame extends BaseGame {
     this.render();
   }
 
+  private updateSkyCycle(dtMs: number): void {
+    // Smoothly progress day/night cycle based on score + subtle time progression
+    // Target advances with score (0 -> score 5 -> score 10 -> score 15+)
+    const targetCycle = Math.min(1.0, this.score / 15);
+    // Smooth interpolation towards targetCycle (or looping continuously)
+    const step = (dtMs / 3000);
+    if (this.skyCycleProgress < targetCycle) {
+      this.skyCycleProgress = Math.min(targetCycle, this.skyCycleProgress + step * 0.1);
+    } else {
+      this.skyCycleProgress = targetCycle;
+    }
+  }
+
+  private updateWindGust(dtMs: number): void {
+    this.windGust.timer -= dtMs;
+
+    if (this.windGust.state === 'idle') {
+      if (this.windGust.timer <= 0) {
+        // Transition to warning state: 2 seconds visual lead time before gust hits
+        this.windGust.state = 'warning';
+        this.windGust.direction = Math.random() > 0.5 ? 'up' : 'down';
+        this.windGust.warningDuration = 2000;
+        this.windGust.timer = this.windGust.warningDuration;
+        this.updateWindHUD();
+      }
+    } else if (this.windGust.state === 'warning') {
+      if (this.windGust.timer <= 0) {
+        // Transition to active gust state
+        this.windGust.state = 'active';
+        this.windGust.activeDuration = 2200 + Math.random() * 800; // 2.2s - 3.0s
+        this.windGust.timer = this.windGust.activeDuration;
+        // Moderate gentle draft force
+        this.windGust.force = this.windGust.direction === 'up' ? -0.16 : 0.14;
+        this.updateWindHUD();
+        this.haptics.lightTap();
+      }
+    } else if (this.windGust.state === 'active') {
+      // Spawn wind stream particles
+      if (!this.prefersReducedMotion && Math.random() < 0.4) {
+        const w = this.canvas?.width ?? 800;
+        const h = this.canvas?.height ?? 600;
+        const startY = this.windGust.direction === 'up' ? h - 30 : 30;
+        const vy = this.windGust.direction === 'up' ? -3 - Math.random() * 2 : 3 + Math.random() * 2;
+        this.particles.push({
+          x: Math.random() * w,
+          y: startY,
+          vx: -(this.gateScrollSpeed * 1.5) + (Math.random() - 0.5),
+          vy,
+          color: 'rgba(255, 255, 255, 0.65)',
+          size: 2 + Math.random() * 3,
+          life: 0,
+          maxLife: 600
+        });
+      }
+
+      if (this.windGust.timer <= 0) {
+        // Return to idle
+        this.windGust.state = 'idle';
+        this.windGust.force = 0;
+        this.windGust.timer = 5000 + Math.random() * 6000; // Next gust in 5-11 seconds
+        this.updateWindHUD();
+      }
+    }
+  }
+
   private updatePhysics(dtScale: number): void {
     const h = this.canvas?.height ?? 600;
 
-    // Gravity & Velocity
-    this.flyerVy += this.gravity * dtScale;
+    // Gravity & Velocity (including wind gust drafts)
+    this.flyerVy += (this.gravity + (this.windGust.state === 'active' ? this.windGust.force : 0)) * dtScale;
     if (this.flyerVy > this.maxFallSpeed) this.flyerVy = this.maxFallSpeed;
     this.flyerY += this.flyerVy * dtScale;
 
@@ -495,13 +594,8 @@ export class PawanaGame extends BaseGame {
 
     this.ctx.clearRect(0, 0, w, h);
 
-    // 1. Sky Gradient
-    const skyGrad = this.ctx.createLinearGradient(0, 0, 0, h);
-    skyGrad.addColorStop(0, '#7DD3FC'); // Crisp Andean alpine sky
-    skyGrad.addColorStop(0.6, '#BAE6FD');
-    skyGrad.addColorStop(1, '#E0F2FE');
-    this.ctx.fillStyle = skyGrad;
-    this.ctx.fillRect(0, 0, w, h);
+    // 1. Dynamic Day / Twilight / Night Andean Sky Gradient
+    this.drawSky(w, h);
 
     // 2. Parallax Mountain Peaks
     this.drawMountains(w, h);
@@ -512,11 +606,156 @@ export class PawanaGame extends BaseGame {
     // 4. Split Gates
     this.drawGates();
 
-    // 5. Particles
+    // 5. Andean Wind Gust Currents & Streams
+    this.drawWindGusts(w, h);
+
+    // 6. Particles
     this.drawParticles();
 
-    // 6. Flyer Character
+    // 7. Flyer Character
     this.drawFlyer();
+  }
+
+  private drawSky(w: number, h: number): void {
+    if (!this.ctx) return;
+    const p = this.skyCycleProgress; // 0.0 (Morning) -> 0.4 (Midday) -> 0.75 (Twilight) -> 1.0 (Night)
+
+    // Interpolate sky colors based on progress p
+    // Morning (p=0): #FEF08A -> #7DD3FC -> #BAE6FD
+    // Midday (p=0.33): #38BDF8 -> #7DD3FC -> #E0F2FE
+    // Sunset / Inti Twilight (p=0.66): #4C1D95 -> #C026D3 -> #F97316
+    // Andean Night (p=1.0): #0F172A -> #1E1B4B -> #312E81
+    const skyGrad = this.ctx.createLinearGradient(0, 0, 0, h);
+
+    if (p < 0.4) {
+      // Transition from Morning Gold to High Noon Alpine Sky
+      const t = p / 0.4;
+      const r0 = Math.round(254 + (56 - 254) * t);
+      const g0 = Math.round(240 + (189 - 240) * t);
+      const b0 = Math.round(138 + (248 - 138) * t);
+
+      const r1 = Math.round(125 + (125 - 125) * t);
+      const g1 = Math.round(211 + (211 - 211) * t);
+      const b1 = Math.round(252 + (252 - 252) * t);
+
+      skyGrad.addColorStop(0, `rgb(${r0}, ${g0}, ${b0})`);
+      skyGrad.addColorStop(0.6, `rgb(${r1}, ${g1}, ${b1})`);
+      skyGrad.addColorStop(1, '#E0F2FE');
+    } else if (p < 0.75) {
+      // Transition from Alpine Noon to Golden Andean Sunset (Inti Twilight)
+      const t = (p - 0.4) / 0.35;
+      const r0 = Math.round(56 + (76 - 56) * t);
+      const g0 = Math.round(189 + (29 - 189) * t);
+      const b0 = Math.round(248 + (149 - 248) * t);
+
+      const r1 = Math.round(125 + (192 - 125) * t);
+      const g1 = Math.round(211 + (38 - 211) * t);
+      const b1 = Math.round(252 + (211 - 252) * t);
+
+      const r2 = Math.round(224 + (249 - 224) * t);
+      const g2 = Math.round(242 + (115 - 242) * t);
+      const b2 = Math.round(254 + (22 - 254) * t);
+
+      skyGrad.addColorStop(0, `rgb(${r0}, ${g0}, ${b0})`);
+      skyGrad.addColorStop(0.6, `rgb(${r1}, ${g1}, ${b1})`);
+      skyGrad.addColorStop(1, `rgb(${r2}, ${g2}, ${b2})`);
+    } else {
+      // Transition from Sunset to Andean Starlit Night
+      const t = (p - 0.75) / 0.25;
+      const r0 = Math.round(76 + (15 - 76) * t);
+      const g0 = Math.round(29 + (23 - 29) * t);
+      const b0 = Math.round(149 + (42 - 149) * t);
+
+      const r1 = Math.round(192 + (30 - 192) * t);
+      const g1 = Math.round(38 + (27 - 38) * t);
+      const b1 = Math.round(211 + (75 - 211) * t);
+
+      skyGrad.addColorStop(0, `rgb(${r0}, ${g0}, ${b0})`);
+      skyGrad.addColorStop(0.6, `rgb(${r1}, ${g1}, ${b1})`);
+      skyGrad.addColorStop(1, '#312E81');
+    }
+
+    this.ctx.fillStyle = skyGrad;
+    this.ctx.fillRect(0, 0, w, h);
+
+    // If night (p >= 0.7), render subtle stars
+    if (p >= 0.7) {
+      const starAlpha = (p - 0.7) / 0.3;
+      this.ctx.fillStyle = `rgba(255, 255, 255, ${starAlpha * 0.8})`;
+      // Static deterministic stars
+      for (let i = 0; i < 24; i++) {
+        const sx = ((i * 137.5) % w);
+        const sy = ((i * 83.3) % (h * 0.45));
+        this.ctx.fillRect(sx, sy, 2, 2);
+      }
+    }
+  }
+
+  private drawWindGusts(w: number, h: number): void {
+    if (!this.ctx || this.windGust.state === 'idle') return;
+
+    this.ctx.save();
+    const isUp = this.windGust.direction === 'up';
+
+    if (this.windGust.state === 'warning') {
+      // Clear visual lead time indicator: gentle shimmering wind chevron cues
+      const remainingRatio = Math.max(0, this.windGust.timer / this.windGust.warningDuration);
+      const pulseAlpha = this.prefersReducedMotion
+        ? 0.3
+        : 0.25 + 0.25 * Math.sin(this.windGust.timer * 0.012);
+
+      this.ctx.strokeStyle = isUp ? `rgba(245, 158, 11, ${pulseAlpha})` : `rgba(14, 165, 233, ${pulseAlpha})`;
+      this.ctx.lineWidth = 3;
+      this.ctx.setLineDash([8, 8]);
+
+      // Draw 3 horizontal wind warning trail guides across player flight corridor
+      for (let i = 0; i < 3; i++) {
+        const lineY = h * 0.25 + i * (h * 0.22);
+        this.ctx.beginPath();
+        this.ctx.moveTo(30, lineY);
+        this.ctx.lineTo(w - 30, lineY);
+        this.ctx.stroke();
+
+        // Arrowhead indicator pointing in draft direction
+        const arrowX = 140 + (1 - remainingRatio) * 120;
+        this.ctx.fillStyle = this.ctx.strokeStyle;
+        this.ctx.beginPath();
+        if (isUp) {
+          this.ctx.moveTo(arrowX, lineY - 14);
+          this.ctx.lineTo(arrowX - 8, lineY + 4);
+          this.ctx.lineTo(arrowX + 8, lineY + 4);
+        } else {
+          this.ctx.moveTo(arrowX, lineY + 14);
+          this.ctx.lineTo(arrowX - 8, lineY - 4);
+          this.ctx.lineTo(arrowX + 8, lineY - 4);
+        }
+        this.ctx.fill();
+      }
+    } else if (this.windGust.state === 'active') {
+      // Active wind streams flowing across the canvas
+      const streamAlpha = this.prefersReducedMotion ? 0.3 : 0.45;
+      this.ctx.strokeStyle = isUp ? `rgba(255, 255, 255, ${streamAlpha})` : `rgba(186, 230, 253, ${streamAlpha})`;
+      this.ctx.lineWidth = 4;
+      this.ctx.setLineDash([16, 12]);
+
+      const offset = (this.windGust.timer * 0.2) % 40;
+      this.ctx.lineDashOffset = offset;
+
+      for (let i = 0; i < 4; i++) {
+        const streamY = (h * 0.2) + i * (h * 0.18) + (isUp ? -offset * 0.5 : offset * 0.5);
+        this.ctx.beginPath();
+        this.ctx.moveTo(0, streamY);
+        // Gentle wave curve
+        this.ctx.bezierCurveTo(
+          w * 0.33, streamY + (isUp ? -20 : 20),
+          w * 0.66, streamY + (isUp ? 20 : -20),
+          w, streamY
+        );
+        this.ctx.stroke();
+      }
+    }
+
+    this.ctx.restore();
   }
 
   private drawMountains(w: number, h: number): void {
@@ -924,12 +1163,47 @@ export class PawanaGame extends BaseGame {
         </div>
 
         <div class="pawana-hud-right">
+          <div id="pawana-wind-indicator" class="pawana-wind-banner" role="status" aria-live="polite" aria-label="Wind status">
+            ${this.getWindBannerHtml()}
+          </div>
           <div class="pawana-hud-pill" role="status" aria-label="Score: ${this.score}">
             ⭐ <span>${this.score}</span>
           </div>
         </div>
       </div>
     `;
+    this.updateWindHUD();
+  }
+
+  private getWindBannerHtml(): string {
+    if (this.windGust.state === 'warning') {
+      const arrow = this.windGust.direction === 'up' ? '⬆️' : '⬇️';
+      return `⚠️ Wind Gust Incoming ${arrow}`;
+    } else if (this.windGust.state === 'active') {
+      const arrow = this.windGust.direction === 'up' ? '⬆️ Updraft' : '⬇️ Downdraft';
+      return `💨 Wayra Wind: ${arrow}`;
+    }
+    return '';
+  }
+
+  private updateWindHUD(): void {
+    if (!this.overlayContainer) return;
+    const banner = this.overlayContainer.querySelector('#pawana-wind-indicator') as HTMLElement | null;
+    if (!banner) return;
+
+    if (this.windGust.state === 'idle') {
+      banner.classList.add('hidden');
+      banner.classList.remove('active');
+      banner.textContent = '';
+    } else {
+      banner.classList.remove('hidden');
+      if (this.windGust.state === 'active') {
+        banner.classList.add('active');
+      } else {
+        banner.classList.remove('active');
+      }
+      banner.textContent = this.getWindBannerHtml();
+    }
   }
 
   private updateFlightHUDPrompt(): void {
@@ -937,7 +1211,7 @@ export class PawanaGame extends BaseGame {
     const nextGate = this.gates.find(g => !g.passed);
     const promptMain = this.overlayContainer.querySelector('.pawana-hud-prompt-main');
     const promptSub = this.overlayContainer.querySelector('.pawana-hud-prompt-sub');
-    const scoreVal = this.overlayContainer.querySelector('.pawana-hud-right span');
+    const scoreVal = this.overlayContainer.querySelector('.pawana-hud-right .pawana-hud-pill:last-child span');
 
     if (promptMain && nextGate) promptMain.textContent = nextGate.question.prompt;
     if (promptSub && nextGate?.question.subPrompt) promptSub.textContent = nextGate.question.subPrompt;

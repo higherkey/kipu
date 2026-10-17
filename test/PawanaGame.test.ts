@@ -169,6 +169,63 @@ describe('PawanaGame', () => {
     expect(document.getElementById('pawana-pause-overlay')).toBeNull();
   });
 
+  it('should manage wind gust warning lead-time and active state transitions', () => {
+    game.init(canvas);
+    (game as any).startFlight();
+
+    const windGust = (game as any).windGust;
+    expect(windGust).toBeDefined();
+    expect(windGust.state).toBe('idle');
+
+    // Fast-forward wind idle timer
+    windGust.timer = 50;
+    (game as any).updateWindGust(60);
+
+    // Should enter warning state with lead time and visual indicator
+    expect(windGust.state).toBe('warning');
+    expect(windGust.warningDuration).toBe(2000);
+    const indicator = document.getElementById('pawana-wind-indicator');
+    expect(indicator).not.toBeNull();
+    expect(indicator?.classList.contains('hidden')).toBe(false);
+    expect(indicator?.textContent).toContain('Wind Gust Incoming');
+
+    // Fast-forward warning duration into active gust
+    windGust.timer = 50;
+    (game as any).updateWindGust(60);
+
+    // Should enter active state with force applied
+    expect(windGust.state).toBe('active');
+    expect(windGust.force).not.toBe(0);
+    expect(indicator?.classList.contains('active')).toBe(true);
+    expect(indicator?.textContent).toContain('Wayra Wind');
+
+    // Verify draft force influences flyer physics in updatePhysics
+    const initialVy = (game as any).flyerVy;
+    (game as any).updatePhysics(1.0);
+    expect((game as any).flyerVy).toBeCloseTo(initialVy + (game as any).gravity + windGust.force, 2);
+
+    // Fast-forward active duration back to idle
+    windGust.timer = 50;
+    (game as any).updateWindGust(60);
+    expect(windGust.state).toBe('idle');
+    expect(windGust.force).toBe(0);
+    expect(indicator?.classList.contains('hidden')).toBe(true);
+  });
+
+  it('should advance sky cycle progress based on game score', () => {
+    game.init(canvas);
+    (game as any).startFlight();
+
+    expect((game as any).skyCycleProgress).toBe(0);
+
+    // Increment score to 8 and update sky cycle
+    (game as any).score = 8;
+    (game as any).updateSkyCycle(1000);
+
+    expect((game as any).skyCycleProgress).toBeGreaterThan(0);
+    expect((game as any).skyCycleProgress).toBeLessThanOrEqual(8 / 15);
+  });
+
   it('should cleanly remove listeners and tear down DOM overlay on destroy', () => {
     const windowRemoveSpy = vi.spyOn(window, 'removeEventListener');
     const canvasRemoveSpy = vi.spyOn(canvas, 'removeEventListener');
