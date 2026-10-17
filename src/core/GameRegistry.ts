@@ -23,6 +23,7 @@ import { KhipuSynthGame } from '../games/khipuSynth/KhipuSynthGame';
 import { SoundWaveStudioGame } from '../games/busyBoard/SoundWaveStudioGame';
 import { TypographyBoardGame } from '../games/busyBoard/TypographyBoardGame';
 import { KineticSandboxGame } from '../games/busyBoard/KineticSandboxGame';
+import { PawanaGame } from '../games/pawana/PawanaGame';
 
 export interface GameRegistration {
   id: string;
@@ -291,6 +292,16 @@ export class GameRegistry {
         category: 'sensory',
         desc: 'Explore pendulums, pinwheels, hourglass sand, plinko pegs, Newton\'s cradle, and pneumatic bellows!',
         constructorRef: KineticSandboxGame
+      },
+      {
+        id: 'pawana',
+        name: 'Pawana',
+        subtitle: 'Logic Flight Path',
+        portal: 'lab',
+        icon: 'feather',
+        category: 'brain',
+        desc: 'Navigate aerial logic gates and sequence pathways in this educational flight challenge!',
+        constructorRef: PawanaGame
       }
     ];
 
