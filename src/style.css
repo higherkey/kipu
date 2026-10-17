@@ -545,6 +545,9 @@ canvas.hidden,
 .game-list a[data-game="digitalLiteBrite"] { background-color: #2D3875; color: #F5EDD8; }
 .game-list a[data-game="digitalLiteBrite"] .game-subtitle { color: rgba(245,237,216,0.6); }
 .game-list a[data-game="trashSorcerer"]    { background-color: #D9EDDF; }
+#game-list a[data-game="pawana"],
+.cards-grid a[data-game="pawana"],
+.game-list a[data-game="pawana"]           { background-color: #BAE6FD; }
 
 /* Music category — purple */
 .game-list a[data-category="music"] {
