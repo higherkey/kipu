@@ -33,7 +33,9 @@ export class NeonClient {
       return [];
     }
     try {
-      const result = await (this.sqlClient as any)(queryString, params);
+      const result = (this.sqlClient as any).query
+        ? await (this.sqlClient as any).query(queryString, params)
+        : await (this.sqlClient as any)(queryString, params);
       return result as T[];
     } catch (err) {
       console.error('[NeonClient] Query error:', err);

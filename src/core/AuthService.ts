@@ -93,6 +93,12 @@ export class AuthService {
       isLoading: false,
     };
     this.notify();
+
+    // Sync to Neon if configured
+    this.syncUserToNeon(guestUser).catch(err => {
+      console.warn('[AuthService] Neon sync notice:', err);
+    });
+
     return guestUser;
   }
 
@@ -111,7 +117,26 @@ export class AuthService {
       isLoading: false,
     };
     this.notify();
+
+    // Sync to Neon if configured
+    this.syncUserToNeon(user).catch(err => {
+      console.warn('[AuthService] Neon sync notice:', err);
+    });
+
     return user;
+  }
+
+  private async syncUserToNeon(user: UserProfile): Promise<void> {
+    const neonClient = (await import('./NeonClient')).NeonClient.getInstance();
+    if (neonClient.isConfigured()) {
+      await neonClient.query(
+        `INSERT INTO users (id, email, name, avatar_url)
+         VALUES ($1, $2, $3, $4)
+         ON CONFLICT (email)
+         DO UPDATE SET name = EXCLUDED.name, updated_at = NOW();`,
+        [user.id, user.email, user.name || null, user.avatarUrl || null]
+      );
+    }
   }
 
   public async signOut(): Promise<void> {
