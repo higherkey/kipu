@@ -924,6 +924,11 @@ canvas.hidden,
   background-color: #D7CCC8; /* Warm light wood/cork */
 }
 
+/* The Kinetic Sandbox */
+.cards-grid a[data-game="kineticSandbox"] {
+  background-color: var(--color-cord); /* Andean tactile stone/natural cord */
+}
+
 /* Game name label */
 .cards-grid a .game-label {
   display: flex;

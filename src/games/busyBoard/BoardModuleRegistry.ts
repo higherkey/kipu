@@ -48,6 +48,14 @@ import { WordGravitySwitch } from './modules/WordGravitySwitch';
 import { KineticTextHolder } from './modules/KineticTextHolder';
 import { CaseSwitcher } from './modules/CaseSwitcher';
 
+// Board 6 Modules (The Kinetic Sandbox)
+import { HangingPendulum } from './modules/HangingPendulum';
+import { PinwheelHub } from './modules/PinwheelHub';
+import { HourglassInverter } from './modules/HourglassInverter';
+import { PlinkoFunnel } from './modules/PlinkoFunnel';
+import { NewtonsCradle } from './modules/NewtonsCradle';
+import { BellowsPump } from './modules/BellowsPump';
+
 export type BusyBoardModuleConstructor = new (
   id: string,
   x: number,
@@ -107,5 +115,13 @@ export const BoardModuleRegistry: Record<string, BusyBoardModuleConstructor> = {
   '044': CaseSwitcher,
   '046': KineticTextHolder,
   '047': WordGravitySwitch,
+
+  // Board 6 (The Kinetic Sandbox)
+  '051': HangingPendulum,
+  '052': PinwheelHub,
+  '054': HourglassInverter,
+  '055': PlinkoFunnel,
+  '057': BellowsPump,
+  '058': NewtonsCradle,
 };
 
