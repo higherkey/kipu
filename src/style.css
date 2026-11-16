@@ -4,8 +4,6 @@
    cochineal red, deep indigo, fibrous string motifs.
    ======================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600&display=swap');
-
 /* ========================================
    Kipu Design System — Tier 1 Global Shell
    Inspired by the Andean khipu: warm parchment,
@@ -2096,5 +2094,20 @@ body.parental-gate-open #game-canvas,
   opacity: 0;
   pointer-events: none;
   clip-path: inset(50%);
+}
+
+/* ========================================
+   Accessibility: Reduced Motion Preference
+   ======================================== */
+@media (prefers-reduced-motion: reduce) {
+  .hero-card,
+  .bouncing-arrow,
+  .workshop-icon-bounce,
+  .shake,
+  .squash-stretch,
+  .bounce {
+    animation: none;
+    transition: none;
+  }
 }
 

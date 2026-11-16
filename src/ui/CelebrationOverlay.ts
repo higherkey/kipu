@@ -230,7 +230,7 @@ export class CelebrationOverlay {
         continue;
       }
 
-      if (this.ctx) {
+      if (this.ctx && typeof this.ctx.save === 'function') {
         this.ctx.save();
         this.ctx.globalAlpha = Math.max(0, p.alpha);
         this.ctx.fillStyle = p.color;
@@ -257,22 +257,22 @@ export class CelebrationOverlay {
     let rot = (Math.PI / 2) * 3;
     const step = Math.PI / spikes;
 
-    ctx.beginPath();
-    ctx.moveTo(cx, cy - outerRadius);
+    if (typeof ctx.beginPath === 'function') ctx.beginPath();
+    if (typeof ctx.moveTo === 'function') ctx.moveTo(cx, cy - outerRadius);
     for (let i = 0; i < spikes; i++) {
       let x = cx + Math.cos(rot) * outerRadius;
       let y = cy + Math.sin(rot) * outerRadius;
-      ctx.lineTo(x, y);
+      if (typeof ctx.lineTo === 'function') ctx.lineTo(x, y);
       rot += step;
 
       x = cx + Math.cos(rot) * innerRadius;
       y = cy + Math.sin(rot) * innerRadius;
-      ctx.lineTo(x, y);
+      if (typeof ctx.lineTo === 'function') ctx.lineTo(x, y);
       rot += step;
     }
-    ctx.lineTo(cx, cy - outerRadius);
-    ctx.closePath();
-    ctx.fill();
+    if (typeof ctx.lineTo === 'function') ctx.lineTo(cx, cy - outerRadius);
+    if (typeof ctx.closePath === 'function') ctx.closePath();
+    if (typeof ctx.fill === 'function') ctx.fill();
   }
 
   public clear(): void {

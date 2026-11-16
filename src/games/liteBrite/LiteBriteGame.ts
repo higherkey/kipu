@@ -90,6 +90,14 @@ export class LiteBriteGame implements Game {
     canvas.addEventListener('touchcancel', this.handleTouchEnd);
   }
 
+  public resize(width?: number, height?: number): void {
+    if (!this.canvas) return;
+    if (width !== undefined && height !== undefined) {
+      this.canvas.width = width;
+      this.canvas.height = height;
+    }
+  }
+
   private initGrid(): void {
     this.grid = [];
     for (let r = 0; r < this.rows; r++) {

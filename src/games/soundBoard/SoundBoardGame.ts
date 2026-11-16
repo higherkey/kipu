@@ -37,7 +37,17 @@ export class SoundBoardGame extends BaseGame {
     this.buildGrid();
 
     this.canvas?.addEventListener('mousedown', this.handleMouse);
-    this.canvas?.addEventListener('touchstart', this.handleTouch);
+    this.canvas?.addEventListener('touchstart', this.handleTouch, { passive: false });
+    this.canvas?.addEventListener('touchmove', this.handleTouchMove, { passive: false });
+  }
+
+  public resize(width?: number, height?: number): void {
+    if (!this.canvas) return;
+    if (width !== undefined && height !== undefined) {
+      this.canvas.width = width;
+      this.canvas.height = height;
+    }
+    this.buildGrid();
   }
 
   private buildGrid() {
@@ -87,18 +97,29 @@ export class SoundBoardGame extends BaseGame {
     });
   };
 
+  private readonly handleTouchMove = (e: TouchEvent) => {
+    if (this.paused) return;
+    Array.from(e.changedTouches).forEach(touch => {
+      const pos = this.getCanvasPos(touch.clientX, touch.clientY);
+      this.hitTest(pos.x, pos.y, true);
+    });
+  };
+
   private readonly handleMouse = (e: MouseEvent) => {
     if (this.paused) return;
     const pos = this.getCanvasPos(e.clientX, e.clientY);
     this.hitTest(pos.x, pos.y);
   };
 
-  private hitTest(x: number, y: number) {
+  private hitTest(x: number, y: number, isMove = false) {
     for (const pad of this.pads) {
       if (
         x >= pad.x && x <= pad.x + pad.width &&
         y >= pad.y && y <= pad.y + pad.height
       ) {
+        if (isMove && pad.active > 0.4) {
+          break;
+        }
         this.triggerPad(pad);
         break;
       }
@@ -198,6 +219,7 @@ export class SoundBoardGame extends BaseGame {
     if (this.canvas) {
       this.canvas.removeEventListener('mousedown', this.handleMouse);
       this.canvas.removeEventListener('touchstart', this.handleTouch);
+      this.canvas.removeEventListener('touchmove', this.handleTouchMove);
     }
   }
 }

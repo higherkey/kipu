@@ -163,4 +163,19 @@ describe('ParticlePhysicsGame', () => {
     // Now should have 2 calls
     expect(vibrateMock).toHaveBeenCalledTimes(2);
   });
+
+  it('should stop pointer drag when mouseup occurs anywhere on window', () => {
+    const downEvent = new MouseEvent('mousedown', { clientX: 200, clientY: 400 });
+    canvas.dispatchEvent(downEvent);
+    expect((game as any).pointers.has(-1)).toBe(true);
+
+    window.dispatchEvent(new MouseEvent('mouseup'));
+    expect((game as any).pointers.has(-1)).toBe(false);
+  });
+
+  it('should support resize by updating canvas dimensions', () => {
+    game.resize(500, 600);
+    expect(canvas.width).toBe(500);
+    expect(canvas.height).toBe(600);
+  });
 });

@@ -15,13 +15,27 @@ Comprehensive implementation and stabilization across all mini-games and foundat
    - `BalloonPopGame`: Deterministic dot layout eliminating per-frame Math.random jitter.
 5. **Parental Gate & Safe Exit Flow (Issues #16, #28)**: Dual-corner 3s hold and arithmetic fallback protecting active sessions and settings routes (`/settings`).
 6. **Child-Safe Camera & Eeno Voice Board (Issues #33, #34)**: Local canvas shutter and filters with mock fallback; expanded preschool vocabulary with voice pitch/rate controls.
+7. **Sitewright, LCP & a11y Standards Hardening**:
+   - Replaced blocking `@import` in `src/style.css` with font preconnects and `<link>` in `index.html` to eliminate critical-chain render delay.
+   - Added WCAG 2.2 Level AA `@media (prefers-reduced-motion: reduce)` in `src/style.css` without `!important`.
+   - Annotated all decorative and navigational SVGs in `index.html` with `aria-hidden="true" focusable="false"`.
+   - Verified touch targets meet $\ge 44\text{px}$ and zero inline styles across dynamic and static UI.
+8. **Gameplay & Replay Loop Enhancements**:
+   - `BubbleWrapGame`: Added drag/swipe-to-pop support across `touchmove`/`mousemove` and auto-refresh loop when all bubbles are popped with confetti celebration.
+   - `BugCatcherGame`: Added tap-anywhere replay reset loop upon catching all 4 bugs and star celebration.
+   - `BalloonPopGame`: Added visible HUD pop counter (`🎈 N`) and milestone celebrations every 10 pops.
+   - `SoundBoardGame`: Added responsive `resize()` handling and sliding touch arpeggios.
+   - `ParticlePhysicsGame`: Bound window-level `mouseup` listener preventing stuck particle spawning on off-canvas mouse release; added `resize()`.
+   - `CloudShapeGame`: Added audio/particle responses for tapping morphed animal clouds and celebration when finding all 4 animals.
+   - `MarblePipeGame` & `PawanaGame`: Integrated global `CelebrationOverlay` fireworks and ARIA announcements into win conditions.
 
 ## 4a Blockers
-- None. Full test suite (58 files, 515 tests) passing with 0 errors.
+- None. Full test suite (58 files, 525 tests) passing with 0 errors.
 
 ## 4b Quick Wins
 - 100% test coverage for new features with dedicated adversarial stress tests.
 - Production PWA build generating service worker precaching 28 entries.
+- TypeScript compiler verification (`tsc --noEmit`) passes cleanly with zero warnings.
 
 ## 4c Deferred Items
 - Issue #38 (CI/CD pipeline alignment & serverless database credentials rotation) reserved for backend/ops milestone.

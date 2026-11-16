@@ -128,4 +128,16 @@ describe('SoundBoardGame', () => {
     game.resume();
     expect(() => game.update(16)).not.toThrow();
   });
+
+  it('should adapt pad layout on resize', () => {
+    game.resize(600, 800);
+    expect(canvas.width).toBe(600);
+    expect(canvas.height).toBe(800);
+    const pads = (game as any).pads;
+    expect(pads.length).toBe(9);
+    pads.forEach((p: any) => {
+      expect(p.x + p.width).toBeLessThanOrEqual(600);
+      expect(p.y + p.height).toBeLessThanOrEqual(800);
+    });
+  });
 });

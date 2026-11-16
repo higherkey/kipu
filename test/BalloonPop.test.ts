@@ -15,6 +15,7 @@ function createMockCanvas(): HTMLCanvasElement {
     lineWidth: 1,
     clearRect: vi.fn(),
     fillRect: vi.fn(),
+    fillText: vi.fn(),
     save: vi.fn(),
     restore: vi.fn(),
     beginPath: vi.fn(),

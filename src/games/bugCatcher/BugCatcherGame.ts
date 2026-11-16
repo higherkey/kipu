@@ -1,4 +1,5 @@
 import { BaseGame } from '../../core/BaseGame';
+import { CelebrationOverlay } from '../../ui/CelebrationOverlay';
 
 interface Bug {
   x: number;
@@ -133,6 +134,12 @@ export class BugCatcherGame extends BaseGame {
   };
 
   private checkBugClick(x: number, y: number) {
+    if (this.bugsCaught === this.totalBugs) {
+      this.createBugs();
+      this.haptics.lightTap();
+      return;
+    }
+
     // Check if click is on any uncaught bug (iterate from last to first for top-down)
     for (let i = this.bugs.length - 1; i >= 0; i--) {
       const bug = this.bugs[i];
@@ -143,6 +150,14 @@ export class BugCatcherGame extends BaseGame {
           this.bugsCaught++;
           this.audio.play('catch');
           this.haptics.lightTap();
+          if (this.bugsCaught === this.totalBugs) {
+            CelebrationOverlay.getInstance().celebrate({
+              type: 'stars',
+              count: 35,
+              x: this.canvas ? this.canvas.width / 2 : undefined,
+              y: this.canvas ? this.canvas.height / 2 : undefined,
+            });
+          }
           break; // Only catch one bug per click
         }
       }
@@ -245,17 +260,21 @@ export class BugCatcherGame extends BaseGame {
 
     // Win screen
     if (this.bugsCaught === this.totalBugs) {
-      this.ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+      this.ctx.fillStyle = 'rgba(0, 0, 0, 0.55)';
       this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
       this.ctx.fillStyle = '#FFFFFF';
-      this.ctx.font = 'bold 48px Fredoka, sans-serif';
+      this.ctx.font = 'bold 44px Fredoka, sans-serif';
       this.ctx.textAlign = 'center';
       this.ctx.textBaseline = 'middle';
-      this.ctx.fillText('All bugs found!', this.canvas.width / 2, this.canvas.height / 2);
+      this.ctx.fillText('All bugs found! 🌟', this.canvas.width / 2, this.canvas.height / 2 - 25);
 
-      this.ctx.font = '20px Fredoka, sans-serif';
-      this.ctx.fillText('Great focus!', this.canvas.width / 2, this.canvas.height / 2 + 60);
+      this.ctx.font = '22px Fredoka, sans-serif';
+      this.ctx.fillText('Great focus!', this.canvas.width / 2, this.canvas.height / 2 + 25);
+
+      this.ctx.font = 'bold 16px Fredoka, sans-serif';
+      this.ctx.fillStyle = '#FFE66D';
+      this.ctx.fillText('Tap anywhere to play again', this.canvas.width / 2, this.canvas.height / 2 + 70);
     }
   }
 

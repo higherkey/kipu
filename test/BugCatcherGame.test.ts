@@ -19,7 +19,12 @@ function createMockCanvas(): HTMLCanvasElement {
     clearRect: vi.fn(),
     fillRect: vi.fn(),
     fillText: vi.fn(),
+    save: vi.fn(),
+    restore: vi.fn(),
+    translate: vi.fn(),
+    rotate: vi.fn(),
     beginPath: vi.fn(),
+    closePath: vi.fn(),
     arc: vi.fn(),
     ellipse: vi.fn(),
     fill: vi.fn(),
@@ -81,11 +86,19 @@ describe('BugCatcherGame', () => {
     expect((game as any).bugsCaught).toBe(1);
   });
 
-  it('should trigger win condition when all 4 bugs are caught', () => {
+  it('should trigger win condition when all 4 bugs are caught and reset on subsequent tap', () => {
     const bugs = (game as any).bugs;
     bugs.forEach((b: any) => (game as any).checkBugClick(b.x, b.y));
 
     expect((game as any).bugsCaught).toBe(4);
+
+    // Tap anywhere while on win screen
+    (game as any).checkBugClick(100, 100);
+
+    // Should have reset
+    expect((game as any).bugsCaught).toBe(0);
+    expect((game as any).bugs.length).toBe(4);
+    expect((game as any).bugs.every((b: any) => !b.caught)).toBe(true);
   });
 
   it('should update texture phase animation', () => {

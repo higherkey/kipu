@@ -15,6 +15,7 @@ function createMockCanvas(): HTMLCanvasElement {
     lineWidth: 1,
     clearRect: vi.fn(),
     fillRect: vi.fn(),
+    fillText: vi.fn(),
     save: vi.fn(),
     restore: vi.fn(),
     beginPath: vi.fn(),
@@ -87,6 +88,20 @@ describe('BalloonPopGame', () => {
     (game as any).checkPop(200, 200);
     expect((game as any).balloons.length).toBe(0);
     expect((game as any).popsCount).toBe(1);
+  });
+
+  it('should render pop counter HUD and handle milestone celebrations', () => {
+    (game as any).popsCount = 10;
+    const ctx = canvas.getContext('2d') as any;
+    ctx.fillText = vi.fn();
+
+    game.update(16);
+
+    expect(ctx.fillText).toHaveBeenCalledWith(
+      expect.stringContaining('🎈 10'),
+      expect.any(Number),
+      expect.any(Number)
+    );
   });
 
   it('should remove event listeners on destroy', () => {

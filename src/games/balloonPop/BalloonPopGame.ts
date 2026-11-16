@@ -1,4 +1,5 @@
 import { BaseGame } from '../../core/BaseGame';
+import { CelebrationOverlay } from '../../ui/CelebrationOverlay';
 
 interface Particle {
   x: number;
@@ -129,6 +130,16 @@ export class BalloonPopGame extends BaseGame {
     this.haptics.heavyImpact();
     this.popsCount++;
     
+    // Milestone celebrations every 10 pops
+    if (this.popsCount % 10 === 0) {
+      CelebrationOverlay.getInstance().celebrate({
+        type: 'stars',
+        count: 25,
+        x: b.x,
+        y: b.y,
+      });
+    }
+
     // Difficulty scaling
     if (this.popsCount % 5 === 0) {
       this.spawnInterval = Math.max(400, this.spawnInterval * 0.9);
@@ -269,6 +280,19 @@ export class BalloonPopGame extends BaseGame {
       this.ctx!.fill();
     });
     this.ctx!.globalAlpha = 1.0;
+
+    // Draw HUD Pop Counter
+    if (this.ctx && typeof this.ctx.fillText === 'function') {
+      this.ctx.save();
+      this.ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+      this.ctx.font = 'bold 22px Fredoka, sans-serif';
+      this.ctx.textAlign = 'right';
+      this.ctx.textBaseline = 'top';
+      this.ctx.shadowColor = 'rgba(0, 0, 0, 0.25)';
+      this.ctx.shadowBlur = 6;
+      this.ctx.fillText(`🎈 ${this.popsCount}`, this.canvas.width - 24, 24);
+      this.ctx.restore();
+    }
   }
 
   destroy(): void {

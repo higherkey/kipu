@@ -1,4 +1,5 @@
 import { BaseGame } from '../../core/BaseGame';
+import { CelebrationOverlay } from '../../ui/CelebrationOverlay';
 import { Engine, World, Bodies, Body, Vector, Events } from 'matter-js';
 
 type SandboxPartType = 'ramp' | 'bumper' | 'booster';
@@ -213,6 +214,11 @@ export class MarblePipeGame extends BaseGame {
     this.audio.play('win');
     this.haptics.lightTap();
     
+    CelebrationOverlay.getInstance().celebrate({
+      type: 'fireworks',
+      count: 45,
+    });
+
     if (this.canvas) {
       this.createConfetti(this.canvas.width / 2, this.canvas.height / 2, 80);
     }

@@ -295,4 +295,44 @@ describe('Sitewright CSS Standards, Specificity Cascade & Touch Targets', () => 
       gameUI.unmount();
     });
   });
+
+  describe('5. LCP & Web Vitals Optimization (/longest-contentful-paint-slim)', () => {
+    it('index.html contains font preconnects and stylesheet link in head to eliminate LCP delay', async () => {
+      // @ts-ignore
+      const fs = await import('fs');
+      const html = fs.readFileSync('index.html', 'utf-8');
+
+      expect(html).toContain('rel="preconnect" href="https://fonts.googleapis.com"');
+      expect(html).toContain('rel="preconnect" href="https://fonts.gstatic.com" crossorigin');
+      expect(html).toContain('href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600&display=swap"');
+    });
+
+    it('src/style.css does not block stylesheet parsing with @import', async () => {
+      // @ts-ignore
+      const fs = await import('fs');
+      const css = fs.readFileSync('src/style.css', 'utf-8');
+
+      expect(css).not.toContain('@import url(');
+    });
+  });
+
+  describe('6. Accessibility & a11y Standards (/accessibility-and-a11y-slim)', () => {
+    it('index.html marks decorative SVGs with aria-hidden="true" and focusable="false"', async () => {
+      // @ts-ignore
+      const fs = await import('fs');
+      const html = fs.readFileSync('index.html', 'utf-8');
+
+      // Check all nav and tab bar SVGs have aria-hidden="true"
+      expect(html).toContain('aria-hidden="true" focusable="false"');
+    });
+
+    it('src/style.css supports prefers-reduced-motion to respect user motion preferences', async () => {
+      // @ts-ignore
+      const fs = await import('fs');
+      const css = fs.readFileSync('src/style.css', 'utf-8');
+
+      expect(css).toContain('@media (prefers-reduced-motion: reduce)');
+      expect(css).toContain('animation: none');
+    });
+  });
 });
