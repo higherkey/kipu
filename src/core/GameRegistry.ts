@@ -26,6 +26,7 @@ import { KineticSandboxGame } from '../games/busyBoard/KineticSandboxGame';
 import { PawanaGame } from '../games/pawana/PawanaGame';
 import { CameraGame } from '../games/camera/CameraGame';
 
+import { ToneGardenGame, PatternLoomGame, TrackSketcherGame } from '../games/musicExperiments/MusicExperiments';
 
 export interface GameRegistration {
   id: string;
@@ -264,6 +265,36 @@ export class GameRegistry {
         category: 'brain',
         desc: 'Build 8-track loop sequences, customize instruments and BPM, and record audio!',
         constructorRef: KhipuSynthGame
+      },
+      {
+        id: 'toneGarden',
+        name: 'Tone Garden',
+        subtitle: 'Tap-to-Play Sound Grid',
+        portal: 'workshop',
+        icon: 'music',
+        category: 'sensory',
+        desc: 'Tap colorful blooms to explore four different sound shapes.',
+        constructorRef: ToneGardenGame
+      },
+      {
+        id: 'patternLoom',
+        name: 'Pattern Loom',
+        subtitle: 'Looping Step Experiment',
+        portal: 'lab',
+        icon: 'music',
+        category: 'brain',
+        desc: 'Switch steps on and listen as a two-lane loop takes shape.',
+        constructorRef: PatternLoomGame
+      },
+      {
+        id: 'trackSketcher',
+        name: 'Track Sketcher',
+        subtitle: 'Local Timeline Experiment',
+        portal: 'lab',
+        icon: 'sliders',
+        category: 'brain',
+        desc: 'Tap notes onto a timeline and return to your locally saved sketch.',
+        constructorRef: TrackSketcherGame
       },
       {
         id: 'soundWaveStudio',
