@@ -1,0 +1,935 @@
+/* ===================================================
+   SettingsView.css — Settings & Mock Monetization UI
+   Sitewright Core Standards:
+   - Zero inline styles
+   - Zero !important
+   - Minimum 44x44px touch targets
+   - WCAG AAA High Contrast Overrides
+   =================================================== */
+
+.settings-view {
+  inline-size: 100%;
+  block-size: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow-y: auto;
+  background-color: var(--bg);
+  color: var(--fg);
+  padding-block-end: 4rem;
+  box-sizing: border-box;
+  position: relative;
+  z-index: 5;
+}
+
+/* Header & Navigation Bar */
+.settings-header {
+  inline-size: 100%;
+  max-inline-size: 800px;
+  padding-inline: 1.5rem;
+  padding-block-start: 1.5rem;
+  padding-block-end: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.settings-nav-bar {
+  inline-size: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-block-size: 56px;
+}
+
+.settings-nav-left,
+.settings-nav-right {
+  flex: 1 1 0%;
+  min-inline-size: 0;
+  display: flex;
+  align-items: center;
+}
+
+.settings-nav-left {
+  justify-content: flex-start;
+}
+
+.settings-nav-right {
+  justify-content: flex-end;
+}
+
+.settings-nav-center {
+  flex: 2 1 auto;
+  min-inline-size: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.settings-title {
+  font-family: 'Fredoka', sans-serif;
+  font-size: clamp(1.75rem, 4cqi + 1rem, 2.5rem);
+  font-weight: 600;
+  color: var(--primary);
+  margin: 0;
+  line-height: 1.1;
+  text-align: center;
+}
+
+.settings-tagline {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 1rem;
+  color: var(--text-muted);
+  margin-block-start: 0.5rem;
+  margin-block-end: 0;
+}
+
+/* Interactive Back Button (>= 44x44px touch target) */
+.settings-back-btn {
+  min-inline-size: 44px;
+  min-block-size: 44px;
+  padding-inline: 14px;
+  padding-block: 8px;
+  border-radius: var(--radius-sm);
+  background-color: var(--color-parchment);
+  color: var(--fg);
+  border: 2px solid var(--cord);
+  font-family: 'Fredoka', sans-serif;
+  font-size: 1rem;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  cursor: pointer;
+  box-shadow: 0 var(--shadow-depth) 0 var(--cord);
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.settings-back-btn:hover {
+  background-color: var(--bg-warm);
+}
+
+.settings-back-btn:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 var(--cord);
+}
+
+.settings-back-btn .btn-icon svg {
+  inline-size: 20px;
+  block-size: 20px;
+  display: block;
+}
+
+/* Settings Container Layout */
+.settings-container {
+  inline-size: 100%;
+  max-inline-size: 800px;
+  padding-inline: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  box-sizing: border-box;
+}
+
+/* Generic Settings Card */
+.settings-card {
+  background-color: var(--bg-warm);
+  border: var(--string-border);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  box-shadow: 0 var(--shadow-depth) 0 var(--cord);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.card-title {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 1.35rem;
+  font-weight: 600;
+  color: var(--primary);
+  margin: 0;
+}
+
+.card-desc {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.settings-items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Settings Row with Label & Toggle */
+.settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-block: 0.5rem;
+  border-block-end: 1px solid color-mix(in oklch, var(--cord) 40%, transparent);
+}
+
+.settings-row:last-child {
+  border-block-end: none;
+}
+
+.settings-row-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1 1 auto;
+}
+
+.settings-row-icon {
+  inline-size: 36px;
+  block-size: 36px;
+  border-radius: 50%;
+  background-color: color-mix(in oklch, var(--primary) 12%, transparent);
+  color: var(--primary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.settings-row-icon svg {
+  inline-size: 20px;
+  block-size: 20px;
+}
+
+.settings-row-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.settings-row-title {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 1.05rem;
+  font-weight: 500;
+  color: var(--fg);
+}
+
+.settings-row-desc {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+/* Sitewright Toggle Switches (min 44x44px hit area) */
+.settings-toggle {
+  min-inline-size: 48px;
+  min-block-size: 44px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.settings-toggle .toggle-track {
+  inline-size: 48px;
+  block-size: 28px;
+  border-radius: var(--radius-pill);
+  background-color: var(--color-cord);
+  border: 2px solid var(--cord);
+  position: relative;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.settings-toggle .toggle-thumb {
+  position: absolute;
+  inset-block-start: 2px;
+  inset-inline-start: 2px;
+  inline-size: 20px;
+  block-size: 20px;
+  border-radius: 50%;
+  background-color: var(--color-parchment);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.settings-toggle.on .toggle-track {
+  background-color: var(--primary);
+  border-color: var(--primary);
+}
+
+.settings-toggle.on .toggle-thumb {
+  transform: translateX(20px);
+}
+
+/* Parental Gate Mode Fieldset */
+.parental-mode-fieldset {
+  border: 1px solid var(--cord);
+  border-radius: var(--radius-sm);
+  padding: 1rem;
+  margin-block-start: 0.5rem;
+  background-color: color-mix(in oklch, var(--bg) 60%, transparent);
+}
+
+.parental-mode-legend {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--fg);
+  padding-inline: 6px;
+}
+
+.parental-mode-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-block-start: 0.5rem;
+}
+
+.parental-mode-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  cursor: pointer;
+  min-block-size: 44px;
+  padding: 6px 8px;
+  border-radius: var(--radius-sm);
+  transition: background-color 0.15s ease;
+}
+
+.parental-mode-option:hover {
+  background-color: color-mix(in oklch, var(--cord) 25%, transparent);
+}
+
+.mode-radio-input {
+  min-inline-size: 20px;
+  min-block-size: 20px;
+  margin-block-start: 4px;
+  accent-color: var(--primary);
+  cursor: pointer;
+}
+
+.mode-option-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.mode-option-title {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--fg);
+}
+
+.mode-option-desc {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+/* Monetization & Tiers Section */
+.monetization-card {
+  border-color: var(--accent);
+}
+
+.monetization-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.monetization-header .heart-icon {
+  color: var(--primary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Supporter Status Banner */
+.supporter-status-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 1rem;
+  border-radius: var(--radius-sm);
+  background-color: color-mix(in oklch, var(--bg) 80%, transparent);
+  border: 1px dashed var(--cord);
+}
+
+.supporter-status-banner.unlocked-status {
+  background-color: color-mix(in oklch, #2E9E6B 15%, transparent);
+  border-color: #2E9E6B;
+}
+
+.status-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.status-badge {
+  display: inline-block;
+  align-self: flex-start;
+  font-family: 'Fredoka', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 3px 10px;
+  border-radius: var(--radius-pill);
+}
+
+.status-badge.free-status {
+  background-color: var(--cord);
+  color: var(--fg);
+}
+
+.status-badge.premium-status {
+  background-color: #2E9E6B;
+  color: white;
+}
+
+.status-text {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 0.9rem;
+  color: var(--fg);
+}
+
+.status-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Generic Buttons (>= 44x44px) */
+.settings-btn {
+  min-inline-size: 44px;
+  min-block-size: 44px;
+  padding-inline: 16px;
+  padding-block: 8px;
+  border-radius: var(--radius-sm);
+  font-family: 'Fredoka', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  box-sizing: border-box;
+  transition: transform 0.1s ease, box-shadow 0.1s ease, background-color 0.15s ease;
+}
+
+.settings-btn.primary-btn {
+  background-color: var(--primary);
+  color: var(--color-parchment);
+  border: 2px solid var(--color-red-hover);
+  box-shadow: 0 var(--shadow-depth) 0 var(--color-red-hover);
+}
+
+.settings-btn.primary-btn:hover {
+  background-color: var(--color-red-hover);
+}
+
+.settings-btn.primary-btn:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 var(--color-red-hover);
+}
+
+.settings-btn.secondary-btn {
+  background-color: var(--color-parchment);
+  color: var(--fg);
+  border: 2px solid var(--cord);
+  box-shadow: 0 2px 0 var(--cord);
+}
+
+.settings-btn.secondary-btn:hover {
+  background-color: var(--bg-warm);
+}
+
+.settings-btn.secondary-btn:active {
+  transform: translateY(2px);
+  box-shadow: 0 0 0 transparent;
+}
+
+/* 3-Tier Grid Layout */
+.tiers-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  margin-block-start: 0.5rem;
+}
+
+.tier-card {
+  background-color: var(--bg);
+  border: 2px solid var(--cord);
+  border-radius: var(--radius-sm);
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  box-shadow: 0 var(--shadow-depth) 0 var(--cord);
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+
+.tier-card:hover {
+  border-color: var(--primary);
+}
+
+.tier-card.active-tier {
+  border-color: #2E9E6B;
+  background-color: color-mix(in oklch, #2E9E6B 8%, var(--bg));
+  box-shadow: 0 var(--shadow-depth) 0 #2E9E6B;
+}
+
+.tier-badge {
+  position: absolute;
+  inset-block-start: -10px;
+  inset-inline-end: 12px;
+  background-color: var(--accent);
+  color: white;
+  font-family: 'Fredoka', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: var(--radius-pill);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+.tier-card-header {
+  margin-block-end: 0.5rem;
+}
+
+.tier-name {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--fg);
+  margin: 0;
+}
+
+.tier-price-box {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  margin-block-start: 4px;
+}
+
+.tier-price {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 1.6rem;
+  font-weight: 600;
+  color: var(--primary);
+}
+
+.tier-period {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.tier-desc {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  line-height: 1.35;
+  margin-block-end: 0.75rem;
+}
+
+.tier-perks {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-family: 'Fredoka', sans-serif;
+  font-size: 0.82rem;
+  color: var(--fg);
+}
+
+.tier-perks li {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.perk-check {
+  color: #2E9E6B;
+  font-weight: bold;
+}
+
+.tier-action-btn {
+  min-inline-size: 100%;
+  min-block-size: 44px;
+  padding: 10px;
+  border-radius: var(--radius-sm);
+  background-color: var(--primary);
+  color: white;
+  border: 2px solid var(--color-red-hover);
+  font-family: 'Fredoka', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 var(--shadow-depth) 0 var(--color-red-hover);
+  transition: transform 0.1s ease, box-shadow 0.1s ease, background-color 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tier-action-btn:hover {
+  background-color: var(--color-red-hover);
+}
+
+.tier-action-btn:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 var(--color-red-hover);
+}
+
+.tier-action-btn.active {
+  background-color: #2E9E6B;
+  border-color: #238056;
+  box-shadow: 0 var(--shadow-depth) 0 #238056;
+}
+
+/* Footer Section */
+.settings-footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  margin-block-start: 1rem;
+}
+
+.return-home-btn {
+  min-inline-size: 220px;
+  min-block-size: 48px;
+  font-size: 1.1rem;
+}
+
+.settings-version {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+/* ===================================================
+   Payment Confirmation Modal & Simulated State
+   =================================================== */
+
+.payment-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(30, 20, 15, 0.65);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  z-index: 1000;
+  box-sizing: border-box;
+}
+
+.payment-modal-dialog {
+  background-color: var(--bg);
+  border: var(--string-border);
+  border-radius: var(--radius);
+  inline-size: 100%;
+  max-inline-size: 480px;
+  box-shadow: 0 var(--shadow-depth-lg) 0 var(--cord);
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem;
+  gap: 1.25rem;
+  box-sizing: border-box;
+  animation: modalPopIn 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes modalPopIn {
+  from {
+    transform: scale(0.92);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.payment-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.payment-modal-title {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 1.35rem;
+  font-weight: 600;
+  color: var(--primary);
+  margin: 0;
+}
+
+.payment-modal-close-btn {
+  min-inline-size: 44px;
+  min-block-size: 44px;
+  background: transparent;
+  border: none;
+  font-size: 1.25rem;
+  color: var(--fg);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+}
+
+.payment-modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.modal-tier-summary {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-sm);
+  background-color: var(--bg-warm);
+  border: 1px solid var(--cord);
+}
+
+.modal-tier-name {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--fg);
+}
+
+.modal-tier-price {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: var(--primary);
+}
+
+.modal-tier-desc {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+  margin: 0;
+}
+
+.mock-sandbox-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-sm);
+  background-color: color-mix(in oklch, var(--accent) 15%, transparent);
+  border: 1px solid var(--accent);
+  font-family: 'Fredoka', sans-serif;
+  font-size: 0.85rem;
+  color: var(--fg);
+  line-height: 1.35;
+}
+
+.notice-icon {
+  font-weight: bold;
+  color: var(--accent);
+}
+
+/* Processing Spinner State */
+.modal-processing-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 1.5rem 0;
+}
+
+.spinner {
+  inline-size: 44px;
+  block-size: 44px;
+  border: 4px solid var(--cord);
+  border-block-start-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.processing-label {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 0.95rem;
+  color: var(--fg);
+  margin: 0;
+}
+
+/* Success Confirmation State */
+.modal-success-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 1rem 0;
+  text-align: center;
+}
+
+.success-badge {
+  inline-size: 52px;
+  block-size: 52px;
+  border-radius: 50%;
+  background-color: #2E9E6B;
+  color: white;
+  font-size: 1.75rem;
+  font-weight: bold;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.success-title {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #2E9E6B;
+  margin: 0;
+}
+
+.success-desc {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 0.9rem;
+  color: var(--fg);
+  margin: 0;
+}
+
+.payment-modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-block-start: 0.5rem;
+}
+
+.modal-btn {
+  min-inline-size: 44px;
+  min-block-size: 44px;
+  padding-inline: 18px;
+  padding-block: 10px;
+  border-radius: var(--radius-sm);
+  font-family: 'Fredoka', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.1s ease, background-color 0.15s ease;
+}
+
+.modal-btn.cancel-btn {
+  background-color: var(--color-parchment);
+  color: var(--fg);
+  border: 2px solid var(--cord);
+}
+
+.modal-btn.cancel-btn:hover {
+  background-color: var(--bg-warm);
+}
+
+.modal-btn.confirm-btn {
+  background-color: var(--primary);
+  color: white;
+  border: 2px solid var(--color-red-hover);
+  box-shadow: 0 var(--shadow-depth) 0 var(--color-red-hover);
+}
+
+.modal-btn.confirm-btn:hover {
+  background-color: var(--color-red-hover);
+}
+
+.modal-btn.confirm-btn:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 var(--color-red-hover);
+}
+
+.modal-btn.done-btn {
+  background-color: #2E9E6B;
+  color: white;
+  border: 2px solid #238056;
+  min-inline-size: 120px;
+}
+
+/* ===================================================
+   WCAG AAA High Contrast Overrides
+   =================================================== */
+
+.high-contrast,
+:root.high-contrast {
+  --bg: #FFFFFF;
+  --fg: #000000;
+  --primary: #8B0000;
+  --accent: #1C3D5A;
+  --cord: #000000;
+  --text-muted: #222222;
+  --string-border: 4px solid #000000;
+}
+
+.high-contrast .settings-card,
+.high-contrast .tier-card,
+.high-contrast .payment-modal-dialog {
+  border-width: 3px;
+  border-color: #000000;
+  box-shadow: none;
+}
+
+.high-contrast .settings-toggle .toggle-track {
+  border-width: 3px;
+  border-color: #000000;
+}
+
+.high-contrast .settings-toggle.on .toggle-track {
+  background-color: #000000;
+}
+
+.high-contrast .settings-toggle.on .toggle-thumb {
+  background-color: #FFFFFF;
+}
+
+.high-contrast .settings-btn,
+.high-contrast .tier-action-btn,
+.high-contrast .modal-btn {
+  border: 3px solid #000000;
+  box-shadow: none;
+}
+
+.high-contrast a:focus-visible,
+.high-contrast button:focus-visible,
+.high-contrast input:focus-visible {
+  outline: 4px solid #000000;
+  outline-offset: 4px;
+}

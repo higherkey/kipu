@@ -1,0 +1,328 @@
+/* ===================================================
+   ParentalGate.css — Safe Navigation & Parental Verification
+   Sitewright Core Standards:
+   - Zero inline styles
+   - Zero !important
+   - Minimum 44x44px touch targets
+   - W3C OKLCH tokens & tactile Andean design
+   =================================================== */
+
+.parental-gate-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: oklch(0% 0 0 / 0.65);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  padding: 16px;
+  touch-action: none;
+  box-sizing: border-box;
+}
+
+.parental-gate-modal {
+  position: relative;
+  inline-size: 100%;
+  max-inline-size: 420px;
+  background-color: var(--color-parchment);
+  color: var(--color-indigo);
+  border: var(--string-border);
+  border-radius: var(--radius);
+  box-shadow: 0 12px 36px oklch(0% 0 0 / 0.25);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  font-family: 'Fredoka', sans-serif;
+  user-select: none;
+  -webkit-user-select: none;
+  box-sizing: border-box;
+}
+
+/* Header */
+.parental-gate-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.parental-gate-titles {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.parental-gate-title {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: var(--color-red);
+  line-height: 1.2;
+  margin: 0;
+}
+
+.parental-gate-desc {
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  line-height: 1.35;
+  margin: 0;
+}
+
+.parental-gate-close-btn {
+  inline-size: 48px;
+  block-size: 48px;
+  min-inline-size: 48px;
+  min-block-size: 48px;
+  border-radius: var(--radius-pill);
+  border: 2px solid var(--color-cord);
+  background-color: var(--color-parchment);
+  color: var(--color-indigo);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 var(--shadow-depth) 0 var(--color-cord);
+  transition: transform 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.parental-gate-close-btn:hover {
+  background-color: var(--bg-warm);
+}
+
+.parental-gate-close-btn:active {
+  transform: translateY(2px);
+  box-shadow: 0 0 0 transparent;
+}
+
+.parental-gate-close-btn .parental-gate-icon svg {
+  inline-size: 20px;
+  block-size: 20px;
+  display: block;
+}
+
+/* Dual-Corner Hold View */
+.parental-gate-hold-view {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  padding-block: 8px;
+}
+
+.parental-gate-progress-wrap {
+  position: relative;
+  inline-size: 120px;
+  block-size: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.parental-gate-progress-ring {
+  inline-size: 120px;
+  block-size: 120px;
+  transform: rotate(-90deg);
+}
+
+.progress-ring-track {
+  fill: none;
+  stroke: var(--color-cord);
+  opacity: 0.4;
+}
+
+.progress-ring-indicator {
+  fill: none;
+  stroke: var(--color-red);
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.15s linear;
+}
+
+.parental-gate-modal.is-holding .progress-ring-indicator {
+  animation: parental-gate-fill 3s linear forwards;
+}
+
+@keyframes parental-gate-fill {
+  from {
+    stroke-dashoffset: 314.16;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.parental-gate-countdown-text {
+  position: absolute;
+  font-size: 1.6rem;
+  font-weight: 600;
+  color: var(--color-red);
+}
+
+.parental-gate-corners-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  inline-size: 100%;
+  padding-inline: 12px;
+  box-sizing: border-box;
+}
+
+.parental-gate-corner-btn {
+  inline-size: 96px;
+  block-size: 96px;
+  min-inline-size: 80px;
+  min-block-size: 80px;
+  border-radius: var(--radius-pill);
+  border: 3px solid var(--color-cord);
+  background-color: var(--color-parchment);
+  color: var(--color-indigo);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  touch-action: none;
+  box-shadow: 0 var(--shadow-depth) 0 var(--color-cord);
+  transition: transform 0.1s ease, border-color 0.1s ease, background-color 0.1s ease;
+}
+
+.parental-gate-corner-btn .corner-label {
+  font-size: 1.8rem;
+  font-weight: 600;
+}
+
+.parental-gate-corner-btn.is-active {
+  border-color: var(--color-red);
+  background-color: color-mix(in oklch, var(--color-red) 18%, var(--color-parchment));
+  color: var(--color-red);
+  transform: translateY(var(--shadow-depth));
+  box-shadow: 0 0 0 transparent;
+}
+
+/* Cognitive Math View */
+.parental-gate-math-view {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: center;
+  inline-size: 100%;
+}
+
+.parental-gate-math-question {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--color-indigo);
+  text-align: center;
+}
+
+.parental-gate-math-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  inline-size: 100%;
+  box-sizing: border-box;
+}
+
+.parental-gate-choice-btn {
+  min-inline-size: 72px;
+  min-block-size: 56px;
+  border-radius: var(--radius-sm);
+  border: 2px solid var(--color-cord);
+  background-color: var(--color-parchment);
+  color: var(--color-indigo);
+  font-size: 1.4rem;
+  font-weight: 600;
+  font-family: 'Fredoka', sans-serif;
+  cursor: pointer;
+  box-shadow: 0 var(--shadow-depth) 0 var(--color-cord);
+  transition: transform 0.1s ease, background-color 0.15s ease, border-color 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.parental-gate-choice-btn:hover {
+  background-color: var(--bg-warm);
+}
+
+.parental-gate-choice-btn:active {
+  transform: translateY(var(--shadow-depth));
+  box-shadow: 0 0 0 transparent;
+}
+
+.parental-gate-choice-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.parental-gate-choice-btn.is-correct {
+  background-color: oklch(65% 0.18 140);
+  border-color: oklch(50% 0.18 140);
+  color: white;
+}
+
+.parental-gate-choice-btn.is-incorrect {
+  background-color: var(--color-red);
+  border-color: var(--color-red-hover);
+  color: white;
+}
+
+.parental-gate-lockout-msg {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--color-red);
+  padding: 12px;
+  text-align: center;
+}
+
+/* Footer & Mode Switch */
+.parental-gate-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.parental-gate-switch-btn {
+  min-inline-size: 180px;
+  min-block-size: 44px;
+  border: none;
+  background: transparent;
+  color: var(--color-indigo);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  font-size: 0.95rem;
+  font-family: 'Fredoka', sans-serif;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 16px;
+  border-radius: var(--radius-sm);
+}
+
+.parental-gate-switch-btn:hover {
+  color: var(--color-red);
+}
+
+/* Shake Animation */
+.parental-gate-modal.shake {
+  animation: parental-gate-shake 0.35s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+@keyframes parental-gate-shake {
+  10%, 90% { transform: translate3d(-3px, 0, 0); }
+  20%, 80% { transform: translate3d(5px, 0, 0); }
+  30%, 50%, 70% { transform: translate3d(-6px, 0, 0); }
+  40%, 60% { transform: translate3d(6px, 0, 0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .progress-ring-indicator,
+  .parental-gate-modal.is-holding .progress-ring-indicator,
+  .parental-gate-modal.shake {
+    animation: none;
+    transition: none;
+  }
+}
