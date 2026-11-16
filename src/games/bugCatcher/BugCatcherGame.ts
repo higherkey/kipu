@@ -17,6 +17,8 @@ export class BugCatcherGame extends BaseGame {
   private bugsCaught = 0;
   private readonly totalBugs = 4;
   private texturePhase = 0; // For animated natural texture background
+  private noiseTile: HTMLCanvasElement | null = null;
+  private noisePattern: CanvasPattern | null = null;
 
   constructor() {
     super();
@@ -24,10 +26,72 @@ export class BugCatcherGame extends BaseGame {
   }
 
   protected onInit(): void {
+    this.initNoisePattern();
     this.createBugs();
 
     this.canvas?.addEventListener('touchstart', this.handleTouch);
     this.canvas?.addEventListener('mousedown', this.handleMouseDown);
+  }
+
+  private initNoisePattern() {
+    if (typeof document === 'undefined') return;
+    const size = 128;
+    const tile = document.createElement('canvas');
+    tile.width = size;
+    tile.height = size;
+    const tileCtx = tile.getContext('2d');
+    if (!tileCtx) return;
+
+    try {
+      const imgData = tileCtx.createImageData(size, size);
+      const data = imgData.data;
+      for (let py = 0; py < size; py++) {
+        for (let px = 0; px < size; px++) {
+          const i = (py * size + px) * 4;
+          const noise = Math.sin(px * 0.1) * Math.cos(py * 0.1) * 25 + Math.sin(px * 0.3 + py * 0.2) * 15 + 40;
+          const base = 140 + noise;
+          data[i] = Math.min(255, Math.max(0, Math.floor(base * 0.7)));     // R
+          data[i + 1] = Math.min(255, Math.max(0, Math.floor(base * 0.9))); // G
+          data[i + 2] = Math.min(255, Math.max(0, Math.floor(base * 0.8))); // B
+          data[i + 3] = 255;
+        }
+      }
+      tileCtx.putImageData(imgData, 0, 0);
+      this.noiseTile = tile;
+
+      if (this.ctx && typeof this.ctx.createPattern === 'function') {
+        this.noisePattern = this.ctx.createPattern(tile, 'repeat');
+      }
+    } catch {
+      this.noiseTile = tile;
+    }
+  }
+
+  public resize(width: number, height: number): void {
+    if (!this.canvas) return;
+    const oldW = this.canvas.width || width;
+    const oldH = this.canvas.height || height;
+
+    this.canvas.width = width;
+    this.canvas.height = height;
+
+    const margin = 120;
+    this.bugs.forEach(bug => {
+      if (oldW > 0 && oldH > 0) {
+        bug.x = (bug.x / oldW) * width;
+        bug.y = (bug.y / oldH) * height;
+      }
+      bug.x = Math.max(margin, Math.min(width - margin, bug.x));
+      bug.y = Math.max(margin, Math.min(height - margin, bug.y));
+    });
+
+    if (this.ctx && this.noiseTile && typeof this.ctx.createPattern === 'function') {
+      try {
+        this.noisePattern = this.ctx.createPattern(this.noiseTile, 'repeat');
+      } catch {
+        // Fallback handled in drawWoolTexture
+      }
+    }
   }
 
   private createBugs() {
@@ -93,26 +157,20 @@ export class BugCatcherGame extends BaseGame {
   private drawWoolTexture(x: number, y: number, w: number, h: number) {
     if (!this.ctx) return;
 
-    // Draw natural wool-like stone texture using multiple noise layers
-    const imageData = this.ctx.createImageData(w, h);
-    const data = imageData.data;
-
-    for (let i = 0; i < data.length; i += 4) {
-      // Simplex-inspired noise (simplified)
-      const px = (i / 4) % w;
-      const py = Math.floor((i / 4) / w);
-      
-      // Create organic noise pattern
-      const noise = Math.sin(px * 0.05 + this.texturePhase) * Math.cos(py * 0.05) * 30 + 50;
-      const base = 140 + noise; // Sage green-ish base
-      
-      data[i] = base * 0.7; // R
-      data[i + 1] = base * 0.9; // G
-      data[i + 2] = base * 0.8; // B
-      data[i + 3] = 255; // A
+    if (this.noisePattern) {
+      this.ctx.fillStyle = this.noisePattern;
+      this.ctx.fillRect(x, y, w, h);
+    } else if (this.noiseTile && typeof this.ctx.drawImage === 'function') {
+      const size = this.noiseTile.width;
+      for (let tx = x; tx < w; tx += size) {
+        for (let ty = y; ty < h; ty += size) {
+          this.ctx.drawImage(this.noiseTile, tx, ty);
+        }
+      }
+    } else {
+      this.ctx.fillStyle = '#85AB98';
+      this.ctx.fillRect(x, y, w, h);
     }
-
-    this.ctx.putImageData(imageData, x, y);
   }
 
   private render() {

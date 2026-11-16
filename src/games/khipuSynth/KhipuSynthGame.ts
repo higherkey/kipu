@@ -29,6 +29,23 @@ export interface PerformancePad {
   activeTimer: number; // For visual feedback animation
 }
 
+export interface KhipuTrackPattern {
+  id: number;
+  name?: string;
+  instrument: InstrumentType;
+  note: string;
+  steps: boolean[];
+  muted?: boolean;
+  solo?: boolean;
+}
+
+export interface KhipuPatternExport {
+  version: 1;
+  name?: string;
+  bpm: number;
+  tracks: KhipuTrackPattern[];
+}
+
 // 8 Pentatonic / standard notes for rows (High to Low or Low to High)
 const SCALE_NOTES: string[] = ['C5', 'A4', 'G4', 'E4', 'D4', 'C4', 'A3', 'G3'];
 
@@ -103,7 +120,9 @@ export class KhipuSynthGame implements Game {
 
   // Hover / Interaction state
   private activeTouchId: number | null = null;
+  private bpmDragTouchId: number | null = null;
   private isDraggingBpm = false;
+  private shareFeedbackTimer = 0;
 
   constructor() {
     this.haptics = HapticController.getInstance();
@@ -194,8 +213,10 @@ export class KhipuSynthGame implements Game {
     canvas.addEventListener('touchstart', this.handleTouchStart, { passive: false });
     canvas.addEventListener('touchmove', this.handleTouchMove, { passive: false });
     canvas.addEventListener('touchend', this.handleTouchEnd, { passive: false });
+    canvas.addEventListener('touchcancel', this.handleTouchEnd, { passive: false });
 
     this.initAudio();
+    this.loadFromUrl();
   }
 
   public setSoundEnabled(enabled: boolean): void {
@@ -258,6 +279,10 @@ export class KhipuSynthGame implements Game {
       if (pad.activeTimer > 0) {
         pad.activeTimer = Math.max(0, pad.activeTimer - dt * 0.005);
       }
+    }
+
+    if (this.shareFeedbackTimer > 0) {
+      this.shareFeedbackTimer = Math.max(0, this.shareFeedbackTimer - dt / 1000);
     }
 
     // Update spectrum visualizer data
@@ -722,12 +747,10 @@ export class KhipuSynthGame implements Game {
 
   private readonly handleTouchStart = (e: TouchEvent) => {
     e.preventDefault();
-    if (e.touches.length > 0) {
-      const touch = e.touches[0];
-      this.activeTouchId = touch.identifier;
+    Array.from(e.changedTouches).forEach(touch => {
       const pos = this.getCanvasPos(touch.clientX, touch.clientY);
-      this.handleInputStart(pos.x, pos.y);
-    }
+      this.handleInputStart(pos.x, pos.y, touch.identifier);
+    });
   };
 
   private readonly handleTouchMove = (e: TouchEvent) => {
@@ -735,7 +758,7 @@ export class KhipuSynthGame implements Game {
     if (!this.isDraggingBpm) return;
     for (let i = 0; i < e.changedTouches.length; i++) {
       const touch = e.changedTouches[i];
-      if (touch.identifier === this.activeTouchId) {
+      if (touch.identifier === this.bpmDragTouchId) {
         const pos = this.getCanvasPos(touch.clientX, touch.clientY);
         this.handleBpmDrag(pos.x);
       }
@@ -744,7 +767,12 @@ export class KhipuSynthGame implements Game {
 
   private readonly handleTouchEnd = (e: TouchEvent) => {
     e.preventDefault();
-    this.isDraggingBpm = false;
+    for (let i = 0; i < e.changedTouches.length; i++) {
+      if (e.changedTouches[i].identifier === this.bpmDragTouchId) {
+        this.isDraggingBpm = false;
+        this.bpmDragTouchId = null;
+      }
+    }
   };
 
   private getCanvasPos(clientX: number, clientY: number): { x: number; y: number } {
@@ -756,7 +784,7 @@ export class KhipuSynthGame implements Game {
     };
   }
 
-  private handleInputStart(x: number, y: number) {
+  private handleInputStart(x: number, y: number, touchId: number = -1) {
     if (this.paused || !this.canvas) return;
 
     // Audio Context Resume on user interaction
@@ -764,7 +792,7 @@ export class KhipuSynthGame implements Game {
       this.audioCtx.resume();
     }
 
-    // 1. Check Control Bar (Play/Pause, BPM Slider, Record, Clear)
+    // 1. Check Control Bar (Play/Pause, BPM Slider, Record, Share, Clear)
     const ctrlY = this.layout.spectrumH + 5;
     if (y >= ctrlY && y <= ctrlY + this.layout.controlsH) {
       // Play/Pause Button
@@ -782,10 +810,18 @@ export class KhipuSynthGame implements Game {
 
       // BPM Slider
       const bpmSliderX = 140;
-      const bpmSliderW = this.canvas.width - 250;
+      const bpmSliderW = this.canvas.width - 340;
       if (x >= bpmSliderX - 10 && x <= bpmSliderX + bpmSliderW + 10) {
         this.isDraggingBpm = true;
+        this.bpmDragTouchId = touchId;
         this.handleBpmDrag(x);
+        return;
+      }
+
+      // Share Pattern Button
+      const shareX = this.canvas.width - 180;
+      if (x >= shareX && x <= shareX + 80) {
+        this.sharePattern();
         return;
       }
 
@@ -843,7 +879,7 @@ export class KhipuSynthGame implements Game {
   private handleBpmDrag(x: number) {
     if (!this.canvas) return;
     const bpmSliderX = 140;
-    const bpmSliderW = this.canvas.width - 250;
+    const bpmSliderW = this.canvas.width - 340;
     const clampedX = Math.max(bpmSliderX, Math.min(bpmSliderX + bpmSliderW, x));
     const pct = (clampedX - bpmSliderX) / bpmSliderW;
     this.bpm = Math.round(60 + pct * 120); // 60 to 180 BPM
@@ -862,6 +898,153 @@ export class KhipuSynthGame implements Game {
         step.active = false;
       }
     }
+  }
+
+  // --- Pattern JSON Serialization, Storage & URL Sharing (Issue #30) ---
+  public exportPattern(): KhipuPatternExport {
+    return {
+      version: 1,
+      bpm: this.bpm,
+      tracks: this.tracks.map(t => ({
+        id: t.id,
+        name: t.name,
+        instrument: t.instrument,
+        note: t.note,
+        steps: t.steps.map(s => Boolean(s.active)),
+        muted: Boolean(t.muted),
+        solo: Boolean(t.solo),
+      })),
+    };
+  }
+
+  public exportPatternJson(): string {
+    return JSON.stringify(this.exportPattern(), null, 2);
+  }
+
+  public importPattern(data: KhipuPatternExport | string): boolean {
+    try {
+      const parsed: any = typeof data === 'string' ? JSON.parse(data) : data;
+      if (!parsed || typeof parsed !== 'object') return false;
+      if (parsed.version !== 1 && parsed.version !== '1') return false;
+      if (!Array.isArray(parsed.tracks) || parsed.tracks.length !== 8) return false;
+
+      // Validate bpm
+      if (typeof parsed.bpm === 'number' && !isNaN(parsed.bpm)) {
+        this.bpm = Math.max(60, Math.min(180, Math.round(parsed.bpm)));
+      }
+
+      const validInstruments: InstrumentType[] = ['bell', 'pluck', 'chime', 'drum', 'click', 'marimba', 'flute', 'bass'];
+
+      for (let i = 0; i < 8; i++) {
+        const sourceTrack = parsed.tracks[i];
+        if (!sourceTrack || typeof sourceTrack !== 'object') return false;
+
+        const targetTrack = this.tracks[i];
+        if (sourceTrack.instrument && validInstruments.includes(sourceTrack.instrument)) {
+          targetTrack.instrument = sourceTrack.instrument;
+        }
+        if (typeof sourceTrack.note === 'string' && sourceTrack.note.length > 0) {
+          targetTrack.note = sourceTrack.note;
+        }
+        if (typeof sourceTrack.muted === 'boolean') {
+          targetTrack.muted = sourceTrack.muted;
+        }
+        if (typeof sourceTrack.solo === 'boolean') {
+          targetTrack.solo = sourceTrack.solo;
+        }
+        if (Array.isArray(sourceTrack.steps)) {
+          for (let s = 0; s < 16; s++) {
+            targetTrack.steps[s].active = Boolean(sourceTrack.steps[s]);
+          }
+        }
+      }
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  public saveToStorage(key: string = 'khipu_pattern_saved'): void {
+    try {
+      localStorage.setItem(key, this.exportPatternJson());
+    } catch (e) {
+      console.warn('[KhipuSynth] Failed to save pattern to localStorage:', e);
+    }
+  }
+
+  public loadFromStorage(key: string = 'khipu_pattern_saved'): boolean {
+    try {
+      const saved = localStorage.getItem(key);
+      if (!saved) return false;
+      return this.importPattern(saved);
+    } catch {
+      return false;
+    }
+  }
+
+  public getShareUrl(): string {
+    const compactData = {
+      v: 1,
+      b: this.bpm,
+      t: this.tracks.map(t => ({
+        i: t.instrument,
+        n: t.note,
+        s: t.steps.map(s => (s.active ? 1 : 0)),
+      })),
+    };
+    const json = JSON.stringify(compactData);
+    const encoded = encodeURIComponent(json);
+    const baseUrl = typeof window !== 'undefined' ? `${window.location.origin}${window.location.pathname}` : '';
+    return `${baseUrl}#/game/khipuSynth#pattern=${encoded}`;
+  }
+
+  public loadFromUrl(urlStringOrHash?: string): boolean {
+    try {
+      const raw = urlStringOrHash ?? (typeof window !== 'undefined' ? window.location.hash || window.location.search : '');
+      if (!raw || !raw.includes('pattern=')) return false;
+
+      const patternPart = raw.split('pattern=')[1]?.split('&')[0];
+      if (!patternPart) return false;
+
+      const decoded = decodeURIComponent(patternPart);
+      const parsed = JSON.parse(decoded);
+
+      // Support compact format { v: 1, b: bpm, t: [...] } or standard KhipuPatternExport
+      if (parsed.v === 1 && Array.isArray(parsed.t)) {
+        const fullExport: KhipuPatternExport = {
+          version: 1,
+          bpm: parsed.b || 120,
+          tracks: parsed.t.map((t: any, idx: number) => ({
+            id: idx,
+            instrument: t.i,
+            note: t.n,
+            steps: Array.isArray(t.s) ? t.s.map((val: any) => Boolean(val)) : new Array(16).fill(false),
+          })),
+        };
+        return this.importPattern(fullExport);
+      }
+
+      return this.importPattern(parsed);
+    } catch (e) {
+      console.warn('[KhipuSynth] Failed to load pattern from URL:', e);
+      return false;
+    }
+  }
+
+  public async sharePattern(): Promise<boolean> {
+    const shareUrl = this.getShareUrl();
+    this.haptics.lightTap();
+    this.shareFeedbackTimer = 1.5;
+
+    if (typeof navigator !== 'undefined' && navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+      try {
+        await navigator.clipboard.writeText(shareUrl);
+        return true;
+      } catch {
+        // Fallback or ignore in non-secure context
+      }
+    }
+    return false;
   }
 
   // --- Rendering Pipeline ---
@@ -946,7 +1129,7 @@ export class KhipuSynthGame implements Game {
 
     // 3. BPM Slider Bar
     const sliderX = 135;
-    const sliderW = width - 240;
+    const sliderW = width - 335;
     this.ctx.fillStyle = '#1e293b';
     this.roundRect(sliderX, y + 16, sliderW, 12, 6);
     this.ctx.fill();
@@ -970,7 +1153,18 @@ export class KhipuSynthGame implements Game {
     this.ctx.textAlign = 'left';
     this.ctx.fillText(`${this.bpm} BPM`, sliderX, y + 8);
 
-    // 4. Clear Button
+    // 4. Share Button (Issue #30)
+    const shareX = width - 180;
+    const isShared = this.shareFeedbackTimer > 0;
+    this.ctx.fillStyle = isShared ? '#10b981' : '#334155';
+    this.roundRect(shareX, y + 5, 80, 36, 8);
+    this.ctx.fill();
+
+    this.ctx.fillStyle = isShared ? '#ffffff' : '#38bdf8';
+    this.ctx.textAlign = 'center';
+    this.ctx.fillText(isShared ? 'COPIED!' : 'SHARE', shareX + 40, y + 23);
+
+    // 5. Clear Button
     const clearX = width - 90;
     this.ctx.fillStyle = '#334155';
     this.roundRect(clearX, y + 5, 80, 36, 8);
@@ -1107,6 +1301,7 @@ export class KhipuSynthGame implements Game {
       this.canvas.removeEventListener('touchstart', this.handleTouchStart);
       this.canvas.removeEventListener('touchmove', this.handleTouchMove);
       this.canvas.removeEventListener('touchend', this.handleTouchEnd);
+      this.canvas.removeEventListener('touchcancel', this.handleTouchEnd);
     }
 
     if (this.mediaRecorder && this.mediaRecorder.state !== 'inactive') {

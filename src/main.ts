@@ -10,11 +10,21 @@ import { Router } from './core/Router';
 import { LoadingOverlay } from './ui/LoadingOverlay';
 import { AudioController } from './core/AudioController';
 import { ToneAudioController } from './core/ToneAudioController';
+import { HapticController } from './core/HapticController';
 import { GameRegistry } from './core/GameRegistry';
+import { ParentalGate } from './ui/ParentalGate';
+import { SettingsView } from './ui/SettingsView';
+import { CelebrationOverlay } from './ui/CelebrationOverlay';
+
+// Initialize High Contrast mode immediately if active
+if (typeof localStorage !== 'undefined' && localStorage.getItem('kipu_high_contrast') === 'true') {
+  document.documentElement.classList.add('high-contrast');
+}
 
 // Global audio initialization on first user interaction
 const initAudioOnInteraction = () => {
   ToneAudioController.getInstance().init();
+  HapticController.getInstance().unlockAudioContext();
   window.removeEventListener('pointerdown', initAudioOnInteraction);
   window.removeEventListener('touchstart', initAudioOnInteraction);
 };
@@ -36,6 +46,7 @@ let activeGame: Game | null = null;
 let activeGameId: string | null = null;
 let gameLoop: GameLoop | null = null;
 let gameUI: GameUI | null = null;
+let settingsView: SettingsView | null = null;
 let idleManager: IdleManager | null = null;
 let router: Router | null = null;
 let loadingOverlay: LoadingOverlay | null = null;
@@ -88,40 +99,48 @@ const featuredGames = [
 let currentHeroIndex = 0;
 let heroInterval: any = null;
 
+export function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+export function renderGameList(portalId?: string): void {
+  const container = document.getElementById('game-list');
+  if (!container) return;
+
+  const registry = GameRegistry.getInstance();
+  const allGames = registry.getAll();
+  const games = portalId && portalId !== 'all'
+    ? allGames.filter(g => g.portal === portalId)
+    : allGames;
+
+  container.innerHTML = games.map(game => {
+    const iconSvg = (game.icon in Icons)
+      ? Icons[game.icon as keyof typeof Icons]
+      : (Icons.settings || '');
+
+    return `
+      <a href="/game/${game.id}" data-game="${game.id}" data-portal="${game.portal}" data-category="${game.category}" role="menuitem">
+        <span class="icon">${iconSvg}</span>
+        <span class="game-label">
+          <span class="game-title">${escapeHtml(game.name)}</span>
+          <span class="game-subtitle">${escapeHtml(game.subtitle)}</span>
+        </span>
+      </a>
+    `.trim();
+  }).join('');
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   const navShell = document.getElementById('navigation-shell');
   const gameCanvas = document.getElementById('game-canvas') as HTMLCanvasElement;
-  const gameButtons = document.querySelectorAll('#game-list button, #game-list a');
 
-  // Inject Icons into menu items
-  gameButtons.forEach(button => {
-    const gameId = (button as HTMLElement).dataset.game;
-    const iconContainer = button.querySelector('.icon');
-    if (iconContainer && gameId) {
-      const iconMap: Record<string, string> = {
-        noButton: 'no',
-        bubbleWrap: 'bubble',
-        balloonPop: 'balloon',
-        colorMixer: 'palette',
-        colorDropper: 'droplet',
-        bugCatcher: 'bug',
-        soundMemory: 'music',
-        marblePipe: 'pipe',
-        soundBoard: 'sound',
-        particlePhysics: 'particle',
-        switchboard: 'settings',
-        luminaryBoard: 'bulb',
-        luminaryBoardTone: 'bulb',
-        mechanicalWorkshop: 'settings',
-        kineticSandbox: 'particle',
-        pawana: 'feather',
-      };
-      const iconKey = iconMap[gameId];
-      if (iconKey && iconKey in Icons) {
-        iconContainer.innerHTML = Icons[iconKey as keyof typeof Icons];
-      }
-    }
-  });
+  // Render initial dynamic game cards from GameRegistry
+  renderGameList();
 
   // Setup Hero Banner dots indicators
   const dotsContainer = document.getElementById('hero-dots');
@@ -201,6 +220,46 @@ document.addEventListener('DOMContentLoaded', () => {
   // Setup Router
   router = new Router();
 
+  // Navigation Guards
+  router.beforeEach(async (to, from) => {
+    // 1. Guard active game session exits per Issue #28
+    if (from && from.startsWith('/game/') && to !== from) {
+      pauseGame();
+      document.body.classList.add('parental-gate-open');
+      const canvas = document.getElementById('game-canvas');
+      canvas?.classList.add('interaction-locked');
+
+      return new Promise<boolean>((resolve) => {
+        ParentalGate.getInstance().verify(
+          () => {
+            document.body.classList.remove('parental-gate-open');
+            canvas?.classList.remove('interaction-locked');
+            resolve(true);
+          },
+          () => {
+            document.body.classList.remove('parental-gate-open');
+            canvas?.classList.remove('interaction-locked');
+            resumeGame();
+            resolve(false);
+          }
+        );
+      });
+    }
+
+    // 2. Guard protected Settings route per Issues #16, #28
+    const normalizedTo = router ? router.normalizePath(to) : to.replace(/^#/, '').replace(/^\/?/, '/');
+    if (normalizedTo === '/settings' || normalizedTo.startsWith('/settings')) {
+      return new Promise<boolean>((resolve) => {
+        ParentalGate.getInstance().verify(
+          () => resolve(true),
+          () => resolve(false)
+        );
+      });
+    }
+
+    return true;
+  });
+
   router.addRoute('/', () => {
     const notFound = document.getElementById('not-found-screen');
     notFound?.classList.add('hidden');
@@ -265,16 +324,8 @@ document.addEventListener('DOMContentLoaded', () => {
       gameListEl.classList.remove('hidden');
     }
 
-    // Filter games by portal
-    const gameCards = document.querySelectorAll('#game-list a');
-    gameCards.forEach(card => {
-      const cardPortal = (card as HTMLElement).dataset.portal;
-      if (cardPortal === portalId) {
-        card.classList.remove('hidden');
-      } else {
-        card.classList.add('hidden');
-      }
-    });
+    // Render filtered game cards for selected portal
+    renderGameList(portalId);
 
     // Update Header and show Back Button
     const mainTitle = document.getElementById('main-title');
@@ -356,6 +407,57 @@ document.addEventListener('DOMContentLoaded', () => {
     updateTabBarActiveState(`/game/${gameId}`);
   });
 
+  router.addRoute('/settings', () => {
+    const notFound = document.getElementById('not-found-screen');
+    notFound?.classList.add('hidden');
+
+    cleanupActiveGame();
+
+    navShell?.classList.add('hidden');
+    gameCanvas?.classList.add('hidden');
+    gameCanvas?.classList.remove('with-hud');
+
+    // Stop hero rotation
+    if (heroInterval) {
+      clearInterval(heroInterval);
+      heroInterval = null;
+    }
+
+    if (settingsView) {
+      settingsView.unmount();
+      settingsView = null;
+    }
+
+    settingsView = new SettingsView({
+      onBack: () => {
+        router?.navigate('/');
+      },
+      onSoundToggle: (enabled) => {
+        soundEnabled = enabled;
+        localStorage.setItem('soundEnabled', String(enabled));
+        if (activeGame?.setSoundEnabled) {
+          activeGame.setSoundEnabled(enabled);
+        }
+        AudioController.getInstance().updateMuteState();
+      },
+      onVibrationToggle: (enabled) => {
+        vibrationEnabled = enabled;
+        localStorage.setItem('vibrationEnabled', String(enabled));
+        if (activeGame?.setVibrationEnabled) {
+          activeGame.setVibrationEnabled(enabled);
+        }
+      },
+      onHighContrastToggle: (enabled) => {
+        document.documentElement.classList.toggle('high-contrast', enabled);
+      },
+    });
+
+    const appEl = document.getElementById('app') || document.body;
+    settingsView.mount(appEl);
+
+    updateTabBarActiveState('/settings');
+  });
+
   router.addRoute('*', () => {
     cleanupActiveGame();
 
@@ -385,10 +487,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!tabBar) return;
 
     const isGame = currentPath.startsWith('/game/');
+    const isSettings = currentPath === '/settings' || currentPath.startsWith('/settings');
     const notFoundEl = document.getElementById('not-found-screen');
     const isNotFound = notFoundEl && !notFoundEl.classList.contains('hidden');
     
-    if (isGame || isNotFound || currentPath === '*') {
+    if (isGame || isNotFound || isSettings || currentPath === '*') {
       tabBar.classList.add('hidden');
     } else {
       tabBar.classList.remove('hidden');
@@ -475,6 +578,9 @@ function startGame(gameId: string, canvas: HTMLCanvasElement) {
         activeGame.setVibrationEnabled(enabled);
       }
     },
+    onSettingsNav: () => {
+      router?.navigate('/settings');
+    },
   });
   gameUI.mount();
 
@@ -523,6 +629,15 @@ function exitToHome() {
 }
 
 function cleanupActiveGame() {
+  CelebrationOverlay.getInstance().clear();
+  if (settingsView) {
+    settingsView.unmount();
+    settingsView = null;
+  }
+  document.body.classList.remove('parental-gate-open');
+  const canvas = document.getElementById('game-canvas');
+  canvas?.classList.remove('interaction-locked');
+
   if (activeGame) {
     activeGame.destroy();
     activeGame = null;
@@ -540,9 +655,20 @@ function cleanupActiveGame() {
   }
 }
 
+function getHeaderHeight(): number {
+  if (typeof window === 'undefined' || typeof document === 'undefined') return 64;
+  const val = getComputedStyle(document.documentElement).getPropertyValue('--header-height').trim();
+  const parsed = parseInt(val, 10);
+  if (!Number.isNaN(parsed) && parsed > 0) {
+    return parsed;
+  }
+  return window.innerWidth <= 440 ? 56 : 64;
+}
+
 function resizeCanvas(canvas: HTMLCanvasElement) {
   canvas.width = window.innerWidth;
-  // Account for HUD height
-  canvas.height = window.innerHeight - 60;
+  // Account for HUD height dynamically matching --header-height
+  const headerHeight = canvas.classList.contains('with-hud') ? getHeaderHeight() : 0;
+  canvas.height = window.innerHeight - headerHeight;
 }
 

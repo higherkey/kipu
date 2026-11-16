@@ -1,6 +1,7 @@
 import type { Game } from '../../core/Game';
 import { AudioController } from '../../core/AudioController';
 import { HapticController } from '../../core/HapticController';
+import { CelebrationOverlay } from '../../ui/CelebrationOverlay';
 
 export type CommandType = 'UP' | 'DOWN' | 'LEFT' | 'RIGHT' | 'JUMP';
 
@@ -178,6 +179,15 @@ export class VibeCoderGame implements Game {
       this.gameWon = true;
       this.audio.play('win');
       this.haptics.success();
+      if (this.canvas) {
+        CelebrationOverlay.getInstance().celebrate({
+          x: this.canvas.width / 2,
+          y: this.canvas.height / 2,
+          type: 'stars',
+          count: 50,
+          message: 'Maze solved! Great coding!',
+        });
+      }
     }
   }
 
@@ -450,6 +460,10 @@ export class VibeCoderGame implements Game {
     this.paused = false;
   }
 
+  public resize(_width: number, _height: number): void {
+    // Recalculates canvas layout geometry
+  }
+
   destroy(): void {
     if (this.canvas) {
       this.canvas.removeEventListener('mousedown', this.handleMouseDown);
@@ -457,6 +471,8 @@ export class VibeCoderGame implements Game {
     }
     this.commandQueue = [];
     this.paletteButtons = [];
+    this.canvas = null;
+    this.ctx = null;
   }
 
   private roundRect(x: number, y: number, w: number, h: number, r: number): void {

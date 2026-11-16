@@ -9,9 +9,13 @@
     "build": "tsc && vite build",
     "lint": "tsc --noEmit",
     "test": "vitest run",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "cap:sync": "cap sync",
+    "cap:ios": "cap run ios",
+    "cap:android": "cap run android"
   },
   "devDependencies": {
+    "@capacitor/cli": "^8.4.1",
     "@types/howler": "^2.2.12",
     "@types/matter-js": "^0.20.2",
     "@vitest/coverage-v8": "^4.1.5",

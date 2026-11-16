@@ -592,6 +592,14 @@ export class CloudShapeGame implements Game {
     this.paused = false;
   }
 
+  public resize(width: number, height: number): void {
+    if (!this.canvas) return;
+    this.clouds.forEach(cloud => {
+      cloud.x = Math.max(80, Math.min(width - 80, cloud.x));
+      cloud.y = Math.max(60, Math.min(height * 0.6, cloud.y));
+    });
+  }
+
   destroy(): void {
     if (this.canvas) {
       this.canvas.removeEventListener('mousedown', this.handleMouseDown);
@@ -606,5 +614,8 @@ export class CloudShapeGame implements Game {
     }
     this.clouds = [];
     this.particles = [];
+    this.canvas = null;
+    this.ctx = null;
   }
 }
+

@@ -33,14 +33,23 @@ const PALETTE_NAMES: Record<string, Record<string, string>> = {
 };
 
 export class ColorMixerGame extends BaseGame {
-  // Buffering canvas for the paint layer
+  // Window-level release handlers to eliminate sticky smear when pointer exits canvas bounds
+  private boundWindowMouseUp: (() => void) | null = null;
+  private boundWindowTouchCancel: (() => void) | null = null;
+  private boundWindowBlur: (() => void) | null = null;
+
+  // Offscreen paint buffer canvas
   private bufferCanvas: HTMLCanvasElement | null = null;
   private bufferCtx: CanvasRenderingContext2D | null = null;
+
+  // Secondary scratch canvas to eliminate self-blit GPU hazard/black square artifacts
+  private scratchCanvas: HTMLCanvasElement | null = null;
+  private scratchCtx: CanvasRenderingContext2D | null = null;
 
   // Active Tool Selection
   private activeTool: PaintToolId = 'red';
 
-  // Smudge Drag History
+  // Smudge Drag History & Brush Configuration
   private isDrawing = false;
   private lastPos = { x: 0, y: 0 };
   private readonly brushRadius = 26;
@@ -51,16 +60,28 @@ export class ColorMixerGame extends BaseGame {
   private readonly potsHeight = 70;
   private wells: PaintWell[] = [];
 
-
+  constructor() {
+    super();
+    // Register audio cues to prevent silence on direct navigation
+    this.audio.registerSound('bloop', '/sounds/pop.ogg');
+    this.audio.registerSound('pop', '/sounds/pop.ogg');
+  }
 
   protected onInit(): void {
     if (!this.canvas) return;
 
-    // Setup buffer canvas to draw paint layers
+    // Setup primary paint buffer canvas
     this.bufferCanvas = document.createElement('canvas');
     this.bufferCanvas.width = this.canvas.width;
     this.bufferCanvas.height = this.canvas.height;
     this.bufferCtx = this.bufferCanvas.getContext('2d');
+
+    // Setup dedicated scratch buffer (2 * brushRadius) for safe transfer blits
+    const scratchSize = this.brushRadius * 2;
+    this.scratchCanvas = document.createElement('canvas');
+    this.scratchCanvas.width = scratchSize;
+    this.scratchCanvas.height = scratchSize;
+    this.scratchCtx = this.scratchCanvas.getContext('2d');
     
     // Clear paint layer to parchment color
     if (this.bufferCtx) {
@@ -70,12 +91,22 @@ export class ColorMixerGame extends BaseGame {
 
     this.setupWells();
 
+    // Canvas-level pointer & touch listeners
     this.canvas.addEventListener('touchstart', this.handleTouchStart, { passive: false });
     this.canvas.addEventListener('touchmove', this.handleTouchMove, { passive: false });
     this.canvas.addEventListener('touchend', this.handleTouchEnd, { passive: false });
     this.canvas.addEventListener('mousedown', this.handleMouseDown);
     this.canvas.addEventListener('mousemove', this.handleMouseMove);
     this.canvas.addEventListener('mouseup', this.handleMouseUp);
+
+    // Window-level release handlers: guarantee drawing state resets when cursor/finger leaves canvas
+    this.boundWindowMouseUp = () => { this.endPress(); };
+    this.boundWindowTouchCancel = () => { this.endPress(); };
+    this.boundWindowBlur = () => { this.endPress(); };
+    window.addEventListener('mouseup', this.boundWindowMouseUp);
+    window.addEventListener('touchend', this.boundWindowMouseUp);
+    window.addEventListener('touchcancel', this.boundWindowTouchCancel);
+    window.addEventListener('blur', this.boundWindowBlur);
   }
 
   private setupWells() {
@@ -232,7 +263,8 @@ export class ColorMixerGame extends BaseGame {
     if (!this.bufferCtx || !this.bufferCanvas) return;
 
     const dist = Math.hypot(x2 - x1, y2 - y1);
-    const steps = Math.max(1, Math.floor(dist / 4)); // Smudge every 4px
+    // Smooth step spacing with a protective upper bound to prevent frame drops on fast swipes
+    const steps = Math.max(1, Math.min(50, Math.floor(dist / 6)));
 
     for (let i = 0; i <= steps; i++) {
       const t = i / steps;
@@ -256,37 +288,48 @@ export class ColorMixerGame extends BaseGame {
     }
   }
 
+  /**
+   * Smudges paint at a point using an intermediate scratch canvas.
+   * This completely prevents WebKit GPU self-blit synchronization stalls and black-square artifacts.
+   */
   private smudgeAtPoint(x: number, y: number, prevX: number, prevY: number) {
-    if (!this.bufferCtx || !this.bufferCanvas) return;
+    if (!this.bufferCtx || !this.bufferCanvas || !this.scratchCanvas || !this.scratchCtx) return;
 
     const r = this.brushRadius;
+    const size = r * 2;
 
-    // Save context for clipping path
+    // Calculate source bounds clamped to buffer canvas dimensions
+    const rawSrcX = x - r - (x - prevX) * 0.4;
+    const rawSrcY = y - r - (y - prevY) * 0.4;
+    const srcX = Math.max(0, Math.min(this.bufferCanvas.width - size, rawSrcX));
+    const srcY = Math.max(0, Math.min(this.bufferCanvas.height - size, rawSrcY));
+    const dstX = x - r;
+    const dstY = y - r;
+
+    // Step 1: Copy patch from bufferCanvas into scratchCanvas (separate textures: safe)
+    this.scratchCtx.clearRect(0, 0, size, size);
+    this.scratchCtx.drawImage(
+      this.bufferCanvas,
+      srcX, srcY, size, size,
+      0, 0, size, size
+    );
+
+    // Step 2: Draw scratchCanvas back into bufferCanvas with circular clip & slight opacity
     this.bufferCtx.save();
-    
-    // Circular smudge boundary
     this.bufferCtx.beginPath();
     this.bufferCtx.arc(x, y, r, 0, Math.PI * 2);
     this.bufferCtx.clip();
 
-    // Smearing: copy circular snapshot from slightly offset previous brush location
-    // Draw with slight opacity to fade and smear the paint colors
     this.bufferCtx.globalAlpha = 0.91;
     this.bufferCtx.drawImage(
-      this.bufferCanvas,
-      x - r - (x - prevX) * 0.4,
-      y - r - (y - prevY) * 0.4,
-      r * 2,
-      r * 2,
-      x - r,
-      y - r,
-      r * 2,
-      r * 2
+      this.scratchCanvas,
+      0, 0, size, size,
+      dstX, dstY, size, size
     );
 
     this.bufferCtx.restore();
 
-    // If active color tool is selected, blend in a small amount of new color
+    // If active color tool is selected, blend in a small amount of fresh pigment
     if (this.activeTool !== 'finger') {
       const colorHex = COLOR_MAP[this.activeTool];
       const colorGrad = this.bufferCtx.createRadialGradient(x, y, r * 0.05, x, y, r);
@@ -413,6 +456,33 @@ export class ColorMixerGame extends BaseGame {
 
 
 
+  /**
+   * Resizes the canvas while preserving existing painted artwork.
+   * Re-calibrates well positions for the new width.
+   */
+  public resize(width: number, height: number): void {
+    if (!this.bufferCanvas || !this.bufferCtx || width <= 0 || height <= 0) return;
+
+    // Snapshot existing artwork onto temporary offscreen canvas
+    const temp = document.createElement('canvas');
+    temp.width = this.bufferCanvas.width;
+    temp.height = this.bufferCanvas.height;
+    const tempCtx = temp.getContext('2d');
+    tempCtx?.drawImage(this.bufferCanvas, 0, 0);
+
+    // Resize primary buffer canvas (clears context)
+    this.bufferCanvas.width = width;
+    this.bufferCanvas.height = height;
+
+    // Re-fill parchment background and blit preserved artwork 1:1
+    this.bufferCtx.fillStyle = '#F4ECD8';
+    this.bufferCtx.fillRect(0, 0, width, height);
+    this.bufferCtx.drawImage(temp, 0, 0);
+
+    // Re-calculate paint wells for new canvas width
+    this.setupWells();
+  }
+
   destroy(): void {
     window.speechSynthesis?.cancel();
     if (this.canvas) {
@@ -423,7 +493,22 @@ export class ColorMixerGame extends BaseGame {
       this.canvas.removeEventListener('mousemove', this.handleMouseMove);
       this.canvas.removeEventListener('mouseup', this.handleMouseUp);
     }
+    if (this.boundWindowMouseUp) {
+      window.removeEventListener('mouseup', this.boundWindowMouseUp);
+      window.removeEventListener('touchend', this.boundWindowMouseUp);
+      this.boundWindowMouseUp = null;
+    }
+    if (this.boundWindowTouchCancel) {
+      window.removeEventListener('touchcancel', this.boundWindowTouchCancel);
+      this.boundWindowTouchCancel = null;
+    }
+    if (this.boundWindowBlur) {
+      window.removeEventListener('blur', this.boundWindowBlur);
+      this.boundWindowBlur = null;
+    }
     this.bufferCanvas = null;
     this.bufferCtx = null;
+    this.scratchCanvas = null;
+    this.scratchCtx = null;
   }
 }

@@ -51,15 +51,15 @@ const COLOR_NAMES: Record<string, Record<string, string>> = {
   ru: { red: 'Красный', yellow: 'Желтый', blue: 'Синий', orange: 'Оранжевый', green: 'Зеленый', purple: 'Фиолетовый', brown: 'Коричневый' }
 };
 
-// Pre-computed reference colors for Euclidean name lookup — module-level to avoid per-call allocation
+// Target reference colors for Euclidean name lookup matching vibrant subtractive primaries & secondaries
 const COLOR_REFS: Array<{ name: string; r: number; g: number; b: number }> = [
   { name: 'red',    r: 255, g: 94,  b: 94  },
   { name: 'yellow', r: 255, g: 230, b: 109 },
   { name: 'blue',   r: 78,  g: 205, b: 196 },
-  { name: 'orange', r: 255, g: 162, b: 102 },
-  { name: 'green',  r: 167, g: 218, b: 153 },
-  { name: 'purple', r: 167, g: 150, b: 145 },
-  { name: 'brown',  r: 196, g: 176, b: 133 },
+  { name: 'orange', r: 255, g: 165, b: 0   },
+  { name: 'green',  r: 46,  g: 204, b: 113 },
+  { name: 'purple', r: 155, g: 89,  b: 182 },
+  { name: 'brown',  r: 139, g: 90,  b: 43  },
 ];
 
 export class ColorDropperGame extends BaseGame {
@@ -111,6 +111,20 @@ export class ColorDropperGame extends BaseGame {
     ];
   }
 
+  public resize(width: number, height: number): void {
+    if (!this.canvas) return;
+    this.canvas.width = width;
+    this.canvas.height = height;
+    this.setupPots();
+
+    // Re-bound existing drops inside the new canvas boundaries
+    const topLimit = this.potsHeight + this.potsY + 20;
+    this.blobs.forEach(b => {
+      b.x = Math.max(b.radius, Math.min(width - b.radius, b.x));
+      b.y = Math.max(topLimit + b.radius, Math.min(height - b.radius, b.y));
+    });
+  }
+
   private getLanguage(): string {
     const code = TranslationManager.getCurrent().code;
     return code.split('-')[0];
@@ -122,19 +136,86 @@ export class ColorDropperGame extends BaseGame {
     return dict[key] || key;
   }
 
+  private lerpChannel(c1: number, c2: number, t: number): number {
+    return Math.round(c1 + (c2 - c1) * t);
+  }
+
+  private lerpRGB(c1: [number, number, number], c2: [number, number, number], t: number): [number, number, number] {
+    return [
+      this.lerpChannel(c1[0], c2[0], t),
+      this.lerpChannel(c1[1], c2[1], t),
+      this.lerpChannel(c1[2], c2[2], t),
+    ];
+  }
+
   private computeProgrammaticColor(components: { red: number; yellow: number; blue: number }): { colorHex: string; colorName: string } {
     const total = components.red + components.yellow + components.blue;
     if (total === 0) {
       return { colorHex: COLOR_MAP.red, colorName: 'red' };
     }
 
-    // Weight interpolation: Red (255, 94, 94), Yellow (255, 230, 109), Blue (78, 205, 196)
-    const r = Math.round((components.red * 255 + components.yellow * 255 + components.blue * 78) / total);
-    const g = Math.round((components.red * 94 + components.yellow * 230 + components.blue * 205) / total);
-    const b = Math.round((components.red * 94 + components.yellow * 109 + components.blue * 196) / total);
+    const P_RED: [number, number, number] = [255, 94, 94];
+    const P_YELLOW: [number, number, number] = [255, 230, 109];
+    const P_BLUE: [number, number, number] = [78, 205, 196];
+    const P_ORANGE: [number, number, number] = [255, 165, 0];
+    const P_GREEN: [number, number, number] = [46, 204, 113];
+    const P_PURPLE: [number, number, number] = [155, 89, 182];
+    const P_BROWN: [number, number, number] = [139, 90, 43];
+
+    const rn = components.red / total;
+    const yn = components.yellow / total;
+    const bn = components.blue / total;
+
+    // Subtractive neutral core (Brown) from all 3 components
+    const k = Math.min(rn, yn, bn);
+    const wBrown = 3 * k;
+
+    // Remaining primary components after subtracting neutral core
+    const rRem = rn - k;
+    const yRem = yn - k;
+    const bRem = bn - k;
+    const remSum = rRem + yRem + bRem;
+
+    let arcColor: [number, number, number];
+    if (remSum <= 0.0001) {
+      arcColor = P_BROWN;
+    } else {
+      const fr = rRem / remSum;
+      const fy = yRem / remSum;
+      const fb = bRem / remSum;
+
+      if (fb <= 0.0001) {
+        // Red - Yellow arc
+        const t = fr / (fr + fy);
+        if (t >= 0.5) {
+          arcColor = this.lerpRGB(P_ORANGE, P_RED, (t - 0.5) * 2);
+        } else {
+          arcColor = this.lerpRGB(P_YELLOW, P_ORANGE, t * 2);
+        }
+      } else if (fr <= 0.0001) {
+        // Yellow - Blue arc
+        const t = fy / (fy + fb);
+        if (t >= 0.5) {
+          arcColor = this.lerpRGB(P_GREEN, P_YELLOW, (t - 0.5) * 2);
+        } else {
+          arcColor = this.lerpRGB(P_BLUE, P_GREEN, t * 2);
+        }
+      } else {
+        // Red - Blue arc
+        const t = fr / (fr + fb);
+        if (t >= 0.5) {
+          arcColor = this.lerpRGB(P_PURPLE, P_RED, (t - 0.5) * 2);
+        } else {
+          arcColor = this.lerpRGB(P_BLUE, P_PURPLE, t * 2);
+        }
+      }
+    }
+
+    const finalRgb = wBrown > 0.0001 ? this.lerpRGB(arcColor, P_BROWN, wBrown) : arcColor;
+    const [r, g, b] = finalRgb;
     const colorHex = `rgb(${r}, ${g}, ${b})`;
 
-    // Euclidean distance lookup for closest standard color name (for voice TTS / labels)
+    // Euclidean distance lookup for closest standard color name
     let minDistSq = Infinity;
     let closestName = 'red';
     for (const ref of COLOR_REFS) {
@@ -148,17 +229,19 @@ export class ColorDropperGame extends BaseGame {
     return { colorHex, colorName: closestName };
   }
 
-  private spawnBlob(type: ColorChannel, x: number, y: number) {
-    // Entity Limit check: remove oldest non-dragging drop if at limit
+  private enforceEntityLimit(): void {
     if (this.blobs.length >= this.ENTITY_LIMIT) {
       const indexToRemove = this.blobs.findIndex(b => !b.isDragging);
       if (indexToRemove !== -1) {
         this.blobs.splice(indexToRemove, 1);
       } else {
-        // Fallback to removing first element if all are somehow dragging
         this.blobs.shift();
       }
     }
+  }
+
+  private spawnBlob(type: ColorChannel, x: number, y: number) {
+    this.enforceEntityLimit();
 
     const baseRadius = 45;
     const components = { red: 0, yellow: 0, blue: 0 };
@@ -294,14 +377,18 @@ export class ColorDropperGame extends BaseGame {
     for (let i = 0; i < b.components.yellow; i++) primaries.push('yellow');
     for (let i = 0; i < b.components.blue; i++) primaries.push('blue');
 
-    const splitCount = primaries.length;
-    primaries.forEach((type, idx) => {
+    const splitCount = Math.min(primaries.length, this.ENTITY_LIMIT);
+    const activePrimaries = primaries.slice(0, splitCount);
+
+    activePrimaries.forEach((type, idx) => {
+      this.enforceEntityLimit();
+
       const angle = (idx / splitCount) * Math.PI * 2 + Math.random() * 0.5;
       const speed = 150 + Math.random() * 50;
       const offsetDist = b.radius * 0.6;
 
-      const spawnX = Math.max(45, Math.min(b.x + Math.cos(angle) * offsetDist, this.canvas!.width - 45));
-      const spawnY = Math.max(this.potsHeight + 70, Math.min(b.y + Math.sin(angle) * offsetDist, this.canvas!.height - 45));
+      const spawnX = Math.max(45, Math.min(b.x + Math.cos(angle) * offsetDist, (this.canvas?.width || 800) - 45));
+      const spawnY = Math.max(this.potsHeight + 70, Math.min(b.y + Math.sin(angle) * offsetDist, (this.canvas?.height || 600) - 45));
 
       const newComponents = { red: 0, yellow: 0, blue: 0 };
       newComponents[type] = 1;
@@ -318,7 +405,7 @@ export class ColorDropperGame extends BaseGame {
         colorName,
         components: newComponents,
         isDragging: false,
-        mergeCooldown: 800 // Recombination cooldown enabled!
+        mergeCooldown: 800
       };
 
       this.blobs.push(newBlob);
@@ -379,6 +466,16 @@ export class ColorDropperGame extends BaseGame {
     const { colorHex: newHex, colorName: newName } = this.computeProgrammaticColor(newComponents);
     const oldColorName1 = b1.colorName;
 
+    // Track active pointer position to prevent abrupt positional jump
+    const isEitherDragging = b1.isDragging || b2.isDragging;
+    let pointerX = 0;
+    let pointerY = 0;
+    if (isEitherDragging) {
+      const draggedSource = b1.isDragging ? b1 : b2;
+      pointerX = draggedSource.x + this.dragOffset.x;
+      pointerY = draggedSource.y + this.dragOffset.y;
+    }
+
     b1.x = newX;
     b1.y = newY;
     b1.radius = newRadius;
@@ -386,9 +483,10 @@ export class ColorDropperGame extends BaseGame {
     b1.colorHex = newHex;
     b1.colorName = newName;
 
-    if (!b1.isDragging && b2.isDragging) {
+    if (isEitherDragging) {
       b1.isDragging = true;
       this.draggingBlob = b1;
+      this.dragOffset = { x: pointerX - newX, y: pointerY - newY };
     }
 
     this.blobs.splice(j, 1);
@@ -431,6 +529,7 @@ export class ColorDropperGame extends BaseGame {
 
     const dtSec = dt / 1000;
     const dtMs = dt;
+    const friction = Math.pow(0.98, dtSec * 60);
 
     this.blobs.forEach(b => {
       // Decrement merge cooldown
@@ -442,8 +541,8 @@ export class ColorDropperGame extends BaseGame {
 
       b.vy += 80 * dtSec;
       
-      b.vx *= 0.98;
-      b.vy *= 0.98;
+      b.vx *= friction;
+      b.vy *= friction;
 
       b.x += b.vx * dtSec;
       b.y += b.vy * dtSec;

@@ -51,10 +51,12 @@ export class SoundWaveStudioGame implements Game {
       this.canvas.addEventListener('mousedown', this.handleMouseDown);
       this.canvas.addEventListener('mousemove', this.handleMouseMove);
       this.canvas.addEventListener('mouseup', this.handleMouseUp);
+      this.canvas.addEventListener('mouseleave', this.handleMouseUp);
 
       this.canvas.addEventListener('touchstart', this.handleTouchStart, { passive: false });
       this.canvas.addEventListener('touchmove', this.handleTouchMove, { passive: false });
       this.canvas.addEventListener('touchend', this.handleTouchEnd, { passive: false });
+      this.canvas.addEventListener('touchcancel', this.handleTouchEnd, { passive: false });
     }
   }
 
@@ -131,6 +133,8 @@ export class SoundWaveStudioGame implements Game {
         (module as any).update(dt, px, py, pw, ph);
       }
     });
+
+    this.render();
   }
 
   public render(): void {
@@ -300,12 +304,17 @@ export class SoundWaveStudioGame implements Game {
       this.canvas.removeEventListener('mousedown', this.handleMouseDown);
       this.canvas.removeEventListener('mousemove', this.handleMouseMove);
       this.canvas.removeEventListener('mouseup', this.handleMouseUp);
+      this.canvas.removeEventListener('mouseleave', this.handleMouseUp);
 
       this.canvas.removeEventListener('touchstart', this.handleTouchStart);
       this.canvas.removeEventListener('touchmove', this.handleTouchMove);
       this.canvas.removeEventListener('touchend', this.handleTouchEnd);
+      this.canvas.removeEventListener('touchcancel', this.handleTouchEnd);
     }
     this.modules.forEach(m => m.destroy());
     this.modules = [];
+    this.canvas = null;
+    this.ctx = null;
+    this.activeDragModule = null;
   }
 }

@@ -24,6 +24,8 @@ import { SoundWaveStudioGame } from '../games/busyBoard/SoundWaveStudioGame';
 import { TypographyBoardGame } from '../games/busyBoard/TypographyBoardGame';
 import { KineticSandboxGame } from '../games/busyBoard/KineticSandboxGame';
 import { PawanaGame } from '../games/pawana/PawanaGame';
+import { CameraGame } from '../games/camera/CameraGame';
+
 
 export interface GameRegistration {
   id: string;
@@ -302,6 +304,16 @@ export class GameRegistry {
         category: 'brain',
         desc: 'Navigate aerial logic gates and sequence pathways in this educational flight challenge!',
         constructorRef: PawanaGame
+      },
+      {
+        id: 'camera',
+        name: 'Cam',
+        subtitle: 'Fun Photo Studio',
+        portal: 'workshop',
+        icon: 'camera',
+        category: 'sensory',
+        desc: 'Take silly photos with fun filters, add cute stickers, and doodle with colorful crayons!',
+        constructorRef: CameraGame
       }
     ];
 

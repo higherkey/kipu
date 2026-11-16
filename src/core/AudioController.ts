@@ -1,6 +1,12 @@
 import { Howl, Howler } from 'howler';
 import type { IAudioEngine } from './IAudioEngine';
 
+export interface SpeakOptions {
+  pitch?: number; // 0.5 to 1.5, default 1.0
+  rate?: number; // 0.5 to 1.5, default 1.0
+  gender?: 'male' | 'female' | 'auto';
+}
+
 interface ContinuousVoice {
   osc: OscillatorNode;
   filter?: BiquadFilterNode;
@@ -381,7 +387,7 @@ export class AudioController {
   /**
    * Speaks the given text using the Web Speech Synthesis API.
    */
-  public speak(text: string, lang: string): void {
+  public speak(text: string, lang: string, options?: SpeakOptions): void {
     if (!('speechSynthesis' in window)) {
       console.warn('Speech synthesis not supported in this browser.');
       return;
@@ -390,6 +396,11 @@ export class AudioController {
     window.speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = lang;
+
+    const pitch = options?.pitch ?? (options?.gender === 'female' ? 1.25 : options?.gender === 'male' ? 0.85 : 1.0);
+    const rate = options?.rate ?? 1.0;
+    utterance.pitch = pitch;
+    utterance.rate = rate;
 
     const setVoiceAndSpeak = () => {
       const voices = window.speechSynthesis.getVoices();
@@ -403,9 +414,14 @@ export class AudioController {
         candidates = voices.filter(v => v.lang.toLowerCase().replace('_', '-').startsWith(langFamily));
       }
 
+      const femaleKeywords = ['female', 'woman', 'zira', 'samantha', 'victoria', 'karen', 'susan', 'helena', 'monica', 'paulina', 'laura', 'maria', 'rosa', 'luciana', 'anna', 'alice'];
+      const maleKeywords = ['male', 'man', 'david', 'mark', 'george', 'alex', 'daniel', 'pablo', 'raul', 'jorge', 'diego', 'guy'];
+
       const ranked = candidates.map(v => {
         let score = 0;
         const nameLower = v.name.toLowerCase();
+        if (options?.gender === 'female' && femaleKeywords.some(kw => nameLower.includes(kw))) score += 100;
+        if (options?.gender === 'male' && maleKeywords.some(kw => nameLower.includes(kw))) score += 100;
         if (nameLower.includes('natural')) score += 60;
         if (nameLower.includes('online')) score += 50;
         if (nameLower.includes('neural')) score += 40;
@@ -443,3 +459,4 @@ export class AudioController {
     }
   }
 }
+

@@ -6,7 +6,7 @@
   top: 0;
   left: 0;
   right: 0;
-  height: 60px;
+  height: var(--header-height, 64px);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -89,6 +89,10 @@
   visibility: hidden;
 }
 
+.slide-menu.hidden {
+  display: none;
+}
+
 .slide-menu.open {
   pointer-events: auto;
   visibility: visible;
@@ -107,11 +111,11 @@
 
 .slide-menu-panel {
   position: absolute;
-  top: 60px;
+  top: var(--header-height, 64px);
   right: 0;
   width: 100%;
   max-width: 320px;
-  max-height: calc(100vh - 60px - 20px);
+  max-height: calc(100vh - var(--header-height, 64px) - 20px);
   background-color: var(--bg);
   /* Fibrous texture strip on left edge */
   border-left: 4px solid var(--cord);
@@ -182,6 +186,7 @@
 
 .slide-menu-action-btn {
   width: 100%;
+  min-height: 44px;
   padding: 13px 16px;
   font-size: 1.05rem;
   font-weight: 600;
@@ -206,6 +211,8 @@
 .slide-menu-action-btn:nth-child(1) { background-color: #AED6F1; }
 .slide-menu-action-btn:nth-child(2) { background-color: #F9E4B7; }
 .slide-menu-action-btn:nth-child(3) { background-color: #F1948A; }
+.slide-menu-action-btn.exit-hub-btn { background-color: var(--color-parchment); }
+.slide-menu-action-btn.parent-settings-btn { background-color: var(--color-cord); }
 
 .action-icon {
   display: flex;
@@ -298,6 +305,16 @@
   position: relative;
 }
 
+.settings-toggle::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  min-width: 44px;
+  min-height: 44px;
+}
+
 .settings-toggle.on { background-color: #2E9E6B; }
 
 .toggle-track {
@@ -327,9 +344,10 @@ body.menu-open #game-canvas {
   transition: filter 0.3s ease;
 }
 
+#app #game-canvas.with-hud,
 #game-canvas.with-hud {
-  margin-top: 60px;
-  height: calc(100% - 60px) !important;
+  margin-top: var(--header-height, 64px);
+  height: calc(100% - var(--header-height, 64px));
 }
 
 /* ========================================

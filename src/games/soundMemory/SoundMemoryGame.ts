@@ -25,6 +25,14 @@ interface Particle {
   life: number;
 }
 
+interface PausableTimeout {
+  id: number;
+  callback: () => void;
+  remaining: number;
+  start: number;
+  handle: ReturnType<typeof setTimeout> | null;
+}
+
 /**
  * Yuyay (Sound Memory): Andean auditory pattern recognition.
  * Players listen to and repeat the sequence of melodic tones.
@@ -38,12 +46,17 @@ export class SoundMemoryGame extends BaseGame {
   private phase: GamePhase = 'ready';
   private level = 0;
   private readonly highlightDuration = 380; // ms per highlight
+
+  // Pausable timer architecture to prevent deadlock or note-stacking bursts
+  private pausableTimeouts: Map<number, PausableTimeout> = new Map();
+  private nextTimeoutId = 1;
   private activeTimeouts: ReturnType<typeof setTimeout>[] = [];
   private isPaused = false;
 
   protected onInit(): void {
-    this.activeTimeouts = [];
+    this.clearAllTimeouts();
     this.particles = [];
+    this.isPaused = false;
 
     this.createButtons();
     this.startNewRound();
@@ -52,19 +65,57 @@ export class SoundMemoryGame extends BaseGame {
     // Backward compatibility for environments without pointer events
     this.canvas?.addEventListener('touchstart', this.handleTouch, { passive: false });
     this.canvas?.addEventListener('mousedown', this.handleMouseDown);
+    this.canvas?.addEventListener('pointercancel', this.handlePointerCancel);
+    this.canvas?.addEventListener('touchcancel', this.handleTouchCancel);
   }
 
-  public resize(_width?: number, _height?: number): void {
+  public resize(width?: number, height?: number): void {
     if (!this.canvas) return;
+    if (width !== undefined && height !== undefined) {
+      this.canvas.width = width;
+      this.canvas.height = height;
+    }
     this.createButtons();
   }
 
   public pause(): void {
+    if (this.isPaused) return;
     this.isPaused = true;
+
+    // Reset button visual highlight state so buttons don't stay lit while paused
+    this.buttons.forEach(b => {
+      b.isActive = false;
+    });
+
+    const now = Date.now();
+    for (const entry of this.pausableTimeouts.values()) {
+      if (entry.handle !== null) {
+        clearTimeout(entry.handle);
+        this.activeTimeouts = this.activeTimeouts.filter(t => t !== entry.handle);
+        entry.handle = null;
+      }
+      const elapsed = now - entry.start;
+      entry.remaining = Math.max(0, entry.remaining - elapsed);
+    }
   }
 
   public resume(): void {
+    if (!this.isPaused) return;
     this.isPaused = false;
+
+    const now = Date.now();
+    const entries = Array.from(this.pausableTimeouts.values());
+    for (const entry of entries) {
+      if (!this.pausableTimeouts.has(entry.id)) continue;
+      entry.start = now;
+      const handle = setTimeout(() => {
+        this.pausableTimeouts.delete(entry.id);
+        this.activeTimeouts = this.activeTimeouts.filter(t => t !== handle);
+        entry.callback();
+      }, entry.remaining);
+      entry.handle = handle;
+      this.activeTimeouts.push(handle);
+    }
   }
 
   private createButtons() {
@@ -73,14 +124,16 @@ export class SoundMemoryGame extends BaseGame {
     const w = this.canvas.width;
     const h = this.canvas.height;
     const centerX = w / 2;
-    const centerY = h / 2 + 10;
+    // Account for top Level HUD (60px) and bottom status text (60px)
+    const availableH = Math.max(100, h - 120);
+    const centerY = 50 + availableH / 2;
     const minDim = Math.min(w, h);
 
-    // Responsive radius: clamped between 48px and 78px
+    // Responsive radius: minimum 48px (exceeds Sitewright 44px touch target standard), up to 78px
     const radius = Math.max(48, Math.min(78, minDim * 0.16));
     // Spacing scales dynamically to never overflow viewport
     const spacingX = Math.max(radius + 15, Math.min(145, (w / 2) - radius - 20));
-    const spacingY = Math.max(radius + 15, Math.min(135, (h / 2) - radius - 55));
+    const spacingY = Math.max(radius + 15, Math.min(135, (availableH / 2) - radius - 10));
 
     const existingStates = new Map<number, boolean>();
     this.buttons.forEach(b => existingStates.set(b.id, b.isActive));
@@ -133,18 +186,37 @@ export class SoundMemoryGame extends BaseGame {
     ];
   }
 
-  private setGameTimeout(callback: () => void, delay: number) {
-    const timer = setTimeout(() => {
-      this.activeTimeouts = this.activeTimeouts.filter(t => t !== timer);
-      if (!this.isPaused) {
+  private setGameTimeout(callback: () => void, delay: number): number {
+    const id = this.nextTimeoutId++;
+    const entry: PausableTimeout = {
+      id,
+      callback,
+      remaining: delay,
+      start: Date.now(),
+      handle: null
+    };
+
+    if (!this.isPaused) {
+      const handle = setTimeout(() => {
+        this.pausableTimeouts.delete(id);
+        this.activeTimeouts = this.activeTimeouts.filter(t => t !== handle);
         callback();
-      }
-    }, delay);
-    this.activeTimeouts.push(timer);
-    return timer;
+      }, delay);
+      entry.handle = handle;
+      this.activeTimeouts.push(handle);
+    }
+
+    this.pausableTimeouts.set(id, entry);
+    return id;
   }
 
-  private clearAllTimeouts() {
+  private clearAllTimeouts(): void {
+    for (const entry of this.pausableTimeouts.values()) {
+      if (entry.handle !== null) {
+        clearTimeout(entry.handle);
+      }
+    }
+    this.pausableTimeouts.clear();
     this.activeTimeouts.forEach(t => clearTimeout(t));
     this.activeTimeouts = [];
   }
@@ -162,22 +234,49 @@ export class SoundMemoryGame extends BaseGame {
   }
 
   private readonly handlePointerDown = (e: PointerEvent) => {
+    if (this.isPaused) return;
+    if (e.cancelable) {
+      e.preventDefault();
+    }
     const pos = this.getCanvasPos(e.clientX, e.clientY);
     this.onInteractionAt(pos.x, pos.y);
   };
 
   private readonly handleTouch = (e: TouchEvent) => {
-    // If pointer events are supported and fired, avoid double trigger
+    if (this.isPaused) return;
+    if (e.cancelable) {
+      e.preventDefault();
+    }
+    // If pointer events are supported, pointerdown already handled this
     if (window.PointerEvent && e.type === 'touchstart') return;
     const touch = e.changedTouches[0];
-    const pos = this.getCanvasPos(touch.clientX, touch.clientY);
-    this.onInteractionAt(pos.x, pos.y);
+    if (touch) {
+      const pos = this.getCanvasPos(touch.clientX, touch.clientY);
+      this.onInteractionAt(pos.x, pos.y);
+    }
   };
 
   private readonly handleMouseDown = (e: MouseEvent) => {
-    if (window.PointerEvent && e.type === 'mousedown') return;
+    if (this.isPaused) return;
+    if (e.cancelable) {
+      e.preventDefault();
+    }
+    if (window.PointerEvent && (e as any).pointerType !== undefined) return;
+    if (window.PointerEvent && !(e instanceof (window as any).PointerEvent)) return;
     const pos = this.getCanvasPos(e.clientX, e.clientY);
     this.onInteractionAt(pos.x, pos.y);
+  };
+
+  private readonly handlePointerCancel = () => {
+    this.buttons.forEach(b => {
+      b.isActive = false;
+    });
+  };
+
+  private readonly handleTouchCancel = () => {
+    this.buttons.forEach(b => {
+      b.isActive = false;
+    });
   };
 
   private onInteractionAt(x: number, y: number) {
@@ -409,7 +508,7 @@ export class SoundMemoryGame extends BaseGame {
     } else if (this.phase === 'lost') {
       statusText = 'Listen again... 🎵 Tap to retry';
     }
-    this.ctx.fillText(statusText, this.canvas.width / 2, this.canvas.height - 55);
+    this.ctx.fillText(statusText, this.canvas.width / 2, this.canvas.height - 35);
   }
 
   private lightenColor(color: string, factor: number): string {
@@ -425,6 +524,8 @@ export class SoundMemoryGame extends BaseGame {
       this.canvas.removeEventListener('pointerdown', this.handlePointerDown);
       this.canvas.removeEventListener('touchstart', this.handleTouch);
       this.canvas.removeEventListener('mousedown', this.handleMouseDown);
+      this.canvas.removeEventListener('pointercancel', this.handlePointerCancel);
+      this.canvas.removeEventListener('touchcancel', this.handleTouchCancel);
     }
     this.clearAllTimeouts();
     this.particles = [];
