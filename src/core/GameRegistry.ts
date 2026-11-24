@@ -24,6 +24,7 @@ import { SoundWaveStudioGame } from '../games/busyBoard/SoundWaveStudioGame';
 import { TypographyBoardGame } from '../games/busyBoard/TypographyBoardGame';
 import { KineticSandboxGame } from '../games/busyBoard/KineticSandboxGame';
 import { PawanaGame } from '../games/pawana/PawanaGame';
+import { SuyuGame } from '../games/suyu/SuyuGame';
 
 export interface GameRegistration {
   id: string;
@@ -302,6 +303,16 @@ export class GameRegistry {
         category: 'brain',
         desc: 'Navigate aerial logic gates and sequence pathways in this educational flight challenge!',
         constructorRef: PawanaGame
+      },
+      {
+        id: 'suyu',
+        name: 'Suyu',
+        subtitle: 'Math Conquest',
+        portal: 'lab',
+        icon: 'regions',
+        category: 'brain',
+        desc: 'Unite the regions! Work out each defense with walls, hills, and banners, then send exactly enough knots to win.',
+        constructorRef: SuyuGame
       }
     ];
 
