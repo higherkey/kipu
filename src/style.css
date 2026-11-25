@@ -554,6 +554,9 @@ canvas.hidden,
 #game-list a[data-game="pawana"],
 .cards-grid a[data-game="pawana"],
 .game-list a[data-game="pawana"]           { background-color: #BAE6FD; }
+#game-list a[data-game="suyu"],
+.cards-grid a[data-game="suyu"],
+.game-list a[data-game="suyu"]             { background-color: #CCFBF1; }
 
 /* Music category — purple */
 .game-list a[data-category="music"] {

@@ -115,6 +115,7 @@ document.addEventListener('DOMContentLoaded', () => {
         mechanicalWorkshop: 'settings',
         kineticSandbox: 'particle',
         pawana: 'feather',
+        suyu: 'regions',
       };
       const iconKey = iconMap[gameId];
       if (iconKey && iconKey in Icons) {
