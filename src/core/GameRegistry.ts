@@ -26,6 +26,7 @@ import { KineticSandboxGame } from '../games/busyBoard/KineticSandboxGame';
 import { PawanaGame } from '../games/pawana/PawanaGame';
 import { CameraGame } from '../games/camera/CameraGame';
 import { FortressMathGame } from '../games/fortressMath/FortressMathGame';
+import { PawPantryGame } from '../games/pawPantry/PawPantryGame';
 import { CatQuartersGame } from '../games/catQuarters/CatQuartersGame';
 
 import { ToneGardenGame, PatternLoomGame, TrackSketcherGame } from '../games/musicExperiments/MusicExperiments';
@@ -357,6 +358,16 @@ export class GameRegistry {
         category: 'brain',
         desc: 'Find a spot for each cat without letting any two cats touch.',
         constructorRef: CatQuartersGame
+      },
+      {
+        id: 'pawPantry',
+        name: 'Paw Pantry',
+        subtitle: 'Cat Treat Match-3',
+        portal: 'lab',
+        icon: 'cat',
+        category: 'brain',
+        desc: 'Swap treats, make matches, and fill the cat pantry before your moves run out.',
+        constructorRef: PawPantryGame
       },
       {
         id: 'camera',
