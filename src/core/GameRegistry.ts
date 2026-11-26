@@ -26,6 +26,7 @@ import { KineticSandboxGame } from '../games/busyBoard/KineticSandboxGame';
 import { PawanaGame } from '../games/pawana/PawanaGame';
 import { CameraGame } from '../games/camera/CameraGame';
 import { FortressMathGame } from '../games/fortressMath/FortressMathGame';
+import { CatQuartersGame } from '../games/catQuarters/CatQuartersGame';
 
 import { ToneGardenGame, PatternLoomGame, TrackSketcherGame } from '../games/musicExperiments/MusicExperiments';
 
@@ -346,6 +347,16 @@ export class GameRegistry {
         category: 'brain',
         desc: 'Add up defenses, send explorers, and grow your kingdom against two friendly bots.',
         constructorRef: FortressMathGame
+      },
+      {
+        id: 'catQuarters',
+        name: 'Cat Quarters',
+        subtitle: 'Cat Placement Puzzle',
+        portal: 'lab',
+        icon: 'cat',
+        category: 'brain',
+        desc: 'Find a spot for each cat without letting any two cats touch.',
+        constructorRef: CatQuartersGame
       },
       {
         id: 'camera',

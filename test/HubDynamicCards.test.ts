@@ -41,7 +41,9 @@ describe('Hub Dynamic Game Cards & Icons', () => {
     renderGameList('lab');
     const labCards = document.querySelectorAll('#game-list a');
     expect(labCards.length).toBe(registry.getByPortal('lab').length);
-    expect(labCards.length).toBe(9);
+    expect(labCards.length).toBe(10);
+    expect(document.querySelector('#game-list a[data-game="catQuarters"]')?.getAttribute('href'))
+      .toBe('/game/catQuarters');
 
     renderGameList('busyBoard');
     const busyCards = document.querySelectorAll('#game-list a');
