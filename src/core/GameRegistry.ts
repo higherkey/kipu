@@ -25,6 +25,7 @@ import { TypographyBoardGame } from '../games/busyBoard/TypographyBoardGame';
 import { KineticSandboxGame } from '../games/busyBoard/KineticSandboxGame';
 import { PawanaGame } from '../games/pawana/PawanaGame';
 import { CameraGame } from '../games/camera/CameraGame';
+import { CatQuartersGame } from '../games/catQuarters/CatQuartersGame';
 
 import { ToneGardenGame, PatternLoomGame, TrackSketcherGame } from '../games/musicExperiments/MusicExperiments';
 
@@ -335,6 +336,16 @@ export class GameRegistry {
         category: 'brain',
         desc: 'Navigate aerial logic gates and sequence pathways in this educational flight challenge!',
         constructorRef: PawanaGame
+      },
+      {
+        id: 'catQuarters',
+        name: 'Cat Quarters',
+        subtitle: 'Cat Placement Puzzle',
+        portal: 'lab',
+        icon: 'cat',
+        category: 'brain',
+        desc: 'Find a spot for each cat without letting any two cats touch.',
+        constructorRef: CatQuartersGame
       },
       {
         id: 'camera',
