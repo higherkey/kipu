@@ -29,3 +29,4 @@ dev-dist
 
 # Vite PWA dev server artifacts
 dev-dist/
+.wrangler/

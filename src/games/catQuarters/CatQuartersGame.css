@@ -111,10 +111,17 @@
 }
 
 #cq-controls,
+.cq-library-status,
 .cq-status {
   margin-block: 0.5rem;
   font-size: 0.9rem;
   line-height: 1.4;
+}
+
+.cq-library-status:empty { margin-block: 0; }
+
+.cq-actions button[aria-disabled="true"] {
+  cursor: progress;
 }
 
 .cq-status {
