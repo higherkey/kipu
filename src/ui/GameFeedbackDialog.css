@@ -1,0 +1,123 @@
+.game-feedback-dialog {
+  box-sizing: border-box;
+  inline-size: min(30rem, calc(100% - 2rem));
+  max-block-size: calc(100% - 2rem);
+  margin: auto;
+  padding: 1.5rem;
+  overflow: auto;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
+  background: var(--bg);
+  color: var(--fg);
+  border: 3px solid var(--fg);
+  border-radius: var(--radius);
+  box-shadow: 0 var(--shadow-depth-lg) 0 var(--fg);
+  font-size: 1.125rem;
+  line-height: 1.35;
+}
+
+.game-feedback-dialog::backdrop {
+  background: color-mix(in oklch, var(--fg) 75%, transparent);
+}
+
+.game-feedback-dialog form,
+.game-feedback-preview {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.game-feedback-dialog [hidden] {
+  display: none;
+}
+
+.game-feedback-dialog h2 {
+  margin-block-end: 0.5rem;
+  font-size: clamp(1.375rem, 5vw, 1.75rem);
+  line-height: 1.2;
+}
+
+.game-feedback-dialog label {
+  margin-block-start: 0.5rem;
+  font-weight: 600;
+}
+
+.game-feedback-dialog textarea {
+  display: block;
+  inline-size: 100%;
+  min-block-size: 6rem;
+  padding: 0.5rem;
+  resize: vertical;
+  touch-action: pan-y;
+  background: var(--bg);
+  color: inherit;
+  border: 2px solid var(--fg);
+  border-radius: var(--radius-sm);
+  font: inherit;
+}
+
+.game-feedback-dialog button {
+  min-inline-size: 48px;
+  min-block-size: 48px;
+  inline-size: fit-content;
+  padding-inline: 1rem;
+  background: var(--bg-warm);
+  color: var(--fg);
+  border: 2px solid var(--fg);
+  border-radius: var(--radius-sm);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.game-feedback-dialog button:focus-visible,
+.game-feedback-dialog textarea:focus-visible {
+  outline: 3px solid var(--fg);
+  outline-offset: 3px;
+}
+
+.game-feedback-dialog button:not(:disabled, [aria-disabled='true']):hover {
+  box-shadow: 0 2px 0 var(--fg);
+}
+
+.game-feedback-dialog .game-feedback-primary {
+  background: var(--fg);
+  color: var(--bg);
+}
+
+.game-feedback-dialog button:is(:disabled, [aria-disabled='true']) {
+  opacity: 0.65;
+  cursor: default;
+}
+
+.game-feedback-preview audio {
+  inline-size: 100%;
+  block-size: 3.5rem;
+}
+
+.game-feedback-actions {
+  display: flex;
+  justify-content: end;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-block-start: 0.5rem;
+}
+
+.game-feedback-status:not(:empty) {
+  margin-block-start: 1rem;
+}
+
+.game-feedback-done {
+  margin-block-start: 1rem;
+}
+
+@media (max-width: 36rem) {
+  .game-feedback-dialog {
+    inline-size: 100%;
+    max-inline-size: none;
+    max-block-size: calc(100% - 1rem);
+    margin-block: auto 0;
+    padding-block-end: max(1.5rem, env(safe-area-inset-bottom));
+    border-end-start-radius: 0;
+    border-end-end-radius: 0;
+  }
+}
