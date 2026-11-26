@@ -12,7 +12,7 @@ describe('GameRegistry', () => {
     const registry = GameRegistry.getInstance();
     const allGames = registry.getAll();
 
-    expect(allGames.length).toBe(29);
+    expect(allGames.length).toBe(30);
   });
 
   it('should retrieve registered games by ID', () => {
@@ -40,6 +40,10 @@ describe('GameRegistry', () => {
     expect(camera?.name).toBe('Cam');
     expect(camera?.portal).toBe('workshop');
     expect(camera?.icon).toBe('camera');
+
+    const fortress = registry.get('fortressMath');
+    expect(fortress?.name).toBe('Fortress Math');
+    expect(fortress?.portal).toBe('lab');
   });
 
   it('should return undefined for unregistered game IDs', () => {

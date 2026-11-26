@@ -25,6 +25,7 @@ import { TypographyBoardGame } from '../games/busyBoard/TypographyBoardGame';
 import { KineticSandboxGame } from '../games/busyBoard/KineticSandboxGame';
 import { PawanaGame } from '../games/pawana/PawanaGame';
 import { CameraGame } from '../games/camera/CameraGame';
+import { FortressMathGame } from '../games/fortressMath/FortressMathGame';
 
 import { ToneGardenGame, PatternLoomGame, TrackSketcherGame } from '../games/musicExperiments/MusicExperiments';
 
@@ -335,6 +336,16 @@ export class GameRegistry {
         category: 'brain',
         desc: 'Navigate aerial logic gates and sequence pathways in this educational flight challenge!',
         constructorRef: PawanaGame
+      },
+      {
+        id: 'fortressMath',
+        name: 'Fortress Math',
+        subtitle: 'Count, Plan & Capture',
+        portal: 'lab',
+        icon: 'layers',
+        category: 'brain',
+        desc: 'Add up defenses, send explorers, and grow your kingdom against two friendly bots.',
+        constructorRef: FortressMathGame
       },
       {
         id: 'camera',
