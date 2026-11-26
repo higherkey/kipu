@@ -1,8 +1,10 @@
 import { Icons } from './Icons';
 import { GameHeader } from './GameHeader';
+import { GameFeedbackDialog } from './GameFeedbackDialog';
 import './GameUI.css';
 
 export interface GameUIConfig {
+  gameId?: string;
   gameName: string;
   portalId?: string;
   portalName?: string;
@@ -29,6 +31,7 @@ export class GameUI {
   private readonly element: HTMLElement;
   private isOpen = false;
   private isPaused = false;
+  private feedback: GameFeedbackDialog | null = null;
 
   constructor(config: GameUIConfig) {
     this.config = config;
@@ -38,6 +41,7 @@ export class GameUI {
       portalName: config.portalName,
       onPortalBack: config.onPortalBack,
       onHome: config.onHome,
+      onFeedback: config.gameId ? () => this.openFeedback() : undefined,
       onMenuToggle: () => {
         if (this.config.onMenuToggle) {
           this.config.onMenuToggle();
@@ -177,6 +181,7 @@ export class GameUI {
   }
 
   public unmount(): void {
+    this.closeFeedback();
     if (this.isOpen) {
       this.closeMenu();
     }
@@ -186,6 +191,37 @@ export class GameUI {
 
   public isMenuOpen(): boolean {
     return this.isOpen;
+  }
+
+  public isFeedbackOpen(): boolean {
+    return this.feedback !== null;
+  }
+
+  private openFeedback(): void {
+    if (!this.config.gameId || this.feedback) return;
+    this.closeMenu();
+    this.feedback = new GameFeedbackDialog({
+      gameId: this.config.gameId,
+      gameName: this.config.gameName,
+      onClose: () => this.closeFeedback(true),
+    });
+    try {
+      this.feedback.open();
+    } catch {
+      this.closeFeedback();
+      window.alert('This browser could not open the feedback form.');
+      return;
+    }
+    if (!this.isPaused) this.config.onPause();
+  }
+
+  public closeFeedback(resume = false): boolean {
+    const feedback = this.feedback;
+    if (!feedback) return false;
+    this.feedback = null;
+    feedback.destroy();
+    if (resume && !this.isPaused) this.config.onResume();
+    return true;
   }
 
   public toggleMenu(): void {
