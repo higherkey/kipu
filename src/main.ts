@@ -200,7 +200,7 @@ document.addEventListener('DOMContentLoaded', () => {
   loadingOverlay = new LoadingOverlay();
 
   idleManager = new IdleManager(60000, () => {
-    if (activeGame && gameUI) {
+    if (activeGame && gameUI && !gameUI.isFeedbackOpen()) {
       gameUI.pause();
       gameUI.openMenu();
     }
@@ -224,6 +224,7 @@ document.addEventListener('DOMContentLoaded', () => {
   router.beforeEach(async (to, from) => {
     // 1. Guard active game session exits per Issue #28
     if (from && from.startsWith('/game/') && to !== from) {
+      if (gameUI?.closeFeedback(true)) return false;
       pauseGame();
       document.body.classList.add('parental-gate-open');
       const canvas = document.getElementById('game-canvas');
@@ -542,6 +543,7 @@ function startGame(gameId: string, canvas: HTMLCanvasElement) {
 
   // Create the unified Game UI
   gameUI = new GameUI({
+    gameId,
     gameName,
     portalId,
     portalName,

@@ -35,11 +35,19 @@
 }
 
 /* Left Navigation Container */
-.header-nav-left {
+.header-nav-left,
+.header-nav-right {
   display: flex;
   align-items: center;
   gap: 8px;
   flex-shrink: 0;
+}
+
+.header-btn.feedback-btn {
+  min-inline-size: 48px;
+  min-block-size: 48px;
+  background-color: var(--bg);
+  padding-inline: 8px;
 }
 
 /* HUD buttons */
@@ -142,7 +150,8 @@
     padding: 0 8px;
     gap: 6px;
   }
-  .header-nav-left {
+  .header-nav-left,
+  .header-nav-right {
     gap: 6px;
   }
   .header-btn {
@@ -166,4 +175,12 @@
     width: 18px;
     height: 18px;
   }
+}
+
+@media (max-width: 600px) {
+  .feedback-btn .header-label { display: none; }
+}
+
+@media (max-width: 380px) {
+  .portal-back-btn .header-label { display: none; }
 }

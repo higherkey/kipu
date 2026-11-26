@@ -131,6 +131,15 @@ Kipu uses a three-tier design framework:
 npm run dev
 ```
 
+To test Cat Quarters generation locally, build the app and serve it with Cloudflare Pages Functions.
+
+```bash
+npm run build
+wrangler pages dev dist
+```
+
+New puzzles need an internet connection on the hosted site. Generated boards are saved in the browser and stay in the puzzle picker for offline replay.
+
 ### Production Build
 
 ```bash

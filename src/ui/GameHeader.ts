@@ -7,6 +7,7 @@ export interface GameHeaderConfig {
   portalName?: string;
   onPortalBack?: () => void;
   onHome: () => void;
+  onFeedback?: () => void;
   onMenuToggle: () => void;
 }
 
@@ -44,9 +45,17 @@ export class GameHeader {
         </button>
       </div>
       <span class="header-title">${this.config.gameName}</span>
-      <button class="header-btn menu-btn" title="Menu" aria-label="Open Menu">
-        <span class="header-icon">${Icons.menu}</span>
-      </button>
+      <div class="header-nav-right">
+        ${this.config.onFeedback ? `
+          <button type="button" class="header-btn feedback-btn" title="Give feedback" aria-label="Give feedback" aria-haspopup="dialog">
+            <span class="header-icon" aria-hidden="true">${Icons.feedback}</span>
+            <span class="header-label">Feedback</span>
+          </button>
+        ` : ''}
+        <button type="button" class="header-btn menu-btn" title="Menu" aria-label="Open Menu">
+          <span class="header-icon">${Icons.menu}</span>
+        </button>
+      </div>
     `;
 
     // Event listeners
@@ -68,6 +77,13 @@ export class GameHeader {
       e.preventDefault();
       e.stopPropagation();
       this.config.onMenuToggle();
+    });
+
+    const feedbackButton = header.querySelector<HTMLButtonElement>('.feedback-btn');
+    feedbackButton?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      feedbackButton.focus();
+      this.config.onFeedback?.();
     });
 
     // Prevent touch events from propagating to game

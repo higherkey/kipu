@@ -1,6 +1,7 @@
 import type { Game } from '../../core/Game';
 import { Icons } from '../../ui/Icons';
-import { findConflicts, PUZZLES } from './Puzzles';
+import { findConflicts, isGeneratedBoard, puzzleKey, PUZZLES } from './Puzzles';
+import { openPuzzleLibrary, readSavedPuzzles, savePuzzle } from './PuzzleLibrary';
 import './CatQuartersGame.css';
 
 type Cell = 'empty' | 'cat' | 'mark';
@@ -23,6 +24,11 @@ export class CatQuartersGame implements Game {
   private undo!: HTMLButtonElement;
   private reset!: HTMLButtonElement;
   private next!: HTMLButtonElement;
+  private generate!: HTMLButtonElement;
+  private libraryStatus!: HTMLElement;
+  private library!: Promise<IDBDatabase | null>;
+  private puzzles = [...PUZZLES];
+  private generating = false;
   private tiles: HTMLButtonElement[] = [];
   private cells: Cell[] = [];
   private history: { index: number; previous: Cell }[] = [];
@@ -38,6 +44,8 @@ export class CatQuartersGame implements Game {
     this.canvasWasHidden = canvas.classList.contains('hidden');
     canvas.classList.add('hidden');
     this.paused = false;
+    this.generating = false;
+    this.puzzles = [...PUZZLES];
     this.listeners = new AbortController();
     const options = { signal: this.listeners.signal };
     const root = document.createElement('section');
@@ -64,7 +72,9 @@ export class CatQuartersGame implements Game {
             <button type="button" class="cq-undo">Undo</button>
             <button type="button" class="cq-reset">Reset</button>
             <button type="button" class="cq-next" hidden>Next puzzle</button>
+            <button type="button" class="cq-generate">Generate puzzle</button>
           </div>
+          <p class="cq-library-status" role="status"></p>
         </div>
       </div>`;
     this.root = root;
@@ -74,6 +84,8 @@ export class CatQuartersGame implements Game {
     this.undo = root.querySelector('.cq-undo')!;
     this.reset = root.querySelector('.cq-reset')!;
     this.next = root.querySelector('.cq-next')!;
+    this.generate = root.querySelector('.cq-generate')!;
+    this.libraryStatus = root.querySelector('.cq-library-status')!;
 
     const tools = root.querySelectorAll<HTMLButtonElement>('[data-tool]');
     tools.forEach(button => button.addEventListener('click', () => {
@@ -103,21 +115,110 @@ export class CatQuartersGame implements Game {
     }, options);
     this.next.addEventListener('click', () => {
       if (!this.canPlay()) return;
-      this.loadPuzzle((this.puzzleIndex + 1) % PUZZLES.length);
-      this.focusTile(0);
+      const index = this.puzzleIndex + 1;
+      if (index < this.puzzles.length) {
+        this.loadPuzzle(index);
+        this.focusTile(0);
+      } else {
+        void this.generatePuzzle(this.next, options.signal);
+      }
+    }, options);
+    this.generate.addEventListener('click', () => {
+      if (this.canPlay()) void this.generatePuzzle(this.generate, options.signal);
     }, options);
     canvas.insertAdjacentElement('afterend', root);
     this.loadPuzzle(0);
+    this.library = this.restoreLibrary(options.signal);
   }
 
   private canPlay(): boolean {
-    return !this.paused && !document.body.classList.contains('menu-open');
+    return !this.generating && !this.paused && !document.body.classList.contains('menu-open');
+  }
+
+  private async restoreLibrary(signal: AbortSignal): Promise<IDBDatabase | null> {
+    try {
+      const db = await openPuzzleLibrary(signal);
+      const puzzles = await readSavedPuzzles(db);
+      if (signal.aborted) return null;
+      for (const puzzle of puzzles) this.addSavedPuzzle(puzzle);
+      return db;
+    } catch {
+      return null;
+    }
+  }
+
+  private addSavedPuzzle({ id, rows }: { id: number; rows: string[] }): number {
+    const name = `Generated ${id}`;
+    const index = this.puzzles.push({ name, rows }) - 1;
+    this.picker.add(new Option(`${name} · ${rows.length} × ${rows.length}`, String(index)));
+    return index;
+  }
+
+  private async generatePuzzle(trigger: HTMLButtonElement, signal: AbortSignal): Promise<void> {
+    this.generating = true;
+    this.picker.disabled = true;
+    this.generate.setAttribute('aria-disabled', 'true');
+    this.next.setAttribute('aria-disabled', 'true');
+    this.libraryStatus.textContent = 'Generating a puzzle…';
+    const request = new AbortController();
+    const abortRequest = () => request.abort();
+    signal.addEventListener('abort', abortRequest, { once: true });
+    const deadline = window.setTimeout(abortRequest, 12_000);
+    let message = 'Couldn’t get a new puzzle. Try again when online. Saved puzzles are still available.';
+    let nextIndex: number | undefined;
+    try {
+      const db = await this.library;
+      if (signal.aborted) return;
+      if (!db) {
+        message = 'Allow local storage to save new puzzles on this device.';
+        return;
+      }
+      for (let attempt = 0; attempt < 3; attempt++) {
+        const response = await fetch('/api/cat-quarters/puzzle', { cache: 'no-store', signal: request.signal });
+        if (response.status === 503) continue;
+        if (!response.ok) return;
+        const payload: unknown = await response.json();
+        if (signal.aborted || !payload || typeof payload !== 'object' || !('rows' in payload)
+          || !isGeneratedBoard(payload.rows)) return;
+        const rows = payload.rows;
+        const key = puzzleKey(rows);
+        if (PUZZLES.some(puzzle => puzzleKey(puzzle.rows) === key)) continue;
+
+        const saved = await savePuzzle(db, rows).catch(() => null);
+        if (signal.aborted) return;
+        if (saved === null) {
+          message = 'Couldn’t save the puzzle on this device. Check your available storage and try again.';
+          return;
+        }
+        if (!saved) continue;
+        nextIndex = this.addSavedPuzzle(saved);
+        message = 'Puzzle saved for offline play.';
+        break;
+      }
+    } catch {
+      // Keep the current board and saved puzzles available after a failed request.
+    } finally {
+      window.clearTimeout(deadline);
+      signal.removeEventListener('abort', abortRequest);
+      if (!signal.aborted) {
+        this.generating = false;
+        this.picker.disabled = false;
+        this.generate.removeAttribute('aria-disabled');
+        this.next.removeAttribute('aria-disabled');
+        this.libraryStatus.textContent = message;
+        if (nextIndex !== undefined && this.canPlay()) {
+          const restoreFocus = document.activeElement === trigger || this.board.contains(document.activeElement);
+          this.loadPuzzle(nextIndex);
+          if (restoreFocus) this.focusTile(0);
+        }
+      }
+    }
   }
 
   private loadPuzzle(index = this.puzzleIndex): void {
     this.puzzleIndex = index;
     this.picker.selectedIndex = index;
-    const { rows } = PUZZLES[index];
+    const { rows } = this.puzzles[index];
     this.size = rows.length;
     this.regions = rows.join('');
     this.history = [];

@@ -1,5 +1,6 @@
 import { Icons } from './Icons';
 import { HapticController } from '../core/HapticController';
+import { GameFeedbackInbox } from './GameFeedbackInbox';
 import './SettingsView.css';
 
 export interface DonationTier {
@@ -71,6 +72,7 @@ export class SettingsView {
   private readonly element: HTMLElement;
   private activeModal: HTMLElement | null = null;
   private focusTrapCleanup: (() => void) | null = null;
+  private readonly feedbackInbox = new GameFeedbackInbox();
 
   constructor(config: SettingsViewConfig) {
     this.config = config;
@@ -87,9 +89,11 @@ export class SettingsView {
     container.appendChild(this.element);
     this.attachEventListeners();
     this.syncUIWithState();
+    void this.feedbackInbox.mount(this.element.querySelector('.feedback-inbox')!);
   }
 
   public unmount(): void {
+    this.feedbackInbox.unmount();
     this.closePurchaseModal();
     this.element.remove();
   }
@@ -228,6 +232,13 @@ export class SettingsView {
               </div>
             </fieldset>
           </div>
+        </section>
+
+        <section class="settings-card feedback-inbox" aria-labelledby="heading-feedback-inbox">
+          <h2 id="heading-feedback-inbox" class="card-title">Game feedback</h2>
+          <p class="card-desc">Notes and recordings saved on this device.</p>
+          <p class="feedback-inbox-status" role="status" tabindex="-1">Loading feedback…</p>
+          <ol class="feedback-inbox-list" aria-label="Game feedback"></ol>
         </section>
 
         <!-- Section 4: Support Kipu & Mock Monetization -->
