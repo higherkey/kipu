@@ -1,4 +1,6 @@
-name: CI & Deployment Pipeline
+name: CI
+
+# Cloudflare Pages deploys main, dev, and PR previews through its Git integration.
 
 on:
   push:
@@ -46,72 +48,3 @@ jobs:
           name: dist-artifacts
           path: dist/
           retention-days: 2
-
-  deploy-dev:
-    name: Deploy to Cloudflare Pages (Dev / Preview)
-    needs: test-and-build
-    if: github.event_name == 'push' && github.ref == 'refs/heads/dev'
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Download Build Artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: dist-artifacts
-          path: dist/
-
-      - name: Deploy to Cloudflare Pages (Dev)
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy dist --project-name=kipu --branch=dev
-
-  deploy-preview:
-    name: Deploy PR Preview to Cloudflare Pages
-    needs: test-and-build
-    if: github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Download Build Artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: dist-artifacts
-          path: dist/
-
-      - name: Deploy Preview to Cloudflare Pages
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy dist --project-name=kipu --branch=preview-${{ github.event.pull_request.number }}
-
-  deploy-prod:
-    name: Deploy to Cloudflare Pages (Production)
-    needs: test-and-build
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Download Build Artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: dist-artifacts
-          path: dist/
-
-      - name: Deploy to Cloudflare Pages (Production)
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy dist --project-name=kipu --branch=main
