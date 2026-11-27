@@ -109,6 +109,10 @@ export function escapeHtml(str: string): string {
     .replace(/'/g, '&#39;');
 }
 
+/** Number of game dyes and woven motifs defined in styles/khipu.css. */
+const GAME_DYE_COUNT = 10;
+const GAME_MOTIF_COUNT = 6;
+
 export function renderGameList(portalId?: string): void {
   const container = document.getElementById('game-list');
   if (!container) return;
@@ -119,13 +123,18 @@ export function renderGameList(portalId?: string): void {
     ? allGames.filter(g => g.portal === portalId)
     : allGames;
 
-  container.innerHTML = games.map(game => {
+  container.innerHTML = games.map((game, index) => {
     const iconSvg = (game.icon in Icons)
       ? Icons[game.icon as keyof typeof Icons]
       : (Icons.settings || '');
 
+    // Each card gets its own dye and woven motif. Cycling by position keeps
+    // neighbours on the same page from ever sharing a look.
+    const dye = index % GAME_DYE_COUNT;
+    const motif = index % GAME_MOTIF_COUNT;
+
     return `
-      <a href="/game/${game.id}" data-game="${game.id}" data-portal="${game.portal}" data-category="${game.category}" role="menuitem">
+      <a href="/game/${game.id}" data-game="${game.id}" data-portal="${game.portal}" data-category="${game.category}" data-dye="${dye}" data-motif="${motif}" role="menuitem">
         <span class="icon">${iconSvg}</span>
         <span class="game-label">
           <span class="game-title">${escapeHtml(game.name)}</span>

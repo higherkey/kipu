@@ -102,41 +102,126 @@
 }
 
 /* ----------------------------------------
-   Header: the top cord, wordmark and tagline
+   Header: a woven band with the name sewn on as a label
+   The band is a strip of Andean-style weaving: dyed edge stripes and
+   a zigzag row down the middle, with fringe at each end. The title sits
+   on a card-stock label stitched over the band's lower edge.
    ---------------------------------------- */
-#navigation-shell .cord-line {
-  inline-size: min(100%, 800px);
-  block-size: 10px;
-  border-radius: 999px;
-  margin-block-end: 1.25rem;
-  background: var(--rope-h);
-  box-shadow: var(--rope-shadow);
+#navigation-shell .menu-header {
+  --band-edge: var(--dye-indigo);
+  --band-accent: var(--dye-cochineal);
+  --band-line: var(--dye-ochre);
+  max-inline-size: 880px;
+  margin-block-end: 1.75rem;
 }
 
-/* Knotted ends of the cord */
+#navigation-shell.portal-sandbox .menu-header,
+#navigation-shell.portal-workshop .menu-header,
+#navigation-shell.portal-lab .menu-header,
+#navigation-shell.portal-busyBoard .menu-header {
+  --band-edge: color-mix(in oklch, var(--dye) 85%, var(--ink));
+  --band-accent: var(--dye);
+}
+
+#navigation-shell .cord-line {
+  position: relative;
+  inline-size: calc(100% - 36px);
+  block-size: 38px;
+  margin-block: 4px 0;
+  border-radius: 4px;
+  background-color: var(--paper);
+  background-image:
+    /* edge stripes */
+    linear-gradient(to bottom,
+      var(--band-edge) 0 6px, transparent 6px calc(100% - 6px), var(--band-edge) calc(100% - 6px)),
+    /* thin accent lines inside the edges */
+    linear-gradient(to bottom,
+      transparent 0 9px, var(--band-line) 9px 11px,
+      transparent 11px calc(100% - 11px), var(--band-line) calc(100% - 11px) calc(100% - 9px), transparent 0),
+    /* zigzag row */
+    linear-gradient(135deg, var(--band-accent) 25%, transparent 25%),
+    linear-gradient(225deg, var(--band-accent) 25%, transparent 25%),
+    linear-gradient(315deg, var(--band-accent) 25%, transparent 25%),
+    linear-gradient(45deg, var(--band-accent) 25%, transparent 25%),
+    /* the weave itself */
+    repeating-linear-gradient(90deg, oklch(0% 0 0 / 0.06) 0 1px, transparent 1px 3px),
+    var(--tex-grain);
+  background-size:
+    auto, auto,
+    14px 14px, 14px 14px, 14px 14px, 14px 14px,
+    auto, auto;
+  background-position:
+    0 0, 0 0,
+    -7px 50%, -7px 50%, 0 50%, 0 50%,
+    0 0, 0 0;
+  background-repeat:
+    no-repeat, no-repeat,
+    repeat-x, repeat-x, repeat-x, repeat-x,
+    repeat, repeat;
+  box-shadow:
+    inset 0 1px 0 oklch(100% 0 0 / 0.25),
+    0 6px 10px -6px oklch(30% 0.06 45 / 0.5);
+}
+
+/* Fringe at each end of the band */
 #navigation-shell .cord-line::before,
 #navigation-shell .cord-line::after {
-  inline-size: 18px;
-  block-size: 18px;
-  inset-block-start: -4px;
-  inset-block-end: auto;
-  border-radius: 46% 54% 50% 50%;
+  content: '';
+  position: absolute;
+  inset-block: 3px;
+  inset-block-end: 3px;
+  bottom: auto;
+  inline-size: 16px;
+  block-size: auto;
+  border-radius: 0;
   background:
-    radial-gradient(circle at 35% 30%, oklch(100% 0 0 / 0.45), transparent 45%),
-    repeating-linear-gradient(40deg, var(--rope-mid) 0 2px, var(--rope-dark) 2px 3.5px);
-  box-shadow: 0 2px 3px oklch(30% 0.06 45 / 0.4);
+    linear-gradient(to right, oklch(100% 0 0 / 0.25), transparent),
+    repeating-linear-gradient(to bottom, var(--rope-mid) 0 2px, transparent 2px 4px);
+  box-shadow: none;
 }
-#navigation-shell .cord-line::before { left: -6px; }
-#navigation-shell .cord-line::after  { right: -6px; }
+#navigation-shell .cord-line::before {
+  left: -16px;
+  right: auto;
+  -webkit-mask-image: linear-gradient(to left, black 40%, transparent);
+  mask-image: linear-gradient(to left, black 40%, transparent);
+}
+#navigation-shell .cord-line::after {
+  right: -16px;
+  left: auto;
+  -webkit-mask-image: linear-gradient(to right, black 40%, transparent);
+  mask-image: linear-gradient(to right, black 40%, transparent);
+}
 
+/* Buttons sit just under the band; the label overlaps it */
+#navigation-shell .nav-bar {
+  margin-block-start: -20px;
+  min-block-size: 0;
+  align-items: flex-start;
+  padding-inline: 8px;
+}
+
+#navigation-shell .nav-left,
+#navigation-shell .nav-right {
+  padding-block-start: 32px;
+}
+
+/* The name label, stitched onto the band */
 #navigation-shell h1 {
+  display: inline-block;
+  padding: 10px 30px 12px;
+  font-size: clamp(2rem, 3cqi + 1.3rem, 3rem);
   color: var(--dye-cochineal);
-  letter-spacing: -1px;
+  letter-spacing: -0.5px;
   font-weight: 600;
-  /* Pressed into the cloth, like a letterpress */
-  text-shadow:
-    0 1px 0 oklch(100% 0 0 / 0.55),
-    0 -1px 0 oklch(30% 0.08 35 / 0.2);
+  background-color: var(--paper);
+  background-image: var(--tex-grain);
+  border: 1px solid var(--paper-edge);
+  border-radius: 10px;
+  outline: 1.5px dashed var(--stitch);
+  outline-offset: -6px;
+  box-shadow: inset 0 1px 0 oklch(100% 0 0 / 0.7), var(--tag-shadow);
+  transform: rotate(-1.2deg);
+  text-shadow: 0 1px 0 oklch(100% 0 0 / 0.6);
 }
 
 #navigation-shell.portal-sandbox h1,
@@ -147,8 +232,36 @@
 }
 
 #navigation-shell .tagline {
+  margin-block-start: 0.9rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
   color: var(--ink-soft);
-  letter-spacing: 0.02em;
+}
+
+@container navigation-shell (inline-size < 520px) {
+  #navigation-shell .cord-line {
+    block-size: 32px;
+  }
+
+  #navigation-shell .nav-bar {
+    margin-block-start: -16px;
+    padding-inline: 2px;
+  }
+
+  #navigation-shell .nav-left,
+  #navigation-shell .nav-right {
+    padding-block-start: 26px;
+  }
+
+  #navigation-shell h1 {
+    padding: 8px 20px 10px;
+  }
+
+  #navigation-shell .back-btn span {
+    display: none;
+  }
 }
 
 /* Back and settings buttons: small card-stock tags */
@@ -664,7 +777,7 @@
    Portal page: game tags hang from a cord across each row
    ---------------------------------------- */
 #navigation-shell .cards-grid {
-  --tile-h: 166px;
+  --tile-h: 204px;
   --row-gap: 48px;
   --cord-drop: 22px; /* where the cord sits in the gap above each row */
   --cord-w: 9px;
@@ -726,7 +839,7 @@
   aspect-ratio: auto;
   justify-content: flex-start;
   gap: 8px;
-  padding: 30px 12px 14px;
+  padding: 26px 10px 12px;
   background-color: var(--paper);
   background-image: var(--tex-grain);
   color: var(--ink);
@@ -787,23 +900,93 @@
   box-shadow: inset 0 1px 0 oklch(100% 0 0 / 0.7), 0 1px 2px oklch(30% 0.06 50 / 0.3);
 }
 
-/* Icon: a small felt patch in the portal's dye */
+/* ----------------------------------------
+   Each game's own identity: a dye and a woven motif
+   main.ts tags every card with data-dye (0-9) and data-motif (0-5),
+   cycling by position so no two neighbours look alike.
+   ---------------------------------------- */
+#navigation-shell .cards-grid a[data-dye="0"] { --dye: oklch(52% 0.15 30);  --on-dye: var(--paper); } /* madder */
+#navigation-shell .cards-grid a[data-dye="1"] { --dye: oklch(42% 0.10 262); --on-dye: var(--paper); } /* indigo */
+#navigation-shell .cards-grid a[data-dye="2"] { --dye: oklch(70% 0.12 72);  --on-dye: var(--ink); }   /* ochre */
+#navigation-shell .cards-grid a[data-dye="3"] { --dye: oklch(52% 0.09 140); --on-dye: var(--paper); } /* moss */
+#navigation-shell .cards-grid a[data-dye="4"] { --dye: oklch(45% 0.10 320); --on-dye: var(--paper); } /* logwood */
+#navigation-shell .cards-grid a[data-dye="5"] { --dye: oklch(53% 0.08 200); --on-dye: var(--paper); } /* teal */
+#navigation-shell .cards-grid a[data-dye="6"] { --dye: oklch(60% 0.12 48);  --on-dye: var(--paper); } /* terracotta */
+#navigation-shell .cards-grid a[data-dye="7"] { --dye: oklch(58% 0.14 0);   --on-dye: var(--paper); } /* cochineal pink */
+#navigation-shell .cards-grid a[data-dye="8"] { --dye: oklch(44% 0.05 55);  --on-dye: var(--paper); } /* walnut */
+#navigation-shell .cards-grid a[data-dye="9"] { --dye: oklch(64% 0.10 110); --on-dye: var(--ink); }   /* olive */
+
+/* The woven swatch across the top of each tag, with the icon on a dyed patch */
 #navigation-shell .cards-grid a .icon {
-  inline-size: 52px;
-  block-size: 52px;
+  --weave: color-mix(in oklch, var(--dye) 55%, transparent);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: 100%;
+  block-size: 76px;
+  flex: 0 0 auto;
   margin: 0;
-  border-radius: 50%;
-  color: color-mix(in oklch, var(--dye, var(--dye-cochineal)) 85%, var(--ink));
-  background-color: color-mix(in oklch, var(--dye, var(--dye-cochineal)) 15%, var(--paper));
-  background-image: var(--tex-grain);
-  outline: 1.5px dashed color-mix(in oklch, var(--dye, var(--dye-cochineal)) 35%, transparent);
-  outline-offset: -5px;
-  box-shadow: inset 0 1px 3px oklch(30% 0.06 40 / 0.15);
+  border-radius: 8px;
+  color: var(--on-dye);
+  background-color: color-mix(in oklch, var(--dye) 14%, var(--paper));
+  box-shadow:
+    inset 0 0 0 1px color-mix(in oklch, var(--dye) 25%, transparent),
+    inset 0 2px 4px oklch(30% 0.06 40 / 0.12);
 }
 
+/* Stripes */
+#navigation-shell .cards-grid a[data-motif="0"] .icon {
+  background-image: repeating-linear-gradient(90deg, var(--weave) 0 5px, transparent 5px 9px, var(--weave) 9px 11px, transparent 11px 18px);
+}
+/* Zigzag */
+#navigation-shell .cards-grid a[data-motif="1"] .icon {
+  background-image:
+    linear-gradient(135deg, var(--weave) 25%, transparent 25%),
+    linear-gradient(225deg, var(--weave) 25%, transparent 25%),
+    linear-gradient(315deg, var(--weave) 25%, transparent 25%),
+    linear-gradient(45deg, var(--weave) 25%, transparent 25%);
+  background-size: 16px 16px;
+  background-position: -8px 0, -8px 0, 0 0, 0 0;
+}
+/* Diamonds */
+#navigation-shell .cards-grid a[data-motif="2"] .icon {
+  background-image: repeating-conic-gradient(from 45deg, var(--weave) 0 25%, transparent 0 50%);
+  background-size: 18px 18px;
+  background-position: center;
+}
+/* Dots */
+#navigation-shell .cards-grid a[data-motif="3"] .icon {
+  background-image:
+    radial-gradient(circle, var(--weave) 0 3px, transparent 3.5px),
+    radial-gradient(circle, var(--weave) 0 3px, transparent 3.5px);
+  background-size: 14px 14px;
+  background-position: 0 0, 7px 7px;
+}
+/* Bands */
+#navigation-shell .cards-grid a[data-motif="4"] .icon {
+  background-image: repeating-linear-gradient(0deg, var(--weave) 0 4px, transparent 4px 8px, var(--weave) 8px 10px, transparent 10px 18px);
+}
+/* Checks */
+#navigation-shell .cards-grid a[data-motif="5"] .icon {
+  background-image: repeating-conic-gradient(var(--weave) 0 25%, transparent 0 50%);
+  background-size: 14px 14px;
+}
+
+/* The icon itself, on a felt patch stitched over the swatch */
 #navigation-shell .cards-grid a .icon svg {
-  inline-size: 26px;
-  block-size: 26px;
+  inline-size: 50px;
+  block-size: 50px;
+  padding: 11px;
+  box-sizing: border-box;
+  border-radius: 50%;
+  background-color: var(--dye);
+  color: var(--on-dye);
+  outline: 1.5px dashed color-mix(in oklch, var(--on-dye) 55%, transparent);
+  outline-offset: -4px;
+  box-shadow:
+    0 0 0 3px var(--paper),
+    0 3px 5px 1px oklch(30% 0.06 45 / 0.35);
 }
 
 #navigation-shell .cards-grid a .game-title {
@@ -823,7 +1006,7 @@
 
 @container navigation-shell (inline-size < 520px) {
   #navigation-shell .cards-grid {
-    --tile-h: 158px;
+    --tile-h: 198px;
     grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
     column-gap: 14px;
   }
