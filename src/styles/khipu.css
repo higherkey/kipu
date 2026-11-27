@@ -220,7 +220,6 @@
   outline: 1.5px dashed var(--stitch);
   outline-offset: -6px;
   box-shadow: inset 0 1px 0 oklch(100% 0 0 / 0.7), var(--tag-shadow);
-  transform: rotate(-1.2deg);
   text-shadow: 0 1px 0 oklch(100% 0 0 / 0.6);
 }
 
@@ -397,7 +396,12 @@
   box-shadow:
     inset 0 2px 4px oklch(30% 0.06 40 / 0.15),
     0 1px 0 oklch(100% 0 0 / 0.6);
-  animation: hero-float 7s ease-in-out infinite;
+  animation: khipu-float 7s ease-in-out infinite;
+}
+
+@keyframes khipu-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
 }
 
 #navigation-shell #hero-icon-container {
@@ -514,11 +518,6 @@
   content: none;
 }
 
-/* Each tag hangs a little crooked, as real ones do */
-#navigation-shell .portal-card:nth-child(1) { --tilt: -0.7deg; }
-#navigation-shell .portal-card:nth-child(2) { --tilt: 0.5deg; }
-#navigation-shell .portal-card:nth-child(3) { --tilt: -0.3deg; }
-#navigation-shell .portal-card:nth-child(4) { --tilt: 0.8deg; }
 
 #navigation-shell .portal-card .pendant {
   position: relative;
@@ -585,8 +584,7 @@
   box-shadow: inset 0 1px 0 oklch(100% 0 0 / 0.7), var(--tag-shadow);
   outline: 1.5px dashed color-mix(in oklch, var(--dye) 45%, var(--stitch));
   outline-offset: -7px;
-  transform: rotate(var(--tilt, 0deg));
-  transform-origin: left center;
+  transform: none;
   transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease;
 }
 
@@ -607,11 +605,11 @@
 }
 
 #navigation-shell .portal-card:hover .tag {
-  transform: rotate(calc(var(--tilt, 0deg) - 1.5deg)) translateX(3px);
+  transform: translateX(4px);
 }
 
 #navigation-shell .portal-card:active .tag {
-  transform: rotate(var(--tilt, 0deg)) scale(0.97);
+  transform: scale(0.97);
   box-shadow: inset 0 1px 0 oklch(100% 0 0 / 0.7), 0 1px 2px oklch(30% 0.06 50 / 0.3);
 }
 
@@ -760,7 +758,7 @@
   }
 
   #navigation-shell .portal-card:hover .tag {
-    transform: rotate(calc(var(--tilt, 0deg) - 2deg));
+    transform: translateY(-3px);
   }
 
   #navigation-shell .portal-label {
@@ -825,12 +823,6 @@
   );
 }
 
-/* Each game tag hangs a little crooked */
-#navigation-shell .cards-grid a:nth-child(5n+1) { --tilt: -0.8deg; }
-#navigation-shell .cards-grid a:nth-child(5n+2) { --tilt: 0.6deg; }
-#navigation-shell .cards-grid a:nth-child(5n+3) { --tilt: -0.3deg; }
-#navigation-shell .cards-grid a:nth-child(5n+4) { --tilt: 1deg; }
-#navigation-shell .cards-grid a:nth-child(5n+5) { --tilt: -0.5deg; }
 
 #navigation-shell .cards-grid a,
 #navigation-shell .portal-sandbox .cards-grid a,
@@ -849,8 +841,7 @@
   outline: 1.5px dashed color-mix(in oklch, var(--dye, var(--dye-cochineal)) 40%, var(--stitch));
   outline-offset: -6px;
   overflow: visible;
-  transform: rotate(var(--tilt, 0deg));
-  transform-origin: 50% 14px;
+  transform: none;
   transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
 }
 
@@ -891,12 +882,12 @@
 }
 
 #navigation-shell .cards-grid a:hover {
-  transform: rotate(calc(var(--tilt, 0deg) - 2deg));
+  transform: translateY(-3px);
 }
 
 #navigation-shell .cards-grid a:active,
 #navigation-shell .portal-busyBoard .cards-grid a:active {
-  transform: rotate(var(--tilt, 0deg)) scale(0.96);
+  transform: scale(0.96);
   box-shadow: inset 0 1px 0 oklch(100% 0 0 / 0.7), 0 1px 2px oklch(30% 0.06 50 / 0.3);
 }
 
@@ -1080,6 +1071,6 @@
 
   #navigation-shell .portal-card:hover .tag,
   #navigation-shell .cards-grid a:hover {
-    transform: rotate(var(--tilt, 0deg));
+    transform: none;
   }
 }

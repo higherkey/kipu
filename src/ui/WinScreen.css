@@ -111,6 +111,6 @@
 }
 
 @keyframes pulseStar {
-  0%, 100% { transform: scale(1) rotate(0deg); }
-  50% { transform: scale(1.15) rotate(15deg); }
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.15); }
 }
