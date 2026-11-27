@@ -15,14 +15,17 @@
 
 .win-card {
   background-color: var(--paper, var(--color-parchment));
-  border: 1.5px solid var(--paper-edge, var(--color-cord));
+  background-image: var(--tex-grain, none);
+  border: 1px solid var(--paper-edge, var(--color-cord));
   border-top: 8px solid var(--dye-cochineal, var(--color-red));
+  outline: 1.5px dashed var(--stitch, var(--paper-edge));
+  outline-offset: -12px;
   border-radius: 24px;
   padding: 44px 36px 36px;
   width: 90%;
   max-width: 450px;
   text-align: center;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 24px 44px -12px oklch(25% 0.06 45 / 0.45);
   position: relative;
   z-index: 1010;
   display: flex;

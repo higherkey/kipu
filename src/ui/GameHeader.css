@@ -22,6 +22,7 @@
   justify-content: space-between;
   padding: 0 12px;
   background-color: var(--paper, var(--bg));
+  background-image: var(--tex-grain, none);
   border-bottom: none;
   box-shadow: 0 10px 24px -16px oklch(30% 0.06 50 / 0.45);
   z-index: 100;
@@ -36,9 +37,11 @@
   right: 0;
   bottom: -3px;
   height: 6px;
+  border-radius: 999px;
   background:
-    repeating-linear-gradient(-60deg, transparent 0 5px, oklch(0% 0 0 / 0.2) 5px 7px),
-    var(--dye, var(--rope-light, var(--cord)));
+    linear-gradient(to bottom, oklch(100% 0 0 / 0.3), transparent 50%, oklch(0% 0 0 / 0.3)),
+    repeating-linear-gradient(-55deg, transparent 0 3px, oklch(0% 0 0 / 0.2) 3px 5px),
+    var(--dye, var(--rope-mid, var(--cord)));
 }
 
 #game-header.hidden {
