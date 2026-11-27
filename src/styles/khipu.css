@@ -777,7 +777,7 @@
    Portal page: game tags hang from a cord across each row
    ---------------------------------------- */
 #navigation-shell .cards-grid {
-  --tile-h: 204px;
+  --tile-h: 186px;
   --row-gap: 48px;
   --cord-drop: 22px; /* where the cord sits in the gap above each row */
   --cord-w: 9px;
