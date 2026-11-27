@@ -1,0 +1,718 @@
+/* ========================================
+   Kipu — Khipu Shell Redesign
+   The menu is a khipu: one primary cord, with a pendant string for each
+   portal. Each pendant is dyed its own color and carries one knot per game,
+   the way a khipu records a count. Game tiles hang as tags from cords.
+
+   Loaded after style.css; rules are scoped under #navigation-shell /
+   #mobile-tab-bar so they win over the earlier shell styles without
+   !important.
+   ======================================== */
+
+:root {
+  /* Natural dyes */
+  --dye-indigo:    oklch(40% 0.13 268);
+  --dye-cochineal: oklch(50% 0.18 25);
+  --dye-ochre:     oklch(70% 0.14 72);
+  --dye-moss:      oklch(50% 0.10 150);
+
+  /* Surfaces & ink */
+  --paper:         oklch(98% 0.015 85);
+  --paper-edge:    oklch(87% 0.035 80);
+  --ink:           oklch(25% 0.03 60);
+  --ink-soft:      oklch(45% 0.03 60);
+
+  /* Cotton / camelid fiber rope */
+  --rope-light:    oklch(76% 0.07 72);
+  --rope-dark:     oklch(52% 0.08 55);
+
+  --tag-shadow:
+    0 1px 0 var(--paper-edge),
+    0 14px 28px -16px oklch(30% 0.06 50 / 0.5);
+}
+
+/* Each portal gets its dye, and a readable color for marks drawn on it */
+.portal-busyBoard, [data-portal="busyBoard"] { --dye: var(--dye-indigo);    --on-dye: var(--paper); }
+.portal-sandbox,   [data-portal="sandbox"]   { --dye: var(--dye-cochineal); --on-dye: var(--paper); }
+.portal-workshop,  [data-portal="workshop"]  { --dye: var(--dye-ochre);     --on-dye: var(--ink); }
+.portal-lab,       [data-portal="lab"]       { --dye: var(--dye-moss);      --on-dye: var(--paper); }
+
+/* ----------------------------------------
+   Shell background: plain parchment with a faint fiber weave
+   ---------------------------------------- */
+#navigation-shell,
+#navigation-shell.portal-sandbox,
+#navigation-shell.portal-workshop,
+#navigation-shell.portal-lab,
+#navigation-shell.portal-busyBoard {
+  color: var(--ink);
+  background-color: var(--bg);
+  background-size: auto;
+  background-image:
+    repeating-linear-gradient(0deg, oklch(60% 0.06 70 / 0.035) 0 1px, transparent 1px 5px),
+    repeating-linear-gradient(90deg, oklch(60% 0.06 70 / 0.035) 0 1px, transparent 1px 5px);
+  animation: none;
+  filter: none;
+}
+
+/* On a portal page, a wash of that portal's dye at the top */
+#navigation-shell.portal-sandbox,
+#navigation-shell.portal-workshop,
+#navigation-shell.portal-lab,
+#navigation-shell.portal-busyBoard {
+  background-image:
+    radial-gradient(120% 50% at 50% 0%, color-mix(in oklch, var(--dye) 14%, transparent), transparent 70%),
+    repeating-linear-gradient(0deg, oklch(60% 0.06 70 / 0.035) 0 1px, transparent 1px 5px),
+    repeating-linear-gradient(90deg, oklch(60% 0.06 70 / 0.035) 0 1px, transparent 1px 5px);
+}
+
+/* ----------------------------------------
+   Header: the top cord, wordmark and tagline
+   ---------------------------------------- */
+#navigation-shell .cord-line {
+  inline-size: min(100%, 800px);
+  block-size: 8px;
+  border-radius: 999px;
+  margin-block-end: 1.25rem;
+  background: repeating-linear-gradient(-60deg, var(--rope-light) 0 5px, var(--rope-dark) 5px 7px);
+  box-shadow: 0 1px 0 oklch(40% 0.06 55 / 0.25);
+}
+
+/* Knotted ends of the cord */
+#navigation-shell .cord-line::before,
+#navigation-shell .cord-line::after {
+  inline-size: 14px;
+  block-size: 14px;
+  inset-block-start: -3px;
+  inset-block-end: auto;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, var(--rope-light), var(--rope-dark));
+}
+#navigation-shell .cord-line::before { left: -4px; }
+#navigation-shell .cord-line::after  { right: -4px; }
+
+#navigation-shell h1 {
+  color: var(--dye-cochineal);
+  text-shadow: none;
+  letter-spacing: -1px;
+  font-weight: 600;
+}
+
+#navigation-shell.portal-sandbox h1,
+#navigation-shell.portal-workshop h1,
+#navigation-shell.portal-lab h1,
+#navigation-shell.portal-busyBoard h1 {
+  color: color-mix(in oklch, var(--dye) 85%, var(--ink));
+}
+
+#navigation-shell .tagline {
+  color: var(--ink-soft);
+  letter-spacing: 0.02em;
+}
+
+/* Back and settings buttons: paper tags, soft depth */
+#navigation-shell .back-btn,
+#navigation-shell .nav-settings-btn {
+  background-color: var(--paper);
+  color: var(--ink);
+  border: 1.5px solid var(--paper-edge);
+  border-radius: var(--radius-pill);
+  box-shadow: 0 2px 0 var(--paper-edge), 0 6px 14px -8px oklch(30% 0.06 50 / 0.4);
+}
+
+#navigation-shell .back-btn:hover,
+#navigation-shell .nav-settings-btn:hover {
+  background-color: oklch(96% 0.03 80);
+}
+
+#navigation-shell .back-btn:active,
+#navigation-shell .nav-settings-btn:active {
+  transform: translateY(2px);
+  box-shadow: 0 0 0 var(--paper-edge);
+}
+
+/* ----------------------------------------
+   Featured game: a paper tag with an eyelet
+   ---------------------------------------- */
+#navigation-shell .hero-card {
+  background-color: var(--paper);
+  border: 1.5px solid var(--paper-edge);
+  border-radius: 22px;
+  box-shadow: var(--tag-shadow);
+  padding-block: 28px 40px;
+  padding-inline: 44px 32px;
+}
+
+/* Eyelet the tag would be tied through */
+#navigation-shell .hero-card::before {
+  content: '';
+  position: absolute;
+  inset-block-start: 18px;
+  inset-inline-start: 16px;
+  inline-size: 12px;
+  block-size: 12px;
+  border-radius: 50%;
+  background: var(--bg);
+  box-shadow: inset 0 1px 2px oklch(30% 0.06 50 / 0.35), 0 0 0 3px var(--paper-edge);
+}
+
+#navigation-shell .featured-badge {
+  background: none;
+  border: none;
+  color: var(--dye-cochineal);
+  padding: 0;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+#navigation-shell .featured-badge::before {
+  content: '';
+  inline-size: 18px;
+  block-size: 4px;
+  border-radius: 999px;
+  background: var(--dye-cochineal);
+}
+
+#navigation-shell .hero-card h2 {
+  color: var(--ink);
+  font-weight: 600;
+  letter-spacing: -0.5px;
+}
+
+#navigation-shell .hero-card p#hero-subtitle {
+  color: var(--dye-cochineal);
+}
+
+#navigation-shell .hero-card p#hero-desc {
+  color: var(--ink-soft);
+}
+
+#navigation-shell .hero-btn-play {
+  background-color: var(--dye-cochineal);
+  color: var(--paper);
+  border: none;
+  border-radius: var(--radius-pill);
+  padding: 12px 28px;
+  font-weight: 600;
+  box-shadow: 0 3px 0 oklch(36% 0.14 25);
+}
+
+#navigation-shell .hero-btn-play:hover {
+  background-color: color-mix(in oklch, var(--dye-cochineal) 90%, black);
+}
+
+#navigation-shell .hero-btn-play:active {
+  transform: translateY(3px);
+  box-shadow: 0 0 0 oklch(36% 0.14 25);
+}
+
+#navigation-shell .hero-interactive-preview {
+  inline-size: 128px;
+  block-size: 128px;
+  border: none;
+  background:
+    radial-gradient(circle, transparent 54%, color-mix(in oklch, var(--dye-cochineal) 18%, transparent) 55% 57%, transparent 58%),
+    color-mix(in oklch, var(--dye-cochineal) 10%, var(--paper));
+  animation: hero-float 7s ease-in-out infinite;
+}
+
+#navigation-shell #hero-icon-container {
+  color: var(--dye-cochineal);
+}
+
+/* Slide dots as small knots on a string */
+#navigation-shell .hero-dots {
+  gap: 6px;
+  padding-inline: 10px;
+  background: linear-gradient(var(--rope-light), var(--rope-light)) center / 100% 2px no-repeat;
+}
+
+#navigation-shell .hero-dots .dot {
+  inline-size: 12px;
+  block-size: 12px;
+  border: none;
+  background: radial-gradient(circle at 35% 35%, var(--rope-light), var(--rope-dark));
+  transition: inline-size 0.2s ease, background 0.2s ease;
+}
+
+#navigation-shell .hero-dots .dot.active {
+  inline-size: 22px;
+  border-radius: 999px;
+  transform: none;
+  background: var(--dye-cochineal);
+}
+
+/* ----------------------------------------
+   "Pick a string" caption
+   ---------------------------------------- */
+@container navigation-shell (inline-size < 520px) {
+  #navigation-shell .hero-card {
+    padding-block: 22px 36px;
+    padding-inline: 36px 20px;
+  }
+
+  #navigation-shell .hero-interactive-preview {
+    inline-size: 96px;
+    block-size: 96px;
+    margin-inline-start: 1rem;
+  }
+}
+
+#navigation-shell .portal-instruction {
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin-block-end: 0.5rem;
+}
+
+#navigation-shell .portal-instruction .bouncing-arrow {
+  display: none;
+}
+
+/* ----------------------------------------
+   The khipu: primary cord + one pendant per portal
+   Wide: cord runs across the top and pendants hang down.
+   Narrow: the khipu turns sideways; the cord runs down the
+   left and pendants reach right to their tags.
+   ---------------------------------------- */
+#navigation-shell .portals-grid {
+  position: relative;
+  grid-template-columns: 1fr;
+  gap: 18px;
+  padding-block-start: 8px;
+  padding-inline-start: 18px;
+  margin-block-end: 2.5rem;
+}
+
+/* Primary cord */
+#navigation-shell .portals-grid::before {
+  content: '';
+  position: absolute;
+  inset-block: 0 8px;
+  inset-inline-start: 0;
+  inline-size: 10px;
+  border-radius: 999px;
+  background: repeating-linear-gradient(30deg, var(--rope-light) 0 5px, var(--rope-dark) 5px 7px);
+  box-shadow: 1px 0 0 oklch(40% 0.06 55 / 0.25);
+}
+
+/* Portal = pendant string + tag. The anchor itself carries no surface. */
+#navigation-shell .portal-card,
+#navigation-shell .portal-card.portal-sandbox,
+#navigation-shell .portal-card.portal-workshop,
+#navigation-shell .portal-card.portal-lab,
+#navigation-shell .portal-card.portal-busyBoard {
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  overflow: visible;
+  color: var(--ink);
+  transform: none;
+}
+
+/* Drop the old fiber strip and Lab corner brackets */
+#navigation-shell .portal-card::before,
+#navigation-shell .portal-card::after {
+  content: none;
+}
+
+#navigation-shell .portal-card .pendant {
+  position: relative;
+  flex: 0 0 auto;
+  inline-size: 104px;
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* The pendant string itself, dyed */
+#navigation-shell .portal-card .pendant::before {
+  content: '';
+  position: absolute;
+  inset-inline: -8px 0;
+  inset-block-start: 50%;
+  block-size: 5px;
+  margin-block-start: -2.5px;
+  border-radius: 999px;
+  background:
+    repeating-linear-gradient(-60deg, transparent 0 4px, oklch(0% 0 0 / 0.18) 4px 5px),
+    var(--dye);
+}
+
+#navigation-shell .knots {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  gap: 2px;
+}
+
+/* One knot per game */
+#navigation-shell .knot {
+  display: block;
+  inline-size: 6px;
+  block-size: 12px;
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at 40% 30%, oklch(100% 0 0 / 0.35), transparent 60%),
+    color-mix(in oklch, var(--dye) 80%, black);
+  box-shadow: 0 1px 0 oklch(0% 0 0 / 0.2);
+}
+
+/* The tag hanging from the pendant */
+#navigation-shell .portal-card .tag {
+  flex: 1 1 auto;
+  min-inline-size: 0;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 18px;
+  background-color: var(--paper);
+  border: 1.5px solid var(--paper-edge);
+  border-inline-start: 6px solid var(--dye);
+  border-radius: 18px;
+  box-shadow: var(--tag-shadow);
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease;
+  transform-origin: left center;
+}
+
+#navigation-shell .portal-card:hover .tag {
+  transform: rotate(-1.5deg) translateX(3px);
+}
+
+#navigation-shell .portal-card:active .tag {
+  transform: scale(0.97);
+  box-shadow: 0 1px 0 var(--paper-edge);
+}
+
+#navigation-shell .portal-card .icon,
+#navigation-shell .portal-card:hover .icon {
+  flex: 0 0 auto;
+  inline-size: 56px;
+  block-size: 56px;
+  border: none;
+  border-radius: 50%;
+  background-color: var(--dye);
+  color: var(--on-dye);
+  transform: none;
+  animation: none;
+}
+
+#navigation-shell .portal-card .icon svg {
+  inline-size: 30px;
+  block-size: 30px;
+  color: currentColor;
+}
+
+#navigation-shell .portal-label {
+  align-items: flex-start;
+  text-align: start;
+  gap: 2px;
+}
+
+#navigation-shell .portal-title {
+  font-size: 1.35rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+#navigation-shell .portal-subtitle {
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+  text-align: start;
+}
+
+#navigation-shell .portal-count {
+  margin-block-start: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: color-mix(in oklch, var(--dye) 80%, var(--ink));
+}
+
+#navigation-shell .portal-count:empty {
+  display: none;
+}
+
+/* Wide: hang the pendants from a cord across the top */
+@container navigation-shell (inline-size >= 700px) {
+  #navigation-shell .portals-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    padding-block-start: 0;
+    padding-inline-start: 0;
+    align-items: start;
+  }
+
+  #navigation-shell .portals-grid::before {
+    inset-block: 0 auto;
+    inset-inline: -12px;
+    inline-size: auto;
+    block-size: 10px;
+    background: repeating-linear-gradient(-60deg, var(--rope-light) 0 5px, var(--rope-dark) 5px 7px);
+    box-shadow: 0 1px 0 oklch(40% 0.06 55 / 0.25);
+  }
+
+  #navigation-shell .portal-card,
+  #navigation-shell .portal-card.portal-sandbox,
+  #navigation-shell .portal-card.portal-workshop,
+  #navigation-shell .portal-card.portal-lab,
+  #navigation-shell .portal-card.portal-busyBoard {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  #navigation-shell .portal-card .pendant {
+    inline-size: auto;
+    block-size: var(--pendant-length, 112px);
+    align-self: center;
+  }
+
+  /* Pendants of different lengths, as on a real khipu */
+  #navigation-shell .portal-card:nth-child(1) { --pendant-length: 104px; }
+  #navigation-shell .portal-card:nth-child(2) { --pendant-length: 132px; }
+  #navigation-shell .portal-card:nth-child(3) { --pendant-length: 116px; }
+  #navigation-shell .portal-card:nth-child(4) { --pendant-length: 144px; }
+
+  #navigation-shell .portal-card .pendant::before {
+    inset-inline: 50% auto;
+    inset-block: 4px 0;
+    inline-size: 5px;
+    block-size: auto;
+    margin-block-start: 0;
+    margin-inline-start: -2.5px;
+    background:
+      repeating-linear-gradient(30deg, transparent 0 4px, oklch(0% 0 0 / 0.18) 4px 5px),
+      var(--dye);
+  }
+
+  #navigation-shell .knots {
+    flex-direction: column;
+  }
+
+  #navigation-shell .knot {
+    inline-size: 12px;
+    block-size: 6px;
+  }
+
+  #navigation-shell .portal-card .tag {
+    flex-direction: column;
+    text-align: center;
+    padding: 22px 14px 20px;
+    border-inline-start: 1.5px solid var(--paper-edge);
+    border-block-start: 6px solid var(--dye);
+    transform-origin: top center;
+  }
+
+  #navigation-shell .portal-card:hover .tag {
+    transform: rotate(-2deg);
+  }
+
+  #navigation-shell .portal-label {
+    align-items: center;
+    text-align: center;
+  }
+
+  #navigation-shell .portal-subtitle {
+    text-align: center;
+  }
+}
+
+/* ----------------------------------------
+   Portal page: game tags hang from a cord across each row
+   ---------------------------------------- */
+#navigation-shell .cards-grid {
+  --tile-h: 160px;
+  --row-gap: 34px;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  grid-auto-rows: var(--tile-h);
+  justify-content: stretch;
+  column-gap: 16px;
+  row-gap: var(--row-gap);
+  max-inline-size: 880px;
+  padding-block: var(--row-gap) 0;
+  margin-block-end: 48px;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    var(--rope-dark) 0 2px,
+    var(--rope-light) 2px 6px,
+    var(--rope-dark) 6px 8px,
+    transparent 8px calc(var(--tile-h) + var(--row-gap))
+  );
+}
+
+#navigation-shell .cards-grid a,
+#navigation-shell .portal-sandbox .cards-grid a,
+#navigation-shell .portal-lab .cards-grid a,
+#navigation-shell .portal-busyBoard .cards-grid a {
+  aspect-ratio: auto;
+  justify-content: flex-start;
+  gap: 8px;
+  padding: 20px 12px 14px;
+  background-color: var(--paper);
+  color: var(--ink);
+  border: 1.5px solid var(--paper-edge);
+  border-block-start: 5px solid var(--dye, var(--dye-cochineal));
+  border-radius: 16px;
+  box-shadow: var(--tag-shadow);
+  overflow: visible;
+  transform-origin: top center;
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
+}
+
+/* The short pendant tying each tag to the cord */
+#navigation-shell .cards-grid a::before {
+  content: '';
+  position: absolute;
+  inset-block: auto;
+  inset-block-start: calc(-1 * var(--row-gap) + 2px);
+  inset-inline-start: 50%;
+  inline-size: 3px;
+  block-size: calc(var(--row-gap) - 6px);
+  margin-inline-start: -1.5px;
+  border-radius: 999px;
+  background: color-mix(in oklch, var(--dye, var(--dye-cochineal)) 75%, var(--rope-dark));
+}
+
+/* Knot where the pendant meets the tag */
+#navigation-shell .cards-grid a::after {
+  content: '';
+  position: absolute;
+  inset-block: -13px auto;
+  inset-inline-start: 50%;
+  inline-size: 12px;
+  block-size: 9px;
+  margin-inline-start: -6px;
+  transform: none;
+  opacity: 1;
+  border-radius: 999px;
+  background: color-mix(in oklch, var(--dye, var(--dye-cochineal)) 85%, black);
+}
+
+#navigation-shell .cards-grid a:hover {
+  transform: rotate(-2deg);
+}
+
+#navigation-shell .cards-grid a:active,
+#navigation-shell .portal-busyBoard .cards-grid a:active {
+  transform: scale(0.96);
+  box-shadow: 0 1px 0 var(--paper-edge);
+}
+
+#navigation-shell .cards-grid a .icon {
+  inline-size: 52px;
+  block-size: 52px;
+  margin: 0;
+  border-radius: 50%;
+  color: color-mix(in oklch, var(--dye, var(--dye-cochineal)) 85%, var(--ink));
+  background-color: color-mix(in oklch, var(--dye, var(--dye-cochineal)) 13%, var(--paper));
+}
+
+#navigation-shell .cards-grid a .icon svg {
+  inline-size: 28px;
+  block-size: 28px;
+}
+
+#navigation-shell .cards-grid a .game-title {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+#navigation-shell .cards-grid a .game-subtitle {
+  font-size: 0.8rem;
+  color: var(--ink-soft);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+@container navigation-shell (inline-size < 520px) {
+  #navigation-shell .cards-grid {
+    --tile-h: 150px;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    column-gap: 12px;
+  }
+
+  #navigation-shell .cards-grid a .game-title {
+    font-size: 1.05rem;
+  }
+}
+
+/* ----------------------------------------
+   Mobile tab bar: paper strip under a cord
+   ---------------------------------------- */
+@media (max-width: 600px) {
+  #mobile-tab-bar.mobile-tab-bar {
+    background-color: oklch(97% 0.02 85 / 0.92);
+    border-top: none;
+    box-shadow: 0 -8px 20px -12px oklch(30% 0.06 50 / 0.35);
+  }
+
+  #mobile-tab-bar.mobile-tab-bar::before {
+    content: '';
+    position: absolute;
+    inset-inline: 0;
+    inset-block-start: -3px;
+    block-size: 6px;
+    background: repeating-linear-gradient(-60deg, var(--rope-light) 0 5px, var(--rope-dark) 5px 7px);
+  }
+
+  #mobile-tab-bar .tab-item {
+    position: relative;
+    color: var(--ink-soft);
+    opacity: 1;
+  }
+
+  #mobile-tab-bar .tab-item.active {
+    color: var(--dye, var(--dye-cochineal));
+  }
+
+  /* A knot marks the current tab */
+  #mobile-tab-bar .tab-item.active::before {
+    content: '';
+    position: absolute;
+    inset-block-start: 2px;
+    inline-size: 14px;
+    block-size: 6px;
+    border-radius: 999px;
+    background: currentColor;
+  }
+
+  #mobile-tab-bar .tab-item[data-tab="busyBoard"] { --dye: var(--dye-indigo); }
+  #mobile-tab-bar .tab-item[data-tab="sandbox"]   { --dye: var(--dye-cochineal); }
+  #mobile-tab-bar .tab-item[data-tab="workshop"]  { --dye: color-mix(in oklch, var(--dye-ochre) 70%, var(--ink)); }
+  #mobile-tab-bar .tab-item[data-tab="lab"]       { --dye: var(--dye-moss); }
+}
+
+/* ----------------------------------------
+   Motion preferences
+   ---------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  #navigation-shell .hero-interactive-preview,
+  #navigation-shell .portal-card .tag,
+  #navigation-shell .cards-grid a {
+    animation: none;
+    transition: none;
+  }
+
+  #navigation-shell .portal-card:hover .tag,
+  #navigation-shell .cards-grid a:hover {
+    transform: none;
+  }
+}

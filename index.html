@@ -52,7 +52,7 @@
         </div>
 
         <div id="portal-instruction" class="portal-instruction">
-          <span>Choose a portal to start playing!</span>
+          <span>Pick a string to play</span>
           <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" class="bouncing-arrow" aria-hidden="true">
             <line x1="12" y1="5" x2="12" y2="19"></line>
             <polyline points="19 12 12 19 5 12"></polyline>
@@ -62,39 +62,55 @@
         <!-- Play Portals -->
         <div id="portal-list" class="portals-grid" role="menu">
           <a href="/portal/busyBoard" id="portal-card-busyBoard" class="portal-card portal-busyBoard" role="menuitem">
-            <span class="icon">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="3" y="5" width="18" height="14" rx="2" ry="2"/><line x1="8" y1="5" x2="8" y2="19"/><line x1="16" y1="5" x2="16" y2="19"/><circle cx="8" cy="10" r="2"/><circle cx="16" cy="14" r="2"/></svg>
-            </span>
-            <span class="portal-label">
-              <span class="portal-title">Busy Board</span>
-              <span class="portal-subtitle">Tactile Switchboards</span>
+            <span class="pendant" aria-hidden="true"><span class="knots" data-knots-for="busyBoard"></span></span>
+            <span class="tag">
+              <span class="icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="3" y="5" width="18" height="14" rx="2" ry="2"/><line x1="8" y1="5" x2="8" y2="19"/><line x1="16" y1="5" x2="16" y2="19"/><circle cx="8" cy="10" r="2"/><circle cx="16" cy="14" r="2"/></svg>
+              </span>
+              <span class="portal-label">
+                <span class="portal-title">Busy Board</span>
+                <span class="portal-subtitle">Tactile Switchboards</span>
+                <span class="portal-count" data-count-for="busyBoard"></span>
+              </span>
             </span>
           </a>
           <a href="/portal/sandbox" id="portal-card-sandbox" class="portal-card portal-sandbox" role="menuitem">
-            <span class="icon">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M8.3 10a.7.7 0 0 1-.626-1.079L11.4 3a.7.7 0 0 1 1.198-.043L16.3 8.9a.7.7 0 0 1-.572 1.1Z"/><rect x="3" y="14" width="7" height="7" rx="1"/><circle cx="17.5" cy="17.5" r="3.5"/></svg>
-            </span>
-            <span class="portal-label">
-              <span class="portal-title">Sandbox</span>
-              <span class="portal-subtitle">Sensory & Kinetic Exploration</span>
+            <span class="pendant" aria-hidden="true"><span class="knots" data-knots-for="sandbox"></span></span>
+            <span class="tag">
+              <span class="icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M8.3 10a.7.7 0 0 1-.626-1.079L11.4 3a.7.7 0 0 1 1.198-.043L16.3 8.9a.7.7 0 0 1-.572 1.1Z"/><rect x="3" y="14" width="7" height="7" rx="1"/><circle cx="17.5" cy="17.5" r="3.5"/></svg>
+              </span>
+              <span class="portal-label">
+                <span class="portal-title">Sandbox</span>
+                <span class="portal-subtitle">Sensory & Kinetic Exploration</span>
+                <span class="portal-count" data-count-for="sandbox"></span>
+              </span>
             </span>
           </a>
           <a href="/portal/workshop" id="portal-card-workshop" class="portal-card portal-workshop" role="menuitem">
-            <span class="icon">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
-            </span>
-            <span class="portal-label">
-              <span class="portal-title">Workshop</span>
-              <span class="portal-subtitle">Guided Creation & Sequencing</span>
+            <span class="pendant" aria-hidden="true"><span class="knots" data-knots-for="workshop"></span></span>
+            <span class="tag">
+              <span class="icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+              </span>
+              <span class="portal-label">
+                <span class="portal-title">Workshop</span>
+                <span class="portal-subtitle">Guided Creation & Sequencing</span>
+                <span class="portal-count" data-count-for="workshop"></span>
+              </span>
             </span>
           </a>
           <a href="/portal/lab" id="portal-card-lab" class="portal-card portal-lab" role="menuitem">
-            <span class="icon">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M10 2v7.586a1 1 0 0 1-.293.707l-4.414 4.414A2 2 0 0 0 7 18h10a2 2 0 0 0 1.707-3.293L14.293 10.3A1 1 0 0 1 14 9.586V2"/><path d="M6 2h12"/><path d="M8.5 2v5"/><path d="M15.5 2v5"/><path d="M6 14h12"/></svg>
-            </span>
-            <span class="portal-label">
-              <span class="portal-title">Lab</span>
-              <span class="portal-subtitle">Physics & Logic Challenges</span>
+            <span class="pendant" aria-hidden="true"><span class="knots" data-knots-for="lab"></span></span>
+            <span class="tag">
+              <span class="icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M10 2v7.586a1 1 0 0 1-.293.707l-4.414 4.414A2 2 0 0 0 7 18h10a2 2 0 0 0 1.707-3.293L14.293 10.3A1 1 0 0 1 14 9.586V2"/><path d="M6 2h12"/><path d="M8.5 2v5"/><path d="M15.5 2v5"/><path d="M6 14h12"/></svg>
+              </span>
+              <span class="portal-label">
+                <span class="portal-title">Lab</span>
+                <span class="portal-subtitle">Physics & Logic Challenges</span>
+                <span class="portal-count" data-count-for="lab"></span>
+              </span>
             </span>
           </a>
         </div>

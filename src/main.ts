@@ -1,4 +1,5 @@
 import './style.css';
+import './styles/khipu.css';
 import './ui/NotFound.css';
 import { registerSW } from 'virtual:pwa-register';
 import { Icons } from './ui/Icons';
@@ -135,12 +136,31 @@ export function renderGameList(portalId?: string): void {
   }).join('');
 }
 
+/**
+ * Ties one knot on each portal's pendant string per game in that portal,
+ * the way a khipu records a count, and writes the count on the portal tag.
+ */
+export function renderPortalKnots(): void {
+  const registry = GameRegistry.getInstance();
+  document.querySelectorAll<HTMLElement>('[data-knots-for]').forEach((el) => {
+    const portal = el.dataset.knotsFor as 'sandbox' | 'workshop' | 'lab' | 'busyBoard';
+    const count = registry.getByPortal(portal).length;
+    el.innerHTML = '<span class="knot"></span>'.repeat(count);
+  });
+  document.querySelectorAll<HTMLElement>('[data-count-for]').forEach((el) => {
+    const portal = el.dataset.countFor as 'sandbox' | 'workshop' | 'lab' | 'busyBoard';
+    const count = registry.getByPortal(portal).length;
+    el.textContent = `${count} ${count === 1 ? 'game' : 'games'}`;
+  });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   const navShell = document.getElementById('navigation-shell');
   const gameCanvas = document.getElementById('game-canvas') as HTMLCanvasElement;
 
   // Render initial dynamic game cards from GameRegistry
   renderGameList();
+  renderPortalKnots();
 
   // Setup Hero Banner dots indicators
   const dotsContainer = document.getElementById('hero-dots');
