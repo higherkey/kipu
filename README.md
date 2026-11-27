@@ -99,6 +99,7 @@ Kipu uses a three-tier design framework:
 | `cloudShapeFinder` | Cloud Shape Finder | Find procedurally generated shapes hidden in clouds. Low-stress discovery mechanics. |
 | `digitalLiteBrite` | Digital Lite-Brite | Trace a glowing path by placing colored pins. Snapping haptics. |
 | `trashSorcerer` | Trash Sorcerer | Flick trash items into the correct recycling bin. Velocity-based gesture detection. |
+| `fortressMath` | Fortress Math (POC) | Ages roughly 6–10: add defenses, capture adjacent regions, and hold five regions against two local bots. |
 
 ---
 
@@ -129,6 +130,15 @@ Kipu uses a three-tier design framework:
 ```bash
 npm run dev
 ```
+
+To test Cat Quarters generation locally, build the app and serve it with Cloudflare Pages Functions.
+
+```bash
+npm run build
+wrangler pages dev dist
+```
+
+New puzzles need an internet connection on the hosted site. Generated boards are saved in the browser and stay in the puzzle picker for offline replay.
 
 ### Production Build
 

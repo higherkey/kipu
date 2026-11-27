@@ -84,10 +84,48 @@ describe('BubbleWrapGame', () => {
     expect(() => game.update(16)).not.toThrow();
   });
 
+  it('should auto-refresh bubble grid when all bubbles are popped', () => {
+    vi.useFakeTimers();
+    const bubbles = (game as any).bubbles;
+    // Pop all bubbles
+    bubbles.forEach((b: any) => {
+      b.popped = false;
+    });
+
+    bubbles.forEach((b: any) => {
+      (game as any).checkPop(b.x, b.y);
+    });
+
+    expect(bubbles.every((b: any) => b.popped)).toBe(true);
+
+    // Fast-forward past 1200ms reset timer
+    vi.advanceTimersByTime(1250);
+
+    const refreshed = (game as any).bubbles;
+    expect(refreshed.length).toBeGreaterThan(0);
+    expect(refreshed.every((b: any) => !b.popped)).toBe(true);
+    vi.useRealTimers();
+  });
+
+  it('should support resize by rebuilding grid to new dimensions', () => {
+    game.resize(400, 300);
+    expect(canvas.width).toBe(400);
+    expect(canvas.height).toBe(300);
+    const bubbles = (game as any).bubbles;
+    bubbles.forEach((b: any) => {
+      expect(b.x).toBeLessThan(400);
+      expect(b.y).toBeLessThan(300);
+    });
+  });
+
   it('should unregister event listeners on destroy', () => {
     const removeSpy = vi.spyOn(canvas, 'removeEventListener');
+    const winRemoveSpy = vi.spyOn(window, 'removeEventListener');
     game.destroy();
     expect(removeSpy).toHaveBeenCalledWith('touchstart', expect.any(Function));
+    expect(removeSpy).toHaveBeenCalledWith('touchmove', expect.any(Function));
     expect(removeSpy).toHaveBeenCalledWith('mousedown', expect.any(Function));
+    expect(removeSpy).toHaveBeenCalledWith('mousemove', expect.any(Function));
+    expect(winRemoveSpy).toHaveBeenCalledWith('mouseup', expect.any(Function));
   });
 });

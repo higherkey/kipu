@@ -1,4 +1,5 @@
 import { BaseGame } from '../../core/BaseGame';
+import { CelebrationOverlay } from '../../ui/CelebrationOverlay';
 import { PawanaCurriculum, type PawanaMode, type PawanaDifficulty, type GateQuestion } from './PawanaCurriculum';
 import './PawanaGame.css';
 
@@ -559,6 +560,10 @@ export class PawanaGame extends BaseGame {
 
   private triggerVictory(): void {
     this.state = 'victory';
+    CelebrationOverlay.getInstance().celebrate({
+      type: 'fireworks',
+      count: 45,
+    });
     this.renderVictoryModal();
   }
 

@@ -125,6 +125,14 @@ describe('TypographyBoardGame (Board 5)', () => {
     }).not.toThrow();
   });
 
+  it('should render automatically on update without requiring manual render() call', () => {
+    const ctx = canvas.getContext('2d');
+    expect(ctx?.clearRect).not.toHaveBeenCalled();
+
+    game.update(16);
+    expect(ctx?.clearRect).toHaveBeenCalled();
+  });
+
   it('should handle pointer down, move, and up events', () => {
     const downEvent = new MouseEvent('mousedown', { clientX: 50, clientY: 50 });
     canvas.dispatchEvent(downEvent);

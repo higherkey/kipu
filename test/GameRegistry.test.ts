@@ -12,7 +12,7 @@ describe('GameRegistry', () => {
     const registry = GameRegistry.getInstance();
     const allGames = registry.getAll();
 
-    expect(allGames.length).toBe(25);
+    expect(allGames.length).toBe(31);
   });
 
   it('should retrieve registered games by ID', () => {
@@ -34,6 +34,16 @@ describe('GameRegistry', () => {
     expect(pawana?.name).toBe('Pawana');
     expect(pawana?.portal).toBe('lab');
     expect(pawana?.category).toBe('brain');
+
+    const camera = registry.get('camera');
+    expect(camera).toBeDefined();
+    expect(camera?.name).toBe('Cam');
+    expect(camera?.portal).toBe('workshop');
+    expect(camera?.icon).toBe('camera');
+
+    const fortress = registry.get('fortressMath');
+    expect(fortress?.name).toBe('Fortress Math');
+    expect(fortress?.portal).toBe('lab');
   });
 
   it('should return undefined for unregistered game IDs', () => {
@@ -41,3 +51,4 @@ describe('GameRegistry', () => {
     expect(registry.get('nonExistentGame')).toBeUndefined();
   });
 });
+

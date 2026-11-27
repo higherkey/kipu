@@ -1,6 +1,7 @@
 import type { Game } from '../../core/Game';
 import { AudioController } from '../../core/AudioController';
 import { HapticController } from '../../core/HapticController';
+import { CelebrationOverlay } from '../../ui/CelebrationOverlay';
 
 export type AnimalType = 'Whale' | 'Elephant' | 'Duck' | 'Lion' | 'Bird';
 
@@ -178,11 +179,24 @@ export class CloudShapeGame implements Game {
     // Check cloud tap/drag
     for (const cloud of this.clouds) {
       const dist = Math.hypot(x - cloud.x, y - cloud.y);
-      if (dist < cloud.baseRadius * 2.2 && !cloud.morphed) {
-        cloud.morphed = true;
-        this.audio.play('synth:chime', 'G4');
-        this.haptics.lightTap();
-        this.spawnStarParticles(cloud.x, cloud.y, 16);
+      if (dist < cloud.baseRadius * 2.2) {
+        if (!cloud.morphed) {
+          cloud.morphed = true;
+          this.audio.play('synth:chime', 'G4');
+          this.haptics.lightTap();
+          this.spawnStarParticles(cloud.x, cloud.y, 16);
+          if (this.clouds.length > 0 && this.clouds.every(c => c.morphed)) {
+            CelebrationOverlay.getInstance().celebrate({
+              type: 'confetti',
+              count: 30,
+            });
+          }
+        } else {
+          // Playful tap response on already morphed animal
+          this.audio.play('synth:pluck', 'C5');
+          this.haptics.lightTap();
+          this.spawnStarParticles(cloud.x, cloud.y, 8);
+        }
         break;
       }
     }
@@ -592,6 +606,14 @@ export class CloudShapeGame implements Game {
     this.paused = false;
   }
 
+  public resize(width: number, height: number): void {
+    if (!this.canvas) return;
+    this.clouds.forEach(cloud => {
+      cloud.x = Math.max(80, Math.min(width - 80, cloud.x));
+      cloud.y = Math.max(60, Math.min(height * 0.6, cloud.y));
+    });
+  }
+
   destroy(): void {
     if (this.canvas) {
       this.canvas.removeEventListener('mousedown', this.handleMouseDown);
@@ -606,5 +628,8 @@ export class CloudShapeGame implements Game {
     }
     this.clouds = [];
     this.particles = [];
+    this.canvas = null;
+    this.ctx = null;
   }
 }
+

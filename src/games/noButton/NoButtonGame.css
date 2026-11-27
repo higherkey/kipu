@@ -1,12 +1,143 @@
 /* ========================================
-   Custom Voice Dropdown (Eeno)
+   NoButtonGame.css (Eeno Voice Board)
+   Sitewright Core Standards:
+   - Touch targets >= 44px
+   - Zero !important
+   - Zero inline styles
    ======================================== */
+
+#no-button-game {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  background-color: var(--bg);
+  padding: 1rem;
+  padding-top: 70px;
+  gap: 1rem;
+  box-sizing: border-box;
+  overflow-y: auto;
+}
+
+#no-button-game.game-paused {
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+/* --- Category Navigation Tabs --- */
+
+.eeno-category-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  width: 100%;
+  max-width: 600px;
+}
+
+.eeno-tab-btn {
+  min-height: 44px;
+  min-width: 72px;
+  padding: 0.55rem 1rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  font-family: 'Fredoka', sans-serif;
+  border: 2px solid var(--fg);
+  border-radius: var(--radius-sm);
+  background-color: #fff;
+  color: var(--fg);
+  box-shadow: 0 var(--shadow-depth) 0px var(--fg);
+  cursor: pointer;
+  transition: transform 0.08s ease, box-shadow 0.08s ease, background-color 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.eeno-tab-btn:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0px var(--fg);
+}
+
+.eeno-tab-btn.active {
+  background-color: var(--cord);
+  color: var(--fg);
+  font-weight: 700;
+}
+
+/* --- Voice Settings Bar --- */
+
+.eeno-voice-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  background: rgba(255, 255, 255, 0.75);
+  border: 2px solid var(--fg);
+  border-radius: var(--radius-sm);
+  padding: 0.4rem 0.8rem;
+  box-shadow: 0 2px 0px var(--fg);
+}
+
+.voice-setting-group {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.voice-setting-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--fg);
+  font-family: 'Fredoka', sans-serif;
+  margin-right: 0.2rem;
+}
+
+.eeno-voice-btn {
+  min-height: 44px;
+  min-width: 44px;
+  padding: 0.4rem 0.75rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  font-family: 'Fredoka', sans-serif;
+  border: 2px solid var(--fg);
+  border-radius: 8px;
+  background-color: #fff;
+  color: var(--fg);
+  cursor: pointer;
+  transition: background-color 0.1s ease, transform 0.08s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.eeno-voice-btn.active {
+  background-color: #2E9E6B;
+  color: #fff;
+  border-color: #1A6645;
+}
+
+/* --- Language Selection Header --- */
+
+.game-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-shrink: 0;
+}
+
 .custom-dropdown {
   position: relative;
   display: inline-block;
 }
 
 .dropdown-trigger {
+  min-height: 44px;
   padding: 0.55rem 1rem;
   font-size: 0.95rem;
   font-weight: 600;
@@ -57,6 +188,7 @@
 
 .dropdown-option {
   width: 100%;
+  min-height: 44px;
   padding: 0.6rem 1rem;
   border: none;
   background: none;
@@ -132,7 +264,6 @@
   display: block;
 }
 
-/* Adjust tooltip position on mobile/narrow viewports */
 @media (max-width: 600px) {
   .dropdown-option-wrapper .tooltip {
     left: auto;
@@ -151,46 +282,8 @@
   }
 }
 
-/* ========================================
-   No Button Game (Eeno)
-   ======================================== */
-#no-button-game {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background-color: var(--bg);
-  padding: 1rem;
-  padding-top: 70px;
-  gap: 1.5rem;
-}
-
-.game-controls {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  flex-shrink: 0;
-}
-
-.voice-dropdown {
-  padding: 0.55rem 1rem;
-  font-size: 0.95rem;
-  font-weight: 600;
-  font-family: 'Fredoka', sans-serif;
-  border: 2px solid var(--fg);
-  border-radius: var(--radius-sm);
-  background-color: #fff;
-  color: var(--fg);
-  box-shadow: 0 var(--shadow-depth) 0px var(--fg);
-  cursor: pointer;
-  appearance: auto;
-  max-width: 200px;
-}
-
 .control-btn {
+  min-height: 44px;
   padding: 0.55rem 1.1rem;
   font-size: 0.95rem;
   font-weight: 600;
@@ -202,6 +295,9 @@
   box-shadow: 0 var(--shadow-depth) 0px var(--fg);
   cursor: pointer;
   transition: transform 0.08s ease, box-shadow 0.08s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .control-btn:active {
@@ -209,6 +305,22 @@
   box-shadow: 0 2px 0px var(--fg);
 }
 
+/* --- Category Content Views --- */
+
+.eeno-view {
+  width: 100%;
+  max-width: 700px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+}
+
+.eeno-view.hidden {
+  display: none;
+}
+
+/* View 1: Basic Yes / No */
 .buttons-container {
   display: flex;
   gap: 2.5rem;
@@ -259,6 +371,142 @@
 #giant-yes-button:active {
   transform: translateY(7px);
   box-shadow: 0 3px 0px #1A6645, 0 3px 10px rgba(46,158,107,0.2);
+}
+
+/* View 2: Greetings Grid */
+.eeno-grid-greetings {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.25rem;
+  width: 100%;
+}
+
+.eeno-word-card {
+  min-height: 80px;
+  border: 3px solid var(--fg);
+  border-radius: var(--radius);
+  background-color: #fff;
+  color: var(--fg);
+  box-shadow: 0 var(--shadow-depth) 0px var(--fg);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  gap: 0.35rem;
+  transition: transform 0.08s ease, box-shadow 0.08s ease;
+}
+
+.eeno-word-card:active {
+  transform: translateY(3px);
+  box-shadow: 0 2px 0px var(--fg);
+}
+
+.eeno-card-icon {
+  font-size: 2rem;
+}
+
+.eeno-card-text {
+  font-size: 1.25rem;
+  font-weight: 700;
+  font-family: 'Fredoka', sans-serif;
+}
+
+/* View 3: Colors Grid */
+.eeno-grid-colors {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.25rem;
+  width: 100%;
+}
+
+.eeno-color-card {
+  min-height: 80px;
+  border: 3px solid var(--fg);
+  border-radius: var(--radius);
+  color: #fff;
+  box-shadow: 0 var(--shadow-depth) 0px var(--fg);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  gap: 0.35rem;
+  transition: transform 0.08s ease, box-shadow 0.08s ease;
+}
+
+.eeno-color-card:active {
+  transform: translateY(3px);
+  box-shadow: 0 2px 0px var(--fg);
+}
+
+.eeno-color-card.card-red {
+  background-color: #E74C3C;
+}
+
+.eeno-color-card.card-blue {
+  background-color: #3498DB;
+}
+
+.eeno-color-card.card-yellow {
+  background-color: #F39C12;
+}
+
+.eeno-color-card.card-green {
+  background-color: #27AE60;
+}
+
+/* View 4: Numbers Grid */
+.eeno-grid-numbers {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0.75rem;
+  width: 100%;
+}
+
+@media (max-width: 500px) {
+  .eeno-grid-numbers {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.eeno-number-btn {
+  min-height: 64px;
+  min-width: 48px;
+  border: 3px solid var(--fg);
+  border-radius: var(--radius-sm);
+  background-color: #fff;
+  color: var(--fg);
+  box-shadow: 0 var(--shadow-depth) 0px var(--fg);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem;
+  gap: 0.2rem;
+  transition: transform 0.08s ease, box-shadow 0.08s ease;
+}
+
+.eeno-number-btn:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0px var(--fg);
+}
+
+.eeno-num-digit {
+  font-size: 1.5rem;
+  font-weight: 700;
+  font-family: 'Fredoka', sans-serif;
+  color: var(--primary);
+}
+
+.eeno-num-word {
+  font-size: 0.85rem;
+  font-weight: 600;
+  font-family: 'Fredoka', sans-serif;
+  color: var(--fg);
 }
 
 /* ---- Animations ---- */

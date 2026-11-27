@@ -51,6 +51,8 @@ export class AnimalChoirGame implements Game {
   public isPlaying: boolean = true;
   private currentStep: number = 0;
   private stepTimer: number = 0;
+  private activeTouches: Map<number, string> = new Map();
+  private isMouseDown: boolean = false;
 
   // Controls UI bounds
   private topControlsHeight = 65;
@@ -71,7 +73,14 @@ export class AnimalChoirGame implements Game {
     this.initGrid();
 
     canvas.addEventListener('mousedown', this.handleMouseDown);
+    canvas.addEventListener('mousemove', this.handleMouseMove);
+    canvas.addEventListener('mouseup', this.handleMouseUp);
+    canvas.addEventListener('mouseleave', this.handleMouseUp);
+
     canvas.addEventListener('touchstart', this.handleTouchStart, { passive: false });
+    canvas.addEventListener('touchmove', this.handleTouchMove, { passive: false });
+    canvas.addEventListener('touchend', this.handleTouchEnd);
+    canvas.addEventListener('touchcancel', this.handleTouchEnd);
   }
 
   private initGrid(): void {
@@ -102,8 +111,20 @@ export class AnimalChoirGame implements Game {
 
   private handleMouseDown = (e: MouseEvent) => {
     if (this.paused) return;
+    this.isMouseDown = true;
     const pos = this.getCanvasPos(e.clientX, e.clientY);
-    this.handleInteraction(pos.x, pos.y);
+    this.handleInteraction(pos.x, pos.y, -1, true);
+  };
+
+  private handleMouseMove = (e: MouseEvent) => {
+    if (this.paused || !this.isMouseDown) return;
+    const pos = this.getCanvasPos(e.clientX, e.clientY);
+    this.handleInteraction(pos.x, pos.y, -1, false);
+  };
+
+  private handleMouseUp = () => {
+    this.isMouseDown = false;
+    this.activeTouches.delete(-1);
   };
 
   private handleTouchStart = (e: TouchEvent) => {
@@ -111,16 +132,32 @@ export class AnimalChoirGame implements Game {
     e.preventDefault();
     Array.from(e.changedTouches).forEach(touch => {
       const pos = this.getCanvasPos(touch.clientX, touch.clientY);
-      this.handleInteraction(pos.x, pos.y);
+      this.handleInteraction(pos.x, pos.y, touch.identifier, true);
     });
   };
 
-  private handleInteraction(x: number, y: number): void {
+  private handleTouchMove = (e: TouchEvent) => {
+    if (this.paused) return;
+    e.preventDefault();
+    Array.from(e.changedTouches).forEach(touch => {
+      const pos = this.getCanvasPos(touch.clientX, touch.clientY);
+      this.handleInteraction(pos.x, pos.y, touch.identifier, false);
+    });
+  };
+
+  private handleTouchEnd = (e: TouchEvent) => {
+    Array.from(e.changedTouches).forEach(touch => {
+      this.activeTouches.delete(touch.identifier);
+    });
+  };
+
+  private handleInteraction(x: number, y: number, touchId: number = -1, isTap: boolean = false): void {
     if (!this.canvas) return;
     const w = this.canvas.width;
 
-    // Check Top Controls (Play/Pause, BPM buttons)
+    // Check Top Controls (Play/Pause, BPM buttons) - only on initial tap
     if (y <= this.topControlsHeight) {
+      if (!isTap) return;
       // Play/Pause button
       const playBtnW = 90;
       if (x >= 15 && x <= 15 + playBtnW) {
@@ -164,10 +201,13 @@ export class AnimalChoirGame implements Game {
       const r = Math.floor((y - gridY) / cellH);
 
       if (c >= 0 && c < this.cols && r >= 0 && r < this.rows) {
-        const node = this.grid[r][c];
-        node.active = !node.active;
-
-        this.triggerNodeSing(node);
+        const cellKey = `${r},${c}`;
+        if (this.activeTouches.get(touchId) !== cellKey) {
+          this.activeTouches.set(touchId, cellKey);
+          const node = this.grid[r][c];
+          node.active = !node.active;
+          this.triggerNodeSing(node);
+        }
       }
     }
   }
@@ -211,7 +251,8 @@ export class AnimalChoirGame implements Game {
 
     // Sequencer Playhead step advancement
     if (this.isPlaying) {
-      const stepIntervalMs = (60 / this.bpm) * 1000 * 0.5; // Eighth note / 16th resolution step
+      const safeBpm = Number.isFinite(this.bpm) && this.bpm > 0 ? this.bpm : 120;
+      const stepIntervalMs = (60 / safeBpm) * 1000 * 0.5; // Eighth note / 16th resolution step
       this.stepTimer += dt;
 
       if (this.stepTimer >= stepIntervalMs) {
@@ -405,11 +446,26 @@ export class AnimalChoirGame implements Game {
     this.paused = false;
   }
 
+  public resize(_width: number, _height: number): void {
+    // Canvas dimensions are updated on resize
+  }
+
   destroy(): void {
     if (this.canvas) {
       this.canvas.removeEventListener('mousedown', this.handleMouseDown);
+      this.canvas.removeEventListener('mousemove', this.handleMouseMove);
+      this.canvas.removeEventListener('mouseup', this.handleMouseUp);
+      this.canvas.removeEventListener('mouseleave', this.handleMouseUp);
+
       this.canvas.removeEventListener('touchstart', this.handleTouchStart);
+      this.canvas.removeEventListener('touchmove', this.handleTouchMove);
+      this.canvas.removeEventListener('touchend', this.handleTouchEnd);
+      this.canvas.removeEventListener('touchcancel', this.handleTouchEnd);
     }
+    this.activeTouches.clear();
     this.grid = [];
+    this.canvas = null;
+    this.ctx = null;
   }
 }
+

@@ -12,6 +12,9 @@ dist
 dist-ssr
 dev-dist
 *.local
+.env
+.env.*
+!.env.example
 
 # Editor directories and files
 .vscode/*
@@ -26,3 +29,4 @@ dev-dist
 
 # Vite PWA dev server artifacts
 dev-dist/
+.wrangler/

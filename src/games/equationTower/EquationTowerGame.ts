@@ -1,6 +1,7 @@
 import type { Game } from '../../core/Game';
 import { AudioController } from '../../core/AudioController';
 import { HapticController } from '../../core/HapticController';
+import { CelebrationOverlay } from '../../ui/CelebrationOverlay';
 import { Engine, World, Bodies, Body, Vector, Events } from 'matter-js';
 
 export interface TowerBlock {
@@ -85,9 +86,11 @@ export class EquationTowerGame implements Game {
     canvas.addEventListener('mousedown', this.handleMouseDown);
     canvas.addEventListener('mousemove', this.handleMouseMove);
     canvas.addEventListener('mouseup', this.handleMouseUp);
+    canvas.addEventListener('mouseleave', this.handleMouseUp);
     canvas.addEventListener('touchstart', this.handleTouchStart, { passive: false });
     canvas.addEventListener('touchmove', this.handleTouchMove, { passive: false });
     canvas.addEventListener('touchend', this.handleTouchEnd, { passive: false });
+    canvas.addEventListener('touchcancel', this.handleTouchEnd, { passive: false });
   }
 
   private setupEnvironment() {
@@ -218,6 +221,13 @@ export class EquationTowerGame implements Game {
     
     if (this.canvas) {
       this.createConfetti(this.canvas.width / 2, this.canvas.height / 3, 70);
+      CelebrationOverlay.getInstance().celebrate({
+        x: this.canvas.width / 2,
+        y: this.canvas.height / 3,
+        type: 'confetti',
+        count: 60,
+        message: 'Target sum reached! Equation solved!'
+      });
     }
   }
 
@@ -565,14 +575,22 @@ export class EquationTowerGame implements Game {
     this.paused = false;
   }
 
+  public resize(width: number, height: number): void {
+    if (!this.canvas || !this.world || !this.platformBody || !this.groundBody) return;
+    Body.setPosition(this.groundBody, { x: width / 2, y: height - 20 });
+    Body.setPosition(this.platformBody, { x: width / 2, y: height - 120 });
+  }
+
   destroy(): void {
     if (this.canvas) {
       this.canvas.removeEventListener('mousedown', this.handleMouseDown);
       this.canvas.removeEventListener('mousemove', this.handleMouseMove);
       this.canvas.removeEventListener('mouseup', this.handleMouseUp);
+      this.canvas.removeEventListener('mouseleave', this.handleMouseUp);
       this.canvas.removeEventListener('touchstart', this.handleTouchStart);
       this.canvas.removeEventListener('touchmove', this.handleTouchMove);
       this.canvas.removeEventListener('touchend', this.handleTouchEnd);
+      this.canvas.removeEventListener('touchcancel', this.handleTouchEnd);
     }
     if (this.engine) {
       Events.off(this.engine, 'collisionStart');
@@ -584,5 +602,9 @@ export class EquationTowerGame implements Game {
     this.world = null;
     this.blocks = [];
     this.particles = [];
+    this.draggingBlock = null;
+    this.canvas = null;
+    this.ctx = null;
   }
 }
+

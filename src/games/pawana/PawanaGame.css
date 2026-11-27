@@ -10,10 +10,10 @@
 
 .pawana-overlay-container {
   position: absolute;
-  top: 60px;
+  top: var(--header-height, 64px);
   left: 0;
   width: 100%;
-  height: calc(100% - 60px);
+  height: calc(100% - var(--header-height, 64px));
   pointer-events: none;
   display: flex;
   flex-direction: column;

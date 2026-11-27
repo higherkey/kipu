@@ -24,6 +24,11 @@ import { SoundWaveStudioGame } from '../games/busyBoard/SoundWaveStudioGame';
 import { TypographyBoardGame } from '../games/busyBoard/TypographyBoardGame';
 import { KineticSandboxGame } from '../games/busyBoard/KineticSandboxGame';
 import { PawanaGame } from '../games/pawana/PawanaGame';
+import { CameraGame } from '../games/camera/CameraGame';
+import { FortressMathGame } from '../games/fortressMath/FortressMathGame';
+import { CatQuartersGame } from '../games/catQuarters/CatQuartersGame';
+
+import { ToneGardenGame, PatternLoomGame, TrackSketcherGame } from '../games/musicExperiments/MusicExperiments';
 
 export interface GameRegistration {
   id: string;
@@ -264,6 +269,36 @@ export class GameRegistry {
         constructorRef: KhipuSynthGame
       },
       {
+        id: 'toneGarden',
+        name: 'Tone Garden',
+        subtitle: 'Tap-to-Play Sound Grid',
+        portal: 'workshop',
+        icon: 'music',
+        category: 'sensory',
+        desc: 'Tap colorful blooms to explore four different sound shapes.',
+        constructorRef: ToneGardenGame
+      },
+      {
+        id: 'patternLoom',
+        name: 'Pattern Loom',
+        subtitle: 'Looping Step Experiment',
+        portal: 'lab',
+        icon: 'music',
+        category: 'brain',
+        desc: 'Switch steps on and listen as a two-lane loop takes shape.',
+        constructorRef: PatternLoomGame
+      },
+      {
+        id: 'trackSketcher',
+        name: 'Track Sketcher',
+        subtitle: 'Local Timeline Experiment',
+        portal: 'lab',
+        icon: 'sliders',
+        category: 'brain',
+        desc: 'Tap notes onto a timeline and return to your locally saved sketch.',
+        constructorRef: TrackSketcherGame
+      },
+      {
         id: 'soundWaveStudio',
         name: 'Sound & Wave Studio',
         subtitle: 'Acoustic Mechanics',
@@ -302,6 +337,36 @@ export class GameRegistry {
         category: 'brain',
         desc: 'Navigate aerial logic gates and sequence pathways in this educational flight challenge!',
         constructorRef: PawanaGame
+      },
+      {
+        id: 'fortressMath',
+        name: 'Fortress Math',
+        subtitle: 'Count, Plan & Capture',
+        portal: 'lab',
+        icon: 'layers',
+        category: 'brain',
+        desc: 'Add up defenses, send explorers, and grow your kingdom against two friendly bots.',
+        constructorRef: FortressMathGame
+      },
+      {
+        id: 'catQuarters',
+        name: 'Cat Quarters',
+        subtitle: 'Cat Placement Puzzle',
+        portal: 'lab',
+        icon: 'cat',
+        category: 'brain',
+        desc: 'Find a spot for each cat without letting any two cats touch.',
+        constructorRef: CatQuartersGame
+      },
+      {
+        id: 'camera',
+        name: 'Cam',
+        subtitle: 'Fun Photo Studio',
+        portal: 'workshop',
+        icon: 'camera',
+        category: 'sensory',
+        desc: 'Take silly photos with fun filters, add cute stickers, and doodle with colorful crayons!',
+        constructorRef: CameraGame
       }
     ];
 

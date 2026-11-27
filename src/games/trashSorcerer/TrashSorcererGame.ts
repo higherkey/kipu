@@ -1,6 +1,7 @@
 import type { Game } from '../../core/Game';
 import { AudioController } from '../../core/AudioController';
 import { HapticController } from '../../core/HapticController';
+import { CelebrationOverlay } from '../../ui/CelebrationOverlay';
 import { Engine, World, Bodies, Body, Vector, Events } from 'matter-js';
 
 export type TrashCategory = 'RECYCLING' | 'COMPOST' | 'TRASH';
@@ -97,9 +98,11 @@ export class TrashSorcererGame implements Game {
     canvas.addEventListener('mousedown', this.handleMouseDown);
     canvas.addEventListener('mousemove', this.handleMouseMove);
     canvas.addEventListener('mouseup', this.handleMouseUp);
+    canvas.addEventListener('mouseleave', this.handleMouseUp);
     canvas.addEventListener('touchstart', this.handleTouchStart, { passive: false });
     canvas.addEventListener('touchmove', this.handleTouchMove, { passive: false });
     canvas.addEventListener('touchend', this.handleTouchEnd, { passive: false });
+    canvas.addEventListener('touchcancel', this.handleTouchEnd, { passive: false });
   }
 
   private setupPortals() {
@@ -163,6 +166,15 @@ export class TrashSorcererGame implements Game {
       this.audio.play('star');
       this.haptics.lightTap();
       this.createBurst(portal.x, portal.y, portal.color, 35);
+      if (this.score > 0 && this.score % 50 === 0) {
+        CelebrationOverlay.getInstance().celebrate({
+          x: portal.x,
+          y: portal.y,
+          type: 'fireworks',
+          count: 50,
+          message: `Great sorting! Score: ${this.score}`,
+        });
+      }
     } else {
       this.score = Math.max(0, this.score - 5);
       this.audio.play('pop');
@@ -424,14 +436,28 @@ export class TrashSorcererGame implements Game {
     this.paused = false;
   }
 
+  public resize(width: number, _height: number): void {
+    if (!this.canvas || this.portals.length === 0) return;
+    const spacing = width / 4;
+    this.portals.forEach((p, idx) => {
+      const x = spacing * (idx + 1);
+      p.x = x;
+      if (p.sensorBody) {
+        Body.setPosition(p.sensorBody, { x, y: p.y });
+      }
+    });
+  }
+
   destroy(): void {
     if (this.canvas) {
       this.canvas.removeEventListener('mousedown', this.handleMouseDown);
       this.canvas.removeEventListener('mousemove', this.handleMouseMove);
       this.canvas.removeEventListener('mouseup', this.handleMouseUp);
+      this.canvas.removeEventListener('mouseleave', this.handleMouseUp);
       this.canvas.removeEventListener('touchstart', this.handleTouchStart);
       this.canvas.removeEventListener('touchmove', this.handleTouchMove);
       this.canvas.removeEventListener('touchend', this.handleTouchEnd);
+      this.canvas.removeEventListener('touchcancel', this.handleTouchEnd);
     }
     if (this.engine) {
       Events.off(this.engine, 'collisionStart');
@@ -444,5 +470,9 @@ export class TrashSorcererGame implements Game {
     this.trashItems = [];
     this.portals = [];
     this.particles = [];
+    this.draggingItem = null;
+    this.canvas = null;
+    this.ctx = null;
   }
 }
+

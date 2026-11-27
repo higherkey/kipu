@@ -1,12 +1,22 @@
 /* ========================================
    Game Header Component (HUD)
    ======================================== */
+:root {
+  --header-height: 64px;
+}
+
+@media (max-width: 440px) {
+  :root {
+    --header-height: 56px;
+  }
+}
+
 #game-header {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
-  height: 64px;
+  height: var(--header-height);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -25,11 +35,19 @@
 }
 
 /* Left Navigation Container */
-.header-nav-left {
+.header-nav-left,
+.header-nav-right {
   display: flex;
   align-items: center;
   gap: 8px;
   flex-shrink: 0;
+}
+
+.header-btn.feedback-btn {
+  min-inline-size: 48px;
+  min-block-size: 48px;
+  background-color: var(--bg);
+  padding-inline: 8px;
 }
 
 /* HUD buttons */
@@ -129,16 +147,17 @@
 
 @media (max-width: 440px) {
   #game-header {
-    height: 56px;
     padding: 0 8px;
     gap: 6px;
   }
-  .header-nav-left {
+  .header-nav-left,
+  .header-nav-right {
     gap: 6px;
   }
   .header-btn {
-    height: 40px;
-    min-height: 40px;
+    height: 44px;
+    min-height: 44px;
+    min-width: 44px;
   }
   .header-btn.portal-back-btn {
     max-width: 120px;
@@ -148,12 +167,20 @@
   }
   .header-btn.home-btn,
   .header-btn.menu-btn {
-    width: 40px;
-    height: 40px;
-    min-width: 40px;
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
   }
   .header-icon svg {
     width: 18px;
     height: 18px;
   }
+}
+
+@media (max-width: 600px) {
+  .feedback-btn .header-label { display: none; }
+}
+
+@media (max-width: 380px) {
+  .portal-back-btn .header-label { display: none; }
 }

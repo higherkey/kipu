@@ -58,7 +58,8 @@ export class LiteBriteGame implements Game {
   private gridArea = { x: 0, y: 50, width: 800, height: 500 };
   private cellRadius = 12;
 
-  private isDragging: boolean = false;
+  private isMouseDragging: boolean = false;
+  private activeTouches: Map<number, { x: number; y: number }> = new Map();
   private particles: ParticleSweep[] = [];
   private sweepAnimationProgress: number = -1; // -1 if not sweeping, 0 to 1 if active
 
@@ -89,6 +90,14 @@ export class LiteBriteGame implements Game {
     canvas.addEventListener('touchcancel', this.handleTouchEnd);
   }
 
+  public resize(width?: number, height?: number): void {
+    if (!this.canvas) return;
+    if (width !== undefined && height !== undefined) {
+      this.canvas.width = width;
+      this.canvas.height = height;
+    }
+  }
+
   private initGrid(): void {
     this.grid = [];
     for (let r = 0; r < this.rows; r++) {
@@ -109,41 +118,44 @@ export class LiteBriteGame implements Game {
   private handleMouseDown = (e: MouseEvent) => {
     if (this.paused) return;
     const pos = this.getCanvasPos(e.clientX, e.clientY);
-    this.isDragging = true;
+    this.isMouseDragging = true;
     this.handleInteraction(pos.x, pos.y);
   };
 
   private handleMouseMove = (e: MouseEvent) => {
-    if (this.paused || !this.isDragging) return;
+    if (this.paused || !this.isMouseDragging) return;
     const pos = this.getCanvasPos(e.clientX, e.clientY);
     this.handleInteraction(pos.x, pos.y);
   };
 
   private handleMouseUp = () => {
-    this.isDragging = false;
+    this.isMouseDragging = false;
   };
 
   private handleTouchStart = (e: TouchEvent) => {
     if (this.paused) return;
     e.preventDefault();
-    this.isDragging = true;
     Array.from(e.changedTouches).forEach(touch => {
       const pos = this.getCanvasPos(touch.clientX, touch.clientY);
+      this.activeTouches.set(touch.identifier, pos);
       this.handleInteraction(pos.x, pos.y);
     });
   };
 
   private handleTouchMove = (e: TouchEvent) => {
-    if (this.paused || !this.isDragging) return;
+    if (this.paused || this.activeTouches.size === 0) return;
     e.preventDefault();
     Array.from(e.changedTouches).forEach(touch => {
       const pos = this.getCanvasPos(touch.clientX, touch.clientY);
+      this.activeTouches.set(touch.identifier, pos);
       this.handleInteraction(pos.x, pos.y);
     });
   };
 
-  private handleTouchEnd = () => {
-    this.isDragging = false;
+  private handleTouchEnd = (e: TouchEvent) => {
+    Array.from(e.changedTouches).forEach(touch => {
+      this.activeTouches.delete(touch.identifier);
+    });
   };
 
   private handleInteraction(x: number, y: number): void {

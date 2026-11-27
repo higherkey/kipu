@@ -46,10 +46,19 @@ export class ParticlePhysicsGame extends BaseGame {
     this.canvas?.addEventListener('mousedown', this.onMouseDown);
     this.canvas?.addEventListener('mousemove', this.onMouseMove);
     this.canvas?.addEventListener('mouseup', this.onMouseUp);
+    window.addEventListener('mouseup', this.onMouseUp);
     this.canvas?.addEventListener('touchstart', this.onTouchStart);
     this.canvas?.addEventListener('touchmove', this.onTouchMove);
     this.canvas?.addEventListener('touchend', this.onTouchEnd);
     this.canvas?.addEventListener('touchcancel', this.onTouchEnd);
+  }
+
+  public resize(width?: number, height?: number): void {
+    if (!this.canvas) return;
+    if (width !== undefined && height !== undefined) {
+      this.canvas.width = width;
+      this.canvas.height = height;
+    }
   }
 
   private getCanvasPos(clientX: number, clientY: number): { x: number; y: number } {
@@ -252,6 +261,7 @@ export class ParticlePhysicsGame extends BaseGame {
       this.canvas.removeEventListener('touchend', this.onTouchEnd);
       this.canvas.removeEventListener('touchcancel', this.onTouchEnd);
     }
+    window.removeEventListener('mouseup', this.onMouseUp);
     this.particles = [];
     this.pointers.clear();
   }

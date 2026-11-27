@@ -125,6 +125,14 @@ describe('SoundWaveStudioGame (Board 4)', () => {
     }).not.toThrow();
   });
 
+  it('should render automatically on update without requiring manual render() call', () => {
+    const ctx = canvas.getContext('2d');
+    expect(ctx?.clearRect).not.toHaveBeenCalled();
+
+    game.update(16);
+    expect(ctx?.clearRect).toHaveBeenCalled();
+  });
+
   it('should trigger screen shake cleanly', () => {
     expect(() => {
       game.triggerShake(300, 15);

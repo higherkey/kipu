@@ -4,8 +4,6 @@
    cochineal red, deep indigo, fibrous string motifs.
    ======================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600&display=swap');
-
 /* ========================================
    Kipu Design System — Tier 1 Global Shell
    Inspired by the Andean khipu: warm parchment,
@@ -62,6 +60,9 @@
 
   /* String border — the signature Tier 1 decorative element */
   --string-border:    3px solid var(--cord);
+
+  /* Header / HUD dimensions */
+  --header-height:    64px;
 }
 
 /* ----------------------------------------
@@ -218,6 +219,38 @@ canvas.hidden,
   display: flex;
   justify-content: flex-end;
   align-items: center;
+}
+
+.nav-settings-btn {
+  min-inline-size: 44px;
+  min-block-size: 44px;
+  inline-size: 44px;
+  block-size: 44px;
+  border-radius: var(--radius-sm);
+  background-color: var(--color-parchment);
+  color: var(--fg);
+  border: 2px solid var(--cord);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 var(--shadow-depth) 0 var(--cord);
+  cursor: pointer;
+  transition: transform 0.1s ease, box-shadow 0.1s ease, background-color 0.15s ease;
+  text-decoration: none;
+}
+
+.nav-settings-btn:hover {
+  background-color: var(--bg-warm);
+}
+
+.nav-settings-btn:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 var(--cord);
+}
+
+.nav-settings-btn svg {
+  inline-size: 24px;
+  block-size: 24px;
 }
 
 .nav-bar .back-btn {
@@ -946,6 +979,66 @@ canvas.hidden,
   background-color: var(--color-cord); /* Andean tactile stone/natural cord */
 }
 
+/* Cloud Shape Finder */
+.cards-grid a[data-game="cloudShape"] {
+  background-color: #DFF2FB;
+}
+
+/* Digital Lite Brite */
+.cards-grid a[data-game="liteBrite"] {
+  background-color: #EDE7F6;
+}
+
+/* Animal Choir */
+.cards-grid a[data-game="animalChoir"] {
+  background-color: #E8F8F5;
+}
+
+/* Pawana */
+.cards-grid a[data-game="pawana"] {
+  background-color: #D4EFDF;
+}
+
+/* Equation Tower */
+.cards-grid a[data-game="equationTower"] {
+  background-color: #D5D9EF;
+}
+
+/* Vibe Coder */
+.cards-grid a[data-game="vibeCoder"] {
+  background-color: #D1F2EB;
+}
+
+/* Trash Sorcerer */
+.cards-grid a[data-game="trashSorcerer"] {
+  background-color: #D9EDDF;
+}
+
+/* Khipu Synth */
+.cards-grid a[data-game="khipuSynth"] {
+  background-color: #E8DAEF;
+}
+
+/* Sound & Wave Studio */
+.cards-grid a[data-game="soundWaveStudio"] {
+  background-color: #E0F2F1;
+}
+
+/* Typography & Interface */
+.cards-grid a[data-game="typographyBoard"] {
+  background-color: #F5EEF8;
+}
+
+/* Luminary Board Tone */
+.cards-grid a[data-game="luminaryBoardTone"] {
+  background-color: #FFF9C4;
+}
+
+/* Camera Game (M4 Feature 13) */
+.cards-grid a[data-game="camera"] {
+  background-color: #FFE0B2;
+}
+
 /* Game name label */
 .cards-grid a .game-label {
   display: flex;
@@ -994,9 +1087,10 @@ canvas.hidden,
 }
 
 /* Adjust game canvas to account for HUD */
+#app #game-canvas.with-hud,
 #game-canvas.with-hud {
-  margin-top: 60px;
-  height: calc(100% - 60px);
+  margin-top: var(--header-height);
+  height: calc(100% - var(--header-height));
 }
 
 /* ========================================
@@ -1306,7 +1400,7 @@ canvas.hidden,
   top: 0;
   left: 0;
   right: 0;
-  height: 60px;
+  height: var(--header-height);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -1403,7 +1497,7 @@ canvas.hidden,
   top: 0;
   left: 0;
   right: 0;
-  height: 60px;
+  height: var(--header-height);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -1485,11 +1579,11 @@ canvas.hidden,
 
 .slide-menu-panel {
   position: absolute;
-  top: 60px;
+  top: var(--header-height);
   right: 0;
   width: 100%;
   max-width: 320px;
-  max-height: calc(100vh - 60px - 20px);
+  max-height: calc(100vh - var(--header-height) - 20px);
   background-color: var(--bg-color);
   border-left: 3px solid var(--text-color);
   border-bottom: 3px solid var(--text-color);
@@ -1522,8 +1616,10 @@ canvas.hidden,
 }
 
 .slide-menu-close-btn {
-  width: 36px;
-  height: 36px;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
   border-radius: 10px;
   border: 2px solid var(--text-color);
   background-color: var(--bg-warm);
@@ -1702,6 +1798,19 @@ canvas.hidden,
 body.menu-open #game-canvas {
   filter: brightness(0.7);
   transition: filter 0.3s ease;
+}
+
+body.parental-gate-open #game-canvas,
+#game-canvas.interaction-locked {
+  pointer-events: none;
+  user-select: none;
+  touch-action: none;
+}
+
+@media (max-width: 440px) {
+  :root {
+    --header-height: 56px;
+  }
 }
 
 @media (max-width: 600px) {
@@ -1971,3 +2080,34 @@ body.menu-open #game-canvas {
     gap: 12px;
   }
 }
+
+/* ========================================
+   Accessibility & Hidden Hardware Helpers
+   ======================================== */
+.haptic-switch-fallback,
+.haptic-label-fallback {
+  position: fixed;
+  top: -9999px;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+  clip-path: inset(50%);
+}
+
+/* ========================================
+   Accessibility: Reduced Motion Preference
+   ======================================== */
+@media (prefers-reduced-motion: reduce) {
+  .hero-card,
+  .bouncing-arrow,
+  .workshop-icon-bounce,
+  .shake,
+  .squash-stretch,
+  .bounce {
+    animation: none;
+    transition: none;
+  }
+}
+

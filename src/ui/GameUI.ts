@@ -1,8 +1,10 @@
 import { Icons } from './Icons';
 import { GameHeader } from './GameHeader';
+import { GameFeedbackDialog } from './GameFeedbackDialog';
 import './GameUI.css';
 
 export interface GameUIConfig {
+  gameId?: string;
   gameName: string;
   portalId?: string;
   portalName?: string;
@@ -15,6 +17,8 @@ export interface GameUIConfig {
   vibrationEnabled: boolean;
   onSoundToggle: (enabled: boolean) => void;
   onVibrationToggle: (enabled: boolean) => void;
+  onMenuToggle?: () => void;
+  onSettingsNav?: () => void;
 }
 
 /**
@@ -27,6 +31,7 @@ export class GameUI {
   private readonly element: HTMLElement;
   private isOpen = false;
   private isPaused = false;
+  private feedback: GameFeedbackDialog | null = null;
 
   constructor(config: GameUIConfig) {
     this.config = config;
@@ -36,7 +41,14 @@ export class GameUI {
       portalName: config.portalName,
       onPortalBack: config.onPortalBack,
       onHome: config.onHome,
-      onMenuToggle: () => this.toggleMenu(),
+      onFeedback: config.gameId ? () => this.openFeedback() : undefined,
+      onMenuToggle: () => {
+        if (this.config.onMenuToggle) {
+          this.config.onMenuToggle();
+        } else {
+          this.toggleMenu();
+        }
+      },
     });
     this.element = this.createElement();
   }
@@ -68,6 +80,14 @@ export class GameUI {
             <button class="slide-menu-action-btn restart-btn" title="Restart Game" aria-label="Restart Game">
               <span class="action-icon">${Icons.refresh}</span>
               <span class="action-label">Restart</span>
+            </button>
+            <button class="slide-menu-action-btn exit-hub-btn" title="Exit to Hub" aria-label="Exit to Hub">
+              <span class="action-icon">${Icons.home}</span>
+              <span class="action-label">Exit to Hub</span>
+            </button>
+            <button class="slide-menu-action-btn parent-settings-btn" title="Parent Settings & Support" aria-label="Parent Settings & Support">
+              <span class="action-icon">${Icons.settings}</span>
+              <span class="action-label">Parent Settings</span>
             </button>
           </div>
 
@@ -115,6 +135,20 @@ export class GameUI {
       this.config.onRestart();
     });
 
+    menuEl.querySelector('.exit-hub-btn')?.addEventListener('click', () => {
+      this.closeMenu();
+      this.config.onHome();
+    });
+
+    menuEl.querySelector('.parent-settings-btn')?.addEventListener('click', () => {
+      this.closeMenu();
+      if (this.config.onSettingsNav) {
+        this.config.onSettingsNav();
+      } else {
+        this.config.onHome();
+      }
+    });
+
     // Sound toggle
     const soundToggle = menuEl.querySelector('.settings-grid .settings-item:nth-child(1) .settings-toggle');
     soundToggle?.addEventListener('click', () => {
@@ -147,11 +181,47 @@ export class GameUI {
   }
 
   public unmount(): void {
+    this.closeFeedback();
     if (this.isOpen) {
       this.closeMenu();
     }
     this.element.remove();
     this.gameHeader.unmount();
+  }
+
+  public isMenuOpen(): boolean {
+    return this.isOpen;
+  }
+
+  public isFeedbackOpen(): boolean {
+    return this.feedback !== null;
+  }
+
+  private openFeedback(): void {
+    if (!this.config.gameId || this.feedback) return;
+    this.closeMenu();
+    this.feedback = new GameFeedbackDialog({
+      gameId: this.config.gameId,
+      gameName: this.config.gameName,
+      onClose: () => this.closeFeedback(true),
+    });
+    try {
+      this.feedback.open();
+    } catch {
+      this.closeFeedback();
+      window.alert('This browser could not open the feedback form.');
+      return;
+    }
+    if (!this.isPaused) this.config.onPause();
+  }
+
+  public closeFeedback(resume = false): boolean {
+    const feedback = this.feedback;
+    if (!feedback) return false;
+    this.feedback = null;
+    feedback.destroy();
+    if (resume && !this.isPaused) this.config.onResume();
+    return true;
   }
 
   public toggleMenu(): void {
@@ -212,11 +282,11 @@ export class GameUI {
 
   public show(): void {
     this.gameHeader.show();
-    this.element.style.visibility = 'visible';
+    this.element.classList.remove('hidden');
   }
 
   public hide(): void {
     this.gameHeader.hide();
-    this.element.style.visibility = 'hidden';
+    this.element.classList.add('hidden');
   }
 }
