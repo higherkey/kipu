@@ -316,7 +316,7 @@
   margin: 0;
   padding: 0;
   gap: 0;
-  color: var(--cuff-thread);
+  color: oklch(96% 0.025 85);
   background: transparent;
   border: none;
   border-radius: 0;
@@ -338,7 +338,7 @@
 #navigation-shell .nav-settings-btn svg {
   inline-size: 22px;
   block-size: 22px;
-  color: var(--cuff-thread);
+  color: oklch(96% 0.025 85);
   filter: drop-shadow(0 1px 0 oklch(0% 0 0 / 0.35));
 }
 
