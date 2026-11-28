@@ -463,6 +463,7 @@ export class EquationTowerGame implements Game {
     ctx.clearRect(0, 0, w, h);
     ctx.fillStyle = SAND;
     ctx.fillRect(0, 0, w, h);
+    if (w < 120 || h < 120) return;
     ctx.fillStyle = SAND_LINE;
     for (let y = 7; y < h; y += 9) ctx.fillRect(0, y, w, y % 27 === 7 ? 2 : 1);
 
@@ -928,7 +929,7 @@ export class EquationTowerGame implements Game {
     this.paused = false;
   }
 
-  resize(): void {
+  resize(_width?: number, _height?: number): void {
     this.relayout();
   }
 
