@@ -93,7 +93,7 @@ Kipu uses a three-tier design framework:
 
 | ID | Name | Description |
 |----|------|-------------|
-| `equationTower` | Equation Tower | Stack numbered blocks to match a target equation sum. Matter.js physics. |
+| `equationTower` | Equation Tower | Blocks are as tall as their number; stack them to reach the target line, and the tower spells out the sum. |
 | `marblePipeRun` | Marble Pipe Run | Connect pipe pieces on a grid so a marble can travel from start to finish. |
 | `soundMemory` | Sound Memory | Simon-style auditory pattern recognition. Animal icons pulse when they make their sound. |
 | `cloudShapeFinder` | Cloud Shape Finder | Find procedurally generated shapes hidden in clouds. Low-stress discovery mechanics. |

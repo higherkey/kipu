@@ -251,11 +251,11 @@ export class GameRegistry {
         id: 'equationTower',
         name: 'Equation Tower',
         subtitle: 'Physics Math Balance',
-        tagline: 'Stack blocks to make the sum',
+        tagline: 'Stack blocks to reach the line',
         portal: 'lab',
         icon: 'layers',
         category: 'brain',
-        desc: 'Stack physics blocks on a balance scale to hit target sum goals without tumbling!',
+        desc: 'Each block is as tall as its number. Stack them to reach the line!',
         constructorRef: EquationTowerGame
       },
       {

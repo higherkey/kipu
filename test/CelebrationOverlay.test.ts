@@ -97,7 +97,7 @@ describe('Global Visual Micro-Reward Particle Overlays (Issue #32)', () => {
       expect(celebrateSpy).toHaveBeenCalledWith(
         expect.objectContaining({
           type: 'confetti',
-          message: expect.stringContaining('Equation solved!'),
+          message: expect.stringContaining('You made'),
         })
       );
 

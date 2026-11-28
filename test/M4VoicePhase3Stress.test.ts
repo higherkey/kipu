@@ -473,45 +473,28 @@ describe('M4 Adversarial Stress: Eeno Voice Board & Phase 3 Games Hardening', ()
 
   describe('3. Phase 3 Boundary Release & Resize Torture (Feature 15 / Issue #15)', () => {
     describe('Pointer Boundary Releases (mouseleave & touchcancel)', () => {
-      it('EquationTowerGame immediately releases dragging block on mouseleave and touchcancel', () => {
+      it('EquationTowerGame drops a block on a tray tap and takes it off on a tower tap', () => {
         const { canvas } = createMockCanvas(800, 600);
         const game = new EquationTowerGame();
         game.init(canvas);
 
-        // Spawn a block via palette click
-        const paletteY = (EquationTowerGame as any).PALETTE_Y;
-        const btnX = (game as any).getPaletteSlots(800)[0]; // First button center
-
-        canvas.dispatchEvent(new MouseEvent('mousedown', { clientX: btnX, clientY: paletteY }));
-        canvas.dispatchEvent(new MouseEvent('mouseup'));
-
+        const tile = (game as any).layout.tiles[0];
+        canvas.dispatchEvent(new MouseEvent('pointerdown', {
+          clientX: tile.x + tile.w / 2,
+          clientY: tile.y + tile.h / 2,
+          cancelable: true,
+        }));
         const blocks = (game as any).blocks;
-        expect(blocks.length).toBeGreaterThan(0);
-        const spawned = blocks[0];
+        expect(blocks.length).toBe(1);
 
-        // Start dragging the spawned block
-        canvas.dispatchEvent(new MouseEvent('mousedown', {
-          clientX: spawned.body.position.x,
-          clientY: spawned.body.position.y,
+        for (let f = 0; f < 120; f++) game.update(16.6);
+        const L = (game as any).layout;
+        canvas.dispatchEvent(new MouseEvent('pointerdown', {
+          clientX: L.cx,
+          clientY: L.baseY - L.unit / 2,
+          cancelable: true,
         }));
-        expect((game as any).draggingBlock).not.toBeNull();
-
-        // 1. Fire mouseleave -> must release dragging state
-        canvas.dispatchEvent(new MouseEvent('mouseleave'));
-        expect((game as any).draggingBlock).toBeNull();
-
-        // Start dragging again
-        canvas.dispatchEvent(new MouseEvent('mousedown', {
-          clientX: spawned.body.position.x,
-          clientY: spawned.body.position.y,
-        }));
-        expect((game as any).draggingBlock).not.toBeNull();
-
-        // 2. Fire touchcancel -> must release dragging state
-        const touchCancelEvent = new Event('touchcancel') as any;
-        touchCancelEvent.preventDefault = vi.fn();
-        canvas.dispatchEvent(touchCancelEvent);
-        expect((game as any).draggingBlock).toBeNull();
+        expect((game as any).blocks.length).toBe(0);
 
         game.destroy();
       });
@@ -643,15 +626,10 @@ describe('M4 Adversarial Stress: Eeno Voice Board & Phase 3 Games Hardening', ()
             }
           }).not.toThrow();
 
-          const platform = (game as any).platformBody;
-          const ground = (game as any).groundBody;
-          if (platform) {
-            expect(Number.isFinite(platform.position.x)).toBe(true);
-            expect(Number.isFinite(platform.position.y)).toBe(true);
-          }
-          if (ground) {
-            expect(Number.isFinite(ground.position.x)).toBe(true);
-            expect(Number.isFinite(ground.position.y)).toBe(true);
+          const layout = (game as any).layout;
+          if (layout) {
+            expect(Number.isFinite(layout.baseY)).toBe(true);
+            expect(Number.isFinite(layout.unit)).toBe(true);
           }
         }
 
