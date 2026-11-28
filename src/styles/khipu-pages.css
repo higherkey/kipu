@@ -347,8 +347,15 @@ html .settings-view {
 }
 
 /* Switches: a rounded-square woven track, moss when on */
-.settings-view .settings-toggle {
+.settings-view .settings-toggle,
+.settings-view .settings-toggle.on {
+  inline-size: auto;
+  block-size: auto;
+  min-inline-size: 48px;
   min-block-size: 48px;
+  border: none;
+  border-radius: 0;
+  background-color: transparent;
 }
 
 .settings-view .settings-toggle .toggle-track {
@@ -360,6 +367,9 @@ html .settings-view {
 .settings-view .settings-toggle .toggle-thumb {
   inset-block-start: 3px;
   inset-inline-start: 3px;
+  inline-size: 20px;
+  block-size: 20px;
+  border: none;
   border-radius: 5px;
   background-color: var(--paper);
   box-shadow: 0 1px 2px oklch(30% 0.06 50 / 0.4);
@@ -371,7 +381,7 @@ html .settings-view {
 }
 
 .settings-view .settings-toggle.on .toggle-thumb {
-  transform: translateX(19px);
+  transform: translateX(20px);
 }
 
 .settings-view .parental-mode-fieldset {
