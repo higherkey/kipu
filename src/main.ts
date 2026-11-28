@@ -139,7 +139,7 @@ export function renderGameList(portalId?: string): void {
         <span class="icon">${iconSvg}</span>
         <span class="game-label">
           <span class="game-title">${escapeHtml(game.name)}</span>
-          <span class="game-subtitle">${escapeHtml(game.subtitle)}</span>
+          <span class="game-subtitle">${escapeHtml(game.tagline ?? game.subtitle)}</span>
         </span>
       </a>
     `.trim();
@@ -563,6 +563,7 @@ function startGame(gameId: string, canvas: HTMLCanvasElement) {
   gameUI = new GameUI({
     gameId,
     gameName,
+    gameSubtitle: gameInfo.tagline ?? gameInfo.subtitle,
     portalId,
     portalName,
     onPortalBack: () => {

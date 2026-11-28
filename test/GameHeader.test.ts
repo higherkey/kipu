@@ -28,11 +28,28 @@ describe('GameHeader', () => {
     const el = document.getElementById('game-header');
     expect(el).not.toBeNull();
 
-    const titleEl = el?.querySelector('.header-title');
-    expect(titleEl?.textContent).toBe('Test Game');
+    const nameEl = el?.querySelector('.header-title .header-name');
+    expect(nameEl?.textContent).toBe('Test Game');
 
     const portalBtn = el?.querySelector('.portal-back-btn');
     expect(portalBtn?.textContent).toContain('Sandbox');
+  });
+
+  it('should show a one-line subtitle under the name when given', () => {
+    expect(document.querySelector('.header-subtitle')).toBeNull();
+
+    const withSubtitle = new GameHeader({
+      gameName: 'Test Game',
+      gameSubtitle: 'Pop the bubbles',
+      onHome,
+      onMenuToggle,
+    });
+    withSubtitle.mount(document.body);
+    expect(document.querySelector('.header-title .header-subtitle')?.textContent).toBe('Pop the bubbles');
+
+    withSubtitle.setGameName('Renamed');
+    expect(document.querySelector('.header-name')?.textContent).toBe('Renamed');
+    expect(document.querySelector('.header-subtitle')?.textContent).toBe('Pop the bubbles');
   });
 
   it('should trigger onPortalBack when portal back button is clicked', () => {

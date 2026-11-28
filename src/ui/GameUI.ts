@@ -6,6 +6,7 @@ import './GameUI.css';
 export interface GameUIConfig {
   gameId?: string;
   gameName: string;
+  gameSubtitle?: string;
   portalId?: string;
   portalName?: string;
   onPortalBack?: () => void;
@@ -37,6 +38,7 @@ export class GameUI {
     this.config = config;
     this.gameHeader = new GameHeader({
       gameName: config.gameName,
+      gameSubtitle: config.gameSubtitle,
       portalId: config.portalId,
       portalName: config.portalName,
       onPortalBack: config.onPortalBack,

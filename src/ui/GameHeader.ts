@@ -3,6 +3,8 @@ import './GameHeader.css';
 
 export interface GameHeaderConfig {
   gameName: string;
+  /** One short line under the name saying what the game is. */
+  gameSubtitle?: string;
   portalId?: string;
   portalName?: string;
   onPortalBack?: () => void;
@@ -45,7 +47,10 @@ export class GameHeader {
           <span class="header-icon">${Icons.home}</span>
         </button>
       </div>
-      <span class="header-title">${this.config.gameName}</span>
+      <div class="header-title">
+        <span class="header-name">${this.config.gameName}</span>
+        ${this.config.gameSubtitle ? `<span class="header-subtitle">${this.config.gameSubtitle}</span>` : ''}
+      </div>
       <div class="header-nav-right">
         ${this.config.onFeedback ? `
           <button type="button" class="header-btn feedback-btn" title="Give feedback" aria-label="Give feedback" aria-haspopup="dialog">
@@ -109,8 +114,8 @@ export class GameHeader {
 
   public setGameName(name: string): void {
     this.config.gameName = name;
-    const titleEl = this.element.querySelector('.header-title');
-    if (titleEl) titleEl.textContent = name;
+    const nameEl = this.element.querySelector('.header-name');
+    if (nameEl) nameEl.textContent = name;
   }
 
   public show(): void {
