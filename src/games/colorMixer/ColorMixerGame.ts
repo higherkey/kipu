@@ -416,7 +416,7 @@ export class ColorMixerGame extends BaseGame {
     ctx.lineTo(w, top);
     ctx.lineTo(w, bottom);
     ctx.lineTo(0, bottom);
-    ctx.closePath();
+    ctx.lineTo(0, top);
     ctx.clip();
   }
 
@@ -718,7 +718,6 @@ export class ColorMixerGame extends BaseGame {
     ctx.arc(x + r, y + h - r, r, Math.PI / 2, Math.PI);
     ctx.lineTo(x, y + r);
     ctx.arc(x + r, y + r, r, Math.PI, Math.PI * 1.5);
-    ctx.closePath();
   }
 
   private renderTray(ctx: CanvasRenderingContext2D) {
@@ -876,7 +875,7 @@ export class ColorMixerGame extends BaseGame {
         ctx.lineTo(cx + 8, cy - 6);
         ctx.lineTo(cx + 5, cy + 12);
         ctx.lineTo(cx - 9, cy + 12);
-        ctx.closePath();
+        ctx.lineTo(cx - 12, cy - 6);
         ctx.fill();
         ctx.stroke();
         // Paint at the rim, spilling over the edge
@@ -886,7 +885,7 @@ export class ColorMixerGame extends BaseGame {
         ctx.lineTo(cx + 8, cy - 6);
         ctx.lineTo(cx + 7.2, cy - 1);
         ctx.lineTo(cx - 11.2, cy - 1);
-        ctx.closePath();
+        ctx.lineTo(cx - 12, cy - 6);
         ctx.fill();
         ctx.stroke();
         ctx.beginPath();

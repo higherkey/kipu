@@ -284,7 +284,9 @@ describe('ColorMixerGame - Defect Resolution & Lifecycle Tests', () => {
       expect(bufferCanvas.width).toBe(800);
       expect(bufferCanvas.height).toBe(600);
 
-      // Resize to 1024x768 (e.g. tablet rotation)
+      // Resize to 1024x768 (e.g. tablet rotation); main.ts resizes the canvas first
+      canvas.width = 1024;
+      canvas.height = 768;
       game.resize(1024, 768);
 
       expect(bufferCanvas.width).toBe(1024);

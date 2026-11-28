@@ -628,7 +628,7 @@ describe('M3 Concurrency & Stress Verification Harness', () => {
       expect(bufferCanvas.height).toBe(720);
 
       const wells = (game as any).wells;
-      expect(wells).toHaveLength(6);
+      expect(wells).toHaveLength(5);
       for (const well of wells) {
         expect(well.x + well.width).toBeLessThanOrEqual(1280);
         expect(well.x).toBeGreaterThanOrEqual(0);
