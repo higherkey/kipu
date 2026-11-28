@@ -165,12 +165,30 @@ html #game-header {
   display: none;
 }
 
+/* In the game: each end of the band is one cuff holding its buttons,
+   with a running stitch between neighbours */
+#game-header .header-nav-left,
+#game-header .header-nav-right {
+  --cuff: color-mix(in oklch, var(--band-edge, var(--dye-indigo)) 82%, var(--ink));
+  background-color: var(--cuff);
+  background-image:
+    linear-gradient(to bottom, oklch(100% 0 0 / 0.22), transparent 45%, oklch(0% 0 0 / 0.24)),
+    repeating-linear-gradient(90deg, oklch(0% 0 0 / 0.22) 0 1px, transparent 1px 3px);
+}
+
+#game-header .header-nav-left {
+  border-inline-end: 1.5px dashed oklch(96% 0.025 85 / 0.55);
+}
+
+#game-header .header-nav-right {
+  border-inline-start: 1.5px dashed oklch(96% 0.025 85 / 0.55);
+}
+
 #game-header .header-btn,
 #game-header .header-btn.home-btn,
 #game-header .header-btn.menu-btn,
 #game-header .header-btn.feedback-btn,
 #game-header .header-btn.portal-back-btn {
-  --cuff: color-mix(in oklch, var(--band-edge, var(--dye-indigo)) 82%, var(--ink));
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -186,10 +204,7 @@ html #game-header {
   font-size: 0.95rem;
   font-weight: 600;
   color: oklch(96% 0.025 85);
-  background-color: var(--cuff);
-  background-image:
-    linear-gradient(to bottom, oklch(100% 0 0 / 0.22), transparent 45%, oklch(0% 0 0 / 0.24)),
-    repeating-linear-gradient(90deg, oklch(0% 0 0 / 0.22) 0 1px, transparent 1px 3px);
+  background: transparent;
   border: none;
   border-radius: 0;
   outline: none;
@@ -200,6 +215,10 @@ html #game-header {
   white-space: nowrap;
   text-shadow: 0 1px 0 oklch(0% 0 0 / 0.35);
   transition: background-color 0.15s ease;
+}
+
+#game-header .header-btn + .header-btn {
+  border-inline-start: 1.5px dashed oklch(96% 0.025 85 / 0.35);
 }
 
 .kp-header .kp-btn svg,
@@ -215,12 +234,12 @@ html #game-header {
 }
 
 #game-header .header-btn:hover {
-  background-color: color-mix(in oklch, var(--cuff) 85%, white);
+  background-color: oklch(100% 0 0 / 0.14);
 }
 
 .kp-header .kp-btn:active,
 #game-header .header-btn:active {
-  background-color: color-mix(in oklch, var(--cuff) 80%, black);
+  background-color: oklch(0% 0 0 / 0.18);
   transform: none;
   box-shadow: none;
 }
@@ -264,7 +283,7 @@ html #game-header::after {
 #game-header .header-nav-right {
   align-self: stretch;
   align-items: stretch;
-  gap: 2px;
+  gap: 0;
 }
 
 /* Game name on a stitched label over the band */
