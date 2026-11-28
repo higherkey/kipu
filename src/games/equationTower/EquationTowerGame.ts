@@ -250,7 +250,7 @@ export class EquationTowerGame implements Game {
         }
       }
     });
-    this.audio.play('pop');
+    this.playSafe('pop');
   }
 
   private nextLevel() {
@@ -266,7 +266,7 @@ export class EquationTowerGame implements Game {
 
     const notes = [NOTES[0], NOTES[2], NOTES[4], NOTES[5]];
     notes.forEach((f, i) => {
-      this.timers.push(window.setTimeout(() => this.audio.play('synth:bell', f), i * 110));
+      this.timers.push(window.setTimeout(() => this.playSafe('synth:bell', f), i * 110));
     });
 
     if (this.layout) {
@@ -289,7 +289,16 @@ export class EquationTowerGame implements Game {
 
   private playLand(unitsUpTo: number) {
     const f = NOTES[Math.max(0, Math.min(NOTES.length - 1, unitsUpTo - 1))];
-    this.audio.play('synth:pluck', f);
+    this.playSafe('synth:pluck', f);
+  }
+
+  /** A sound that fails (no audio support, blocked context) must never stop the game. */
+  private playSafe(id: string, arg?: number) {
+    try {
+      this.audio.play(id, arg);
+    } catch {
+      // Sound is a bonus; keep playing silently.
+    }
   }
 
   /* ---------- Layout ---------- */
