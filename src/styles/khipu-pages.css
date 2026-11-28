@@ -1,0 +1,571 @@
+/* ========================================
+   Kipu — the khipu header on every other page
+   Settings, the in-game header, the not-found page and the grown-ups
+   gate share the menu's header: a woven band with back and settings
+   sewn on as card-stock patches, the page name on a stitched label
+   over the band, and a plain subtitle tucked under the label.
+
+   Loaded after khipu.css. Page markup opts in with the kp-* classes;
+   the in-game header (#game-header) is styled directly.
+   ======================================== */
+
+/* ----------------------------------------
+   The woven band
+   ---------------------------------------- */
+.kp-band,
+html #game-header {
+  --band-edge: var(--dye-indigo);
+  --band-accent: var(--dye-cochineal);
+  --band-line: var(--dye-ochre);
+}
+
+.kp-band[data-portal],
+#game-header[data-portal] {
+  --band-edge: color-mix(in oklch, var(--dye) 85%, var(--ink));
+  --band-accent: var(--dye);
+}
+
+.kp-band,
+html #game-header {
+  background-color: var(--paper);
+  background-image:
+    linear-gradient(to bottom,
+      var(--band-edge) 0 6px, transparent 6px calc(100% - 6px), var(--band-edge) calc(100% - 6px)),
+    linear-gradient(to bottom,
+      transparent 0 9px, var(--band-line) 9px 11px,
+      transparent 11px calc(100% - 11px), var(--band-line) calc(100% - 11px) calc(100% - 9px), transparent 0),
+    linear-gradient(135deg, var(--band-accent) 25%, transparent 25%),
+    linear-gradient(225deg, var(--band-accent) 25%, transparent 25%),
+    linear-gradient(315deg, var(--band-accent) 25%, transparent 25%),
+    linear-gradient(45deg, var(--band-accent) 25%, transparent 25%),
+    repeating-linear-gradient(90deg, oklch(0% 0 0 / 0.06) 0 1px, transparent 1px 3px),
+    var(--tex-grain);
+  background-size:
+    auto, auto,
+    14px 14px, 14px 14px, 14px 14px, 14px 14px,
+    auto, auto;
+  background-position:
+    0 0, 0 0,
+    -7px 50%, -7px 50%, 0 50%, 0 50%,
+    0 0, 0 0;
+  background-repeat:
+    no-repeat, no-repeat,
+    repeat-x, repeat-x, repeat-x, repeat-x,
+    repeat, repeat;
+}
+
+/* ----------------------------------------
+   Page header (settings, not-found)
+   ---------------------------------------- */
+.kp-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  inline-size: 100%;
+  max-inline-size: 880px;
+  margin-inline: auto;
+  padding-block: 24px 16px;
+  padding-inline: 16px;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.kp-header .kp-band {
+  inline-size: 100%;
+  block-size: 48px;
+  border-radius: 4px;
+  box-shadow:
+    inset 0 1px 0 oklch(100% 0 0 / 0.25),
+    0 6px 10px -6px oklch(30% 0.06 45 / 0.5);
+}
+
+.kp-header .kp-nav {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  inline-size: 100%;
+  min-block-size: 0;
+  margin-block-start: -48px;
+  padding-inline: 4px;
+  box-sizing: border-box;
+}
+
+.kp-header .kp-nav > :first-child,
+.kp-header .kp-nav > :last-child {
+  flex: 1 1 0%;
+  min-inline-size: 48px;
+  display: flex;
+  align-items: flex-start;
+}
+
+.kp-header .kp-nav > :first-child { justify-content: flex-start; }
+.kp-header .kp-nav > :last-child { justify-content: flex-end; }
+
+.kp-header .kp-nav > :nth-child(2) {
+  flex: 0 1 auto;
+  min-inline-size: 0;
+  display: flex;
+  justify-content: center;
+}
+
+/* The page name on a stitched label, centred over the band */
+.kp-header .kp-label {
+  display: inline-block;
+  margin: 0;
+  margin-block-start: -12px;
+  padding-block: 8px 10px;
+  padding-inline: 24px;
+  font-size: clamp(1.75rem, 1.4rem + 2vw, 2.5rem);
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: -0.5px;
+  color: var(--dye-cochineal);
+  background-color: var(--paper);
+  background-image: var(--tex-grain);
+  border: 1px solid var(--paper-edge);
+  border-radius: 8px;
+  outline: 1.5px dashed var(--stitch);
+  outline-offset: -6px;
+  box-shadow: inset 0 1px 0 oklch(100% 0 0 / 0.7), var(--tag-shadow);
+  text-shadow: 0 1px 0 oklch(100% 0 0 / 0.6);
+}
+
+.kp-header .kp-tagline {
+  margin-block: 8px 0;
+  max-inline-size: 65ch;
+  font-size: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--ink);
+}
+
+/* ----------------------------------------
+   Card-stock patch buttons: the same patch on the band ends, the game
+   header and anywhere a small square control is needed
+   ---------------------------------------- */
+.kp-header .kp-btn,
+#game-header .header-btn,
+#game-header .header-btn.home-btn,
+#game-header .header-btn.menu-btn,
+#game-header .header-btn.feedback-btn,
+#game-header .header-btn.portal-back-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-block-size: 48px;
+  block-size: 48px;
+  min-inline-size: 48px;
+  inline-size: auto;
+  padding-block: 0;
+  padding-inline: 12px;
+  font-family: 'Fredoka', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--ink);
+  background-color: var(--paper);
+  background-image: var(--tex-grain);
+  border: 1px solid var(--paper-edge);
+  border-radius: 6px;
+  outline: 1.5px dashed color-mix(in oklch, var(--band-edge, var(--dye-indigo)) 45%, var(--stitch));
+  outline-offset: -5px;
+  box-shadow:
+    inset 0 1px 0 oklch(100% 0 0 / 0.6),
+    0 2px 4px oklch(30% 0.06 50 / 0.3);
+  filter: none;
+  cursor: pointer;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: transform 0.08s ease, box-shadow 0.08s ease, background-color 0.15s ease;
+}
+
+.kp-header .kp-btn svg,
+#game-header .header-btn svg {
+  color: var(--band-edge, var(--dye-indigo));
+  inline-size: 20px;
+  block-size: 20px;
+}
+
+.kp-header .kp-btn:hover,
+#game-header .header-btn:hover {
+  background-color: oklch(98% 0.02 82);
+}
+
+.kp-header .kp-btn:active,
+#game-header .header-btn:active {
+  transform: translateY(1px);
+  box-shadow: inset 0 1px 2px oklch(30% 0.06 50 / 0.2);
+}
+
+.kp-header .kp-btn:focus-visible,
+#game-header .header-btn:focus-visible {
+  outline: 3px solid var(--band-edge, var(--dye-indigo));
+  outline-offset: 2px;
+}
+
+/* Icon-only patches are square */
+#game-header .header-btn.home-btn,
+#game-header .header-btn.menu-btn {
+  inline-size: 48px;
+  padding-inline: 0;
+}
+
+@media (max-width: 519px) {
+  .kp-header .kp-btn {
+    inline-size: 48px;
+    padding-inline: 0;
+  }
+
+  .kp-header .kp-btn .btn-label {
+    display: none;
+  }
+}
+
+/* ----------------------------------------
+   In-game header: the whole bar is the woven band
+   ---------------------------------------- */
+html #game-header {
+  padding-block: 0;
+  padding-inline: 8px;
+  gap: 8px;
+  box-shadow:
+    inset 0 1px 0 oklch(100% 0 0 / 0.25),
+    0 6px 12px -6px oklch(30% 0.06 45 / 0.5);
+}
+
+/* The band's own edges replace the old cord */
+html #game-header::after {
+  content: none;
+}
+
+/* Game name on a stitched label over the band */
+#game-header .header-title {
+  flex: 0 1 auto;
+  margin-inline: auto;
+  padding-block: 6px 7px;
+  padding-inline: 16px;
+  font-size: clamp(1rem, 0.9rem + 1vw, 1.25rem);
+  line-height: 1.2;
+  color: color-mix(in oklch, var(--dye, var(--dye-cochineal)) 85%, var(--ink));
+  background-color: var(--paper);
+  background-image: var(--tex-grain);
+  border: 1px solid var(--paper-edge);
+  border-radius: 6px;
+  outline: 1.5px dashed var(--stitch);
+  outline-offset: -4px;
+  box-shadow: inset 0 1px 0 oklch(100% 0 0 / 0.7), 0 2px 4px oklch(30% 0.06 50 / 0.3);
+}
+
+@media (max-width: 440px) {
+  #game-header .header-title {
+    padding-inline: 10px;
+  }
+}
+
+@media (max-width: 600px) {
+  #game-header .header-btn.feedback-btn {
+    inline-size: 48px;
+    padding-inline: 0;
+  }
+}
+
+@media (max-width: 380px) {
+  #game-header .header-btn.portal-back-btn {
+    inline-size: 48px;
+    padding-inline: 0;
+  }
+}
+
+/* ----------------------------------------
+   Settings page
+   ---------------------------------------- */
+html .settings-view {
+  color: var(--ink);
+  background-color: var(--sand);
+  background-image:
+    var(--tex-fiber),
+    var(--tex-grain),
+    radial-gradient(130% 70% at 50% 0%, oklch(97% 0.03 85 / 0.85), transparent 65%);
+}
+
+.settings-view .settings-container {
+  max-inline-size: 880px;
+  padding-inline: 16px;
+  gap: 24px;
+}
+
+/* Each section is a stitched card-stock panel */
+.settings-view .settings-card,
+.settings-view .monetization-card {
+  background-color: var(--paper);
+  background-image: var(--tex-grain);
+  border: 1px solid var(--paper-edge);
+  border-radius: 14px;
+  outline: 1.5px dashed var(--stitch);
+  outline-offset: -7px;
+  box-shadow: inset 0 1px 0 oklch(100% 0 0 / 0.7), var(--tag-shadow);
+  padding: 24px;
+}
+
+.settings-view .card-title {
+  color: var(--dye-cochineal);
+}
+
+.settings-view .card-desc,
+.settings-view .settings-row-desc,
+.settings-view .mode-option-desc,
+.settings-view .tier-desc,
+.settings-view .tier-period,
+.settings-view .settings-version,
+.settings-view .status-text {
+  color: var(--ink-soft);
+}
+
+.settings-view .settings-row-title,
+.settings-view .mode-option-title,
+.settings-view .tier-name,
+.settings-view .parental-mode-legend,
+.settings-view .tier-perks {
+  color: var(--ink);
+}
+
+.settings-view .settings-row {
+  border-block-end: 1px dashed var(--paper-edge);
+}
+
+/* Row icons: small dyed felt patches */
+.settings-view .settings-row-icon {
+  inline-size: 40px;
+  block-size: 40px;
+  background-color: var(--dye-cochineal);
+  background-image: var(--tex-grain);
+  color: var(--paper);
+  outline: 1.5px dashed oklch(96% 0.03 80 / 0.5);
+  outline-offset: -4px;
+}
+
+/* Switches: a rounded-square woven track, moss when on */
+.settings-view .settings-toggle {
+  min-block-size: 48px;
+}
+
+.settings-view .settings-toggle .toggle-track {
+  border-radius: 8px;
+  background-color: var(--rope-light);
+  border: 1px solid var(--rope-dark);
+}
+
+.settings-view .settings-toggle .toggle-thumb {
+  inset-block-start: 3px;
+  inset-inline-start: 3px;
+  border-radius: 5px;
+  background-color: var(--paper);
+  box-shadow: 0 1px 2px oklch(30% 0.06 50 / 0.4);
+}
+
+.settings-view .settings-toggle.on .toggle-track {
+  background-color: var(--dye-moss);
+  border-color: color-mix(in oklch, var(--dye-moss) 70%, var(--ink));
+}
+
+.settings-view .settings-toggle.on .toggle-thumb {
+  transform: translateX(19px);
+}
+
+.settings-view .parental-mode-fieldset {
+  background-color: color-mix(in oklch, var(--sand) 40%, var(--paper));
+  border: 1px solid var(--paper-edge);
+  border-radius: 8px;
+}
+
+.settings-view .parental-mode-option {
+  border-radius: 6px;
+}
+
+.settings-view .parental-mode-option:hover {
+  background-color: color-mix(in oklch, var(--rope-light) 30%, transparent);
+}
+
+.settings-view .mode-radio-input {
+  accent-color: var(--dye-cochineal);
+}
+
+/* Support tiers: smaller tags inside the panel */
+.settings-view .tier-card {
+  background-color: var(--paper);
+  background-image: var(--tex-grain);
+  border: 1px solid var(--paper-edge);
+  border-radius: 10px;
+  outline: 1.5px dashed var(--stitch);
+  outline-offset: -6px;
+  box-shadow: inset 0 1px 0 oklch(100% 0 0 / 0.7), 0 2px 4px oklch(30% 0.06 50 / 0.25);
+}
+
+.settings-view .tier-card:hover {
+  border-color: var(--rope-dark);
+}
+
+.settings-view .tier-card.active-tier {
+  border-color: var(--dye-moss);
+  background-color: color-mix(in oklch, var(--dye-moss) 8%, var(--paper));
+}
+
+.settings-view .tier-badge {
+  background-color: var(--dye-indigo);
+  color: var(--paper);
+  border-radius: 4px;
+}
+
+.settings-view .tier-price {
+  color: var(--dye-cochineal);
+}
+
+.settings-view .perk-check {
+  color: var(--dye-moss);
+}
+
+/* Buttons: dyed felt patches, square-cornered, no pills */
+.settings-view .settings-btn,
+.settings-view .tier-action-btn {
+  min-block-size: 48px;
+  border-radius: 6px;
+  font-weight: 600;
+}
+
+.settings-view .settings-btn.primary-btn,
+.settings-view .tier-action-btn {
+  background-color: var(--dye-cochineal);
+  background-image: var(--tex-grain);
+  color: var(--paper);
+  border: none;
+  outline: 1.5px dashed oklch(96% 0.03 80 / 0.55);
+  outline-offset: -5px;
+  box-shadow:
+    inset 0 1px 0 oklch(100% 0 0 / 0.2),
+    0 3px 0 oklch(36% 0.12 30);
+}
+
+.settings-view .settings-btn.primary-btn:hover,
+.settings-view .tier-action-btn:hover {
+  background-color: oklch(47% 0.15 30);
+}
+
+.settings-view .settings-btn.primary-btn:active,
+.settings-view .tier-action-btn:active {
+  transform: translateY(2px);
+  box-shadow: inset 0 1px 0 oklch(100% 0 0 / 0.2), 0 1px 0 oklch(36% 0.12 30);
+}
+
+.settings-view .tier-action-btn.active {
+  background-color: var(--dye-moss);
+  box-shadow: inset 0 1px 0 oklch(100% 0 0 / 0.2), 0 3px 0 oklch(38% 0.08 138);
+}
+
+.settings-view .settings-btn.secondary-btn {
+  background-color: var(--paper);
+  background-image: var(--tex-grain);
+  color: var(--ink);
+  border: 1px solid var(--paper-edge);
+  outline: 1.5px dashed var(--stitch);
+  outline-offset: -5px;
+  box-shadow: inset 0 1px 0 oklch(100% 0 0 / 0.6), 0 2px 4px oklch(30% 0.06 50 / 0.3);
+}
+
+.settings-view .settings-btn.secondary-btn:hover {
+  background-color: oklch(98% 0.02 82);
+}
+
+/* ----------------------------------------
+   Not-found page
+   ---------------------------------------- */
+html .not-found-container {
+  justify-content: flex-start;
+  gap: 24px;
+  padding-block: 24px;
+  padding-inline: 0;
+  color: var(--ink);
+  background-color: var(--sand);
+  background-image:
+    var(--tex-fiber),
+    var(--tex-grain),
+    radial-gradient(130% 70% at 50% 0%, oklch(97% 0.03 85 / 0.85), transparent 65%);
+}
+
+.not-found-container .kp-header {
+  padding-block-start: 0;
+}
+
+.not-found-container .back-home-btn {
+  min-block-size: 48px;
+  padding-block: 0;
+  padding-inline: 24px;
+  font-size: 1.1rem;
+  color: var(--paper);
+  background-color: var(--dye-cochineal);
+  background-image: var(--tex-grain);
+  border: none;
+  border-radius: 6px;
+  outline: 1.5px dashed oklch(96% 0.03 80 / 0.55);
+  outline-offset: -5px;
+  box-shadow:
+    inset 0 1px 0 oklch(100% 0 0 / 0.2),
+    0 3px 0 oklch(36% 0.12 30),
+    0 10px 16px -8px oklch(30% 0.1 30 / 0.5);
+}
+
+.not-found-container .back-home-btn:hover {
+  background-color: oklch(47% 0.15 30);
+}
+
+.not-found-container .back-home-btn:active {
+  transform: translateY(2px);
+  box-shadow: inset 0 1px 0 oklch(100% 0 0 / 0.2), 0 1px 0 oklch(36% 0.12 30);
+}
+
+/* ----------------------------------------
+   Grown-ups gate: a card-stock panel over a plain dim, no frosted blur
+   ---------------------------------------- */
+html .parental-gate-overlay {
+  background-color: oklch(25% 0.03 50 / 0.7);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+html .parental-gate-modal {
+  color: var(--ink);
+  background-color: var(--paper);
+  background-image: var(--tex-grain);
+  border: 1px solid var(--paper-edge);
+  border-radius: 14px;
+  outline: 1.5px dashed var(--stitch);
+  outline-offset: -8px;
+  box-shadow: inset 0 1px 0 oklch(100% 0 0 / 0.7), var(--tag-shadow);
+}
+
+.parental-gate-modal .parental-gate-close-btn {
+  border-radius: 6px;
+  border: 1px solid var(--paper-edge);
+  background-color: var(--paper);
+  color: var(--ink);
+  box-shadow: inset 0 1px 0 oklch(100% 0 0 / 0.6), 0 2px 4px oklch(30% 0.06 50 / 0.3);
+}
+
+.parental-gate-modal .parental-gate-choice-btn {
+  border-radius: 6px;
+  border: 1px solid var(--paper-edge);
+  background-color: var(--paper);
+  color: var(--ink);
+  box-shadow: inset 0 1px 0 oklch(100% 0 0 / 0.6), 0 2px 4px oklch(30% 0.06 50 / 0.3);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kp-header .kp-btn,
+  #game-header .header-btn,
+  .settings-view .settings-btn,
+  .settings-view .tier-action-btn,
+  .not-found-container .back-home-btn {
+    transition-duration: 0.01ms;
+  }
+}

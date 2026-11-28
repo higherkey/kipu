@@ -1,6 +1,7 @@
 import './style.css';
 import './styles/khipu.css';
 import './ui/NotFound.css';
+import './styles/khipu-pages.css';
 import { registerSW } from 'virtual:pwa-register';
 import { Icons } from './ui/Icons';
 import { IdleManager } from './core/IdleManager';
@@ -500,9 +501,16 @@ document.addEventListener('DOMContentLoaded', () => {
       notFound.id = 'not-found-screen';
       notFound.className = 'not-found-container';
       notFound.innerHTML = `
-        <h2>404</h2>
-        <p>This game could not be found.</p>
-        <a href="/" class="back-home-btn">Go Back Home</a>
+        <header class="kp-header">
+          <div class="kp-band" aria-hidden="true"></div>
+          <div class="kp-nav">
+            <div><a href="/" class="kp-btn" aria-label="Back to all games">${Icons.back}<span class="btn-label">Home</span></a></div>
+            <div><h1 class="kp-label">Lost string</h1></div>
+            <div></div>
+          </div>
+          <p class="kp-tagline">We couldn't find that game.</p>
+        </header>
+        <a href="/" class="back-home-btn">Back to all games</a>
       `;
       document.getElementById('app')?.appendChild(notFound);
     } else {

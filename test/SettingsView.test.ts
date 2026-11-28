@@ -59,7 +59,7 @@ describe('SettingsView Component, Mock Monetization & Persistence', () => {
       const view = new SettingsView({ onBack });
       view.mount(document.body);
 
-      expect(document.querySelector('.settings-title')?.textContent).toContain('Settings & Support');
+      expect(document.querySelector('.settings-title')?.textContent).toContain('Settings');
       expect(document.querySelector('.settings-back-btn')).not.toBeNull();
       expect(document.querySelector('.return-home-btn')).not.toBeNull();
       expect(document.getElementById('heading-sensory')).not.toBeNull();

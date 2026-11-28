@@ -106,20 +106,21 @@ export class SettingsView {
     el.setAttribute('aria-label', 'Settings and Support');
 
     el.innerHTML = `
-      <header class="settings-header">
-        <div class="settings-nav-bar">
+      <header class="settings-header kp-header">
+        <div class="kp-band" aria-hidden="true"></div>
+        <div class="settings-nav-bar kp-nav">
           <div class="settings-nav-left">
-            <button class="settings-back-btn back-btn" aria-label="Back to Game Hub" title="Back to Game Hub">
+            <button class="settings-back-btn back-btn kp-btn" aria-label="Back to Game Hub" title="Back to Game Hub">
               <span class="btn-icon">${Icons.back}</span>
-              <span class="btn-label">Hub</span>
+              <span class="btn-label">Home</span>
             </button>
           </div>
           <div class="settings-nav-center">
-            <h1 class="settings-title">Settings & Support</h1>
+            <h1 class="settings-title kp-label">Settings</h1>
           </div>
           <div class="settings-nav-right"></div>
         </div>
-        <p class="settings-tagline">Preferences, Accessibility, and Support for Kipu</p>
+        <p class="settings-tagline kp-tagline">Sound, accessibility, grown-up controls and support</p>
       </header>
 
       <div class="settings-container">
