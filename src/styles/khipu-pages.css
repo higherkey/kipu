@@ -71,6 +71,10 @@ html #game-header {
 }
 
 .kp-header .kp-band {
+  background-image: var(--band-layers);
+  background-size: var(--band-sizes);
+  background-position: var(--band-positions);
+  background-repeat: var(--band-repeats);
   inline-size: 100%;
   block-size: 48px;
   border-radius: 4px;
@@ -80,32 +84,23 @@ html #game-header {
 }
 
 .kp-header .kp-nav {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 8px;
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr) 48px;
+  align-items: start;
+  gap: 0;
   inline-size: 100%;
   min-block-size: 0;
   margin-block-start: -48px;
-  padding-inline: 4px;
+  padding-inline: 0;
   box-sizing: border-box;
 }
 
-.kp-header .kp-nav > :first-child,
-.kp-header .kp-nav > :last-child {
-  flex: 1 1 0%;
-  min-inline-size: 48px;
+.kp-header .kp-nav > * {
   display: flex;
-  align-items: flex-start;
+  min-inline-size: 0;
 }
 
-.kp-header .kp-nav > :first-child { justify-content: flex-start; }
-.kp-header .kp-nav > :last-child { justify-content: flex-end; }
-
 .kp-header .kp-nav > :nth-child(2) {
-  flex: 0 1 auto;
-  min-inline-size: 0;
-  display: flex;
   justify-content: center;
 }
 
@@ -142,21 +137,47 @@ html #game-header {
 }
 
 /* ----------------------------------------
-   Card-stock patch buttons: the same patch on the band ends, the game
-   header and anywhere a small square control is needed
+   Buttons in the band: a pale stitched icon inside a cuff of wrapped
+   thread in the band's own dye. On the page headers the cuffs are part
+   of the band; in the game header each button is its own cuff.
    ---------------------------------------- */
-.kp-header .kp-btn,
+.kp-header .kp-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: 48px;
+  min-inline-size: 48px;
+  block-size: 48px;
+  min-block-size: 48px;
+  padding: 0;
+  color: var(--cuff-thread);
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  outline: none;
+  box-shadow: none;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.kp-header .kp-btn .btn-label {
+  display: none;
+}
+
 #game-header .header-btn,
 #game-header .header-btn.home-btn,
 #game-header .header-btn.menu-btn,
 #game-header .header-btn.feedback-btn,
 #game-header .header-btn.portal-back-btn {
+  --cuff: color-mix(in oklch, var(--band-edge, var(--dye-indigo)) 82%, var(--ink));
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
+  align-self: stretch;
+  block-size: auto;
   min-block-size: 48px;
-  block-size: 48px;
   min-inline-size: 48px;
   inline-size: auto;
   padding-block: 0;
@@ -164,71 +185,70 @@ html #game-header {
   font-family: 'Fredoka', sans-serif;
   font-size: 0.95rem;
   font-weight: 600;
-  color: var(--ink);
-  background-color: var(--paper);
-  background-image: var(--tex-grain);
-  border: 1px solid var(--paper-edge);
-  border-radius: 6px;
-  outline: 1.5px dashed color-mix(in oklch, var(--band-edge, var(--dye-indigo)) 45%, var(--stitch));
-  outline-offset: -5px;
-  box-shadow:
-    inset 0 1px 0 oklch(100% 0 0 / 0.6),
-    0 2px 4px oklch(30% 0.06 50 / 0.3);
+  color: oklch(96% 0.025 85);
+  background-color: var(--cuff);
+  background-image:
+    linear-gradient(to bottom, oklch(100% 0 0 / 0.22), transparent 45%, oklch(0% 0 0 / 0.24)),
+    repeating-linear-gradient(90deg, oklch(0% 0 0 / 0.22) 0 1px, transparent 1px 3px);
+  border: none;
+  border-radius: 0;
+  outline: none;
+  box-shadow: none;
   filter: none;
   cursor: pointer;
   text-decoration: none;
   white-space: nowrap;
-  transition: transform 0.08s ease, box-shadow 0.08s ease, background-color 0.15s ease;
+  text-shadow: 0 1px 0 oklch(0% 0 0 / 0.35);
+  transition: background-color 0.15s ease;
 }
 
 .kp-header .kp-btn svg,
 #game-header .header-btn svg {
-  color: var(--band-edge, var(--dye-indigo));
-  inline-size: 20px;
-  block-size: 20px;
+  color: oklch(96% 0.025 85);
+  inline-size: 22px;
+  block-size: 22px;
+  filter: drop-shadow(0 1px 0 oklch(0% 0 0 / 0.35));
 }
 
-.kp-header .kp-btn:hover,
+.kp-header .kp-btn:hover {
+  background-color: oklch(100% 0 0 / 0.14);
+}
+
 #game-header .header-btn:hover {
-  background-color: oklch(98% 0.02 82);
+  background-color: color-mix(in oklch, var(--cuff) 85%, white);
 }
 
 .kp-header .kp-btn:active,
 #game-header .header-btn:active {
-  transform: translateY(1px);
-  box-shadow: inset 0 1px 2px oklch(30% 0.06 50 / 0.2);
+  background-color: color-mix(in oklch, var(--cuff) 80%, black);
+  transform: none;
+  box-shadow: none;
+}
+
+.kp-header .kp-btn:active {
+  background-color: oklch(0% 0 0 / 0.18);
 }
 
 .kp-header .kp-btn:focus-visible,
 #game-header .header-btn:focus-visible {
-  outline: 3px solid var(--band-edge, var(--dye-indigo));
-  outline-offset: 2px;
+  outline: 3px solid var(--dye-ochre);
+  outline-offset: -3px;
 }
 
-/* Icon-only patches are square */
+/* Icon-only cuffs are square */
 #game-header .header-btn.home-btn,
 #game-header .header-btn.menu-btn {
   inline-size: 48px;
   padding-inline: 0;
 }
 
-@media (max-width: 519px) {
-  .kp-header .kp-btn {
-    inline-size: 48px;
-    padding-inline: 0;
-  }
-
-  .kp-header .kp-btn .btn-label {
-    display: none;
-  }
-}
-
 /* ----------------------------------------
    In-game header: the whole bar is the woven band
    ---------------------------------------- */
 html #game-header {
+  align-items: stretch;
   padding-block: 0;
-  padding-inline: 8px;
+  padding-inline: 0;
   gap: 8px;
   box-shadow:
     inset 0 1px 0 oklch(100% 0 0 / 0.25),
@@ -240,8 +260,16 @@ html #game-header::after {
   content: none;
 }
 
+#game-header .header-nav-left,
+#game-header .header-nav-right {
+  align-self: stretch;
+  align-items: stretch;
+  gap: 2px;
+}
+
 /* Game name on a stitched label over the band */
 #game-header .header-title {
+  align-self: center;
   flex: 0 1 auto;
   margin-inline: auto;
   padding-block: 6px 7px;

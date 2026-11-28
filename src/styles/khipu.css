@@ -131,15 +131,25 @@
   --band-accent: var(--dye);
 }
 
-#navigation-shell .cord-line {
-  position: relative;
-  inline-size: calc(100% - 32px);
-  block-size: 48px;
-  margin-block: 0;
-  margin-inline: auto;
-  border-radius: 4px;
-  background-color: var(--paper);
-  background-image:
+/* The band's weave, with a cuff of wrapped thread bound around each
+   end. Shared by the menu header and the page headers (khipu-pages.css). */
+#navigation-shell .cord-line,
+.kp-header .kp-band {
+  --cuff: color-mix(in oklch, var(--band-edge) 82%, var(--ink));
+  --cuff-thread: oklch(96% 0.025 85);
+  --band-layers:
+    /* cuff shading, so each cuff looks wrapped round the band */
+    linear-gradient(to bottom, oklch(100% 0 0 / 0.22), transparent 45%, oklch(0% 0 0 / 0.24)),
+    linear-gradient(to bottom, oklch(100% 0 0 / 0.22), transparent 45%, oklch(0% 0 0 / 0.24)),
+    /* the wraps of thread */
+    repeating-linear-gradient(90deg, oklch(0% 0 0 / 0.22) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(90deg, oklch(0% 0 0 / 0.22) 0 1px, transparent 1px 3px),
+    /* a running stitch where each cuff meets the weave */
+    repeating-linear-gradient(to bottom, oklch(96% 0.025 85 / 0.55) 0 3px, transparent 3px 6px),
+    repeating-linear-gradient(to bottom, oklch(96% 0.025 85 / 0.55) 0 3px, transparent 3px 6px),
+    /* cuff dye */
+    linear-gradient(var(--cuff), var(--cuff)),
+    linear-gradient(var(--cuff), var(--cuff)),
     /* edge stripes */
     linear-gradient(to bottom,
       var(--band-edge) 0 6px, transparent 6px calc(100% - 6px), var(--band-edge) calc(100% - 6px)),
@@ -155,18 +165,44 @@
     /* the weave itself */
     repeating-linear-gradient(90deg, oklch(0% 0 0 / 0.06) 0 1px, transparent 1px 3px),
     var(--tex-grain);
-  background-size:
+  --band-sizes:
+    48px 100%, 48px 100%,
+    48px 100%, 48px 100%,
+    1.5px 100%, 1.5px 100%,
+    48px 100%, 48px 100%,
     auto, auto,
     14px 14px, 14px 14px, 14px 14px, 14px 14px,
     auto, auto;
-  background-position:
+  --band-positions:
+    left 0 top 0, right 0 top 0,
+    left 0 top 0, right 0 top 0,
+    left 44px top 0, right 44px top 0,
+    left 0 top 0, right 0 top 0,
     0 0, 0 0,
     -7px 50%, -7px 50%, 0 50%, 0 50%,
     0 0, 0 0;
-  background-repeat:
+  --band-repeats:
+    no-repeat, no-repeat,
+    no-repeat, no-repeat,
+    no-repeat, no-repeat,
+    no-repeat, no-repeat,
     no-repeat, no-repeat,
     repeat-x, repeat-x, repeat-x, repeat-x,
     repeat, repeat;
+}
+
+#navigation-shell .cord-line {
+  position: relative;
+  inline-size: calc(100% - 32px);
+  block-size: 48px;
+  margin-block: 0;
+  margin-inline: auto;
+  border-radius: 4px;
+  background-color: var(--paper);
+  background-image: var(--band-layers);
+  background-size: var(--band-sizes);
+  background-position: var(--band-positions);
+  background-repeat: var(--band-repeats);
   box-shadow:
     inset 0 1px 0 oklch(100% 0 0 / 0.25),
     0 6px 10px -6px oklch(30% 0.06 45 / 0.5);
@@ -197,21 +233,35 @@
   mask-image: linear-gradient(to right, black 40%, transparent);
 }
 
-/* One header unit: back and settings are patches sewn onto the ends of
-   the band, the name label is stitched over its middle, and the
-   subtitle hangs straight under the label. */
+/* One header unit. Each end of the band is bound with a cuff of
+   wrapped thread in the band's own dye. Back and settings live inside
+   the cuffs as a pale stitched icon, so they read as part of the
+   weaving. Both cuffs are always there, so the name label stays centred
+   whether or not a page has a back button. */
 #navigation-shell .nav-bar {
-  margin-block: -48px 0;
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr) 48px;
+  align-items: start;
+  inline-size: 100%;
   min-block-size: 0;
-  align-items: flex-start;
-  padding-inline: 20px;
-  gap: 8px;
+  margin-block: -48px 0;
+  padding-inline: 16px;
+  gap: 0;
+  box-sizing: border-box;
 }
 
 #navigation-shell .nav-left,
 #navigation-shell .nav-right {
+  display: flex;
   padding-block-start: 0;
   align-items: flex-start;
+  min-inline-size: 0;
+}
+
+#navigation-shell .nav-center {
+  display: flex;
+  justify-content: center;
+  min-inline-size: 0;
 }
 
 /* The name label, stitched over the band, centred on it */
@@ -253,71 +303,67 @@
   color: var(--ink);
 }
 
-/* Back and settings: card-stock patches stitched onto the band ends,
-   the full height of the band, with the band's own dye on the icon */
+/* Back and settings: a pale icon stitched into the cuff */
 #navigation-shell .back-btn,
 #navigation-shell .nav-settings-btn {
-  min-block-size: 48px;
-  block-size: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: 48px;
   min-inline-size: 48px;
-  inline-size: auto;
-  padding-block: 0;
-  padding-inline: 12px;
-  background-color: var(--paper);
-  background-image: var(--tex-grain);
-  color: var(--ink);
-  border: 1px solid var(--paper-edge);
-  border-radius: 6px;
-  outline: 1.5px dashed color-mix(in oklch, var(--band-edge) 45%, var(--stitch));
-  outline-offset: -5px;
-  box-shadow:
-    inset 0 1px 0 oklch(100% 0 0 / 0.6),
-    0 2px 4px oklch(30% 0.06 50 / 0.3);
+  block-size: 48px;
+  min-block-size: 48px;
+  margin: 0;
+  padding: 0;
+  gap: 0;
+  color: var(--cuff-thread);
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  outline: none;
+  box-shadow: none;
+  transform: none;
+  transition: background-color 0.15s ease;
 }
 
-#navigation-shell .nav-settings-btn {
-  padding-inline: 0;
-  inline-size: 48px;
+#navigation-shell .back-btn.hidden {
+  display: none;
+}
+
+#navigation-shell .back-btn span {
+  display: none;
 }
 
 #navigation-shell .back-btn svg,
 #navigation-shell .nav-settings-btn svg {
-  color: var(--band-edge);
+  inline-size: 22px;
+  block-size: 22px;
+  color: var(--cuff-thread);
+  filter: drop-shadow(0 1px 0 oklch(0% 0 0 / 0.35));
 }
 
 #navigation-shell .back-btn:hover,
 #navigation-shell .nav-settings-btn:hover {
-  background-color: oklch(98% 0.02 82);
+  background-color: oklch(100% 0 0 / 0.14);
+  transform: none;
 }
 
 #navigation-shell .back-btn:active,
 #navigation-shell .nav-settings-btn:active {
-  transform: translateY(1px);
-  box-shadow: inset 0 1px 2px oklch(30% 0.06 50 / 0.2);
+  background-color: oklch(0% 0 0 / 0.18);
+  transform: none;
+  box-shadow: none;
 }
 
 #navigation-shell .back-btn:focus-visible,
 #navigation-shell .nav-settings-btn:focus-visible {
-  outline: 3px solid var(--band-edge);
-  outline-offset: 2px;
+  outline: 3px solid var(--dye-ochre);
+  outline-offset: -3px;
 }
 
 @container navigation-shell (inline-size < 520px) {
-  #navigation-shell .nav-bar {
-    padding-inline: 18px;
-  }
-
   #navigation-shell h1 {
     padding-inline: 20px;
-  }
-
-  #navigation-shell .back-btn {
-    padding-inline: 0;
-    inline-size: 48px;
-  }
-
-  #navigation-shell .back-btn span {
-    display: none;
   }
 }
 
