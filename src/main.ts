@@ -563,6 +563,7 @@ function startGame(gameId: string, canvas: HTMLCanvasElement) {
   gameUI = new GameUI({
     gameId,
     gameName,
+    gameSubtitle: gameInfo.tagline ?? gameInfo.subtitle,
     portalId,
     portalName,
     onPortalBack: () => {

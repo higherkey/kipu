@@ -287,17 +287,13 @@ export class EquationTowerGame implements Game {
       return;
     }
 
-    // Check top palette buttons (y < 90)
-    if (y < 90) {
-      const paletteY = 62;
-      const totalW = this.paletteBlocks.length * 65;
-      const startX = (this.canvas.width - totalW) / 2;
-
-      for (let i = 0; i < this.paletteBlocks.length; i++) {
-        const btnX = startX + i * 65 + 30;
-        const dist = Math.sqrt((x - btnX) ** 2 + (y - paletteY) ** 2);
+    // Check the palette buttons in the top banner
+    if (y < EquationTowerGame.BANNER_H) {
+      const slots = this.getPaletteSlots(this.canvas.width);
+      for (let i = 0; i < slots.length; i++) {
+        const dist = Math.sqrt((x - slots[i]) ** 2 + (y - EquationTowerGame.PALETTE_Y) ** 2);
         if (dist < 28) {
-          this.spawnBlock(this.paletteBlocks[i], this.canvas.width / 2 + (Math.random() * 40 - 20), 120);
+          this.spawnBlock(this.paletteBlocks[i], this.canvas.width / 2 + (Math.random() * 40 - 20), EquationTowerGame.BANNER_H + 36);
           return;
         }
       }
@@ -477,46 +473,66 @@ export class EquationTowerGame implements Game {
     }
   }
 
+  /** Top banner: level and running total on one row, the target on the
+   *  next, then the number tiles to drop, each with room to tap. */
+  private static readonly BANNER_H = 128;
+  private static readonly PALETTE_Y = 100;
+  private static readonly PALETTE_R = 22;
+
+  /** Centre x of each palette tile, spaced evenly across the width. */
+  private getPaletteSlots(w: number): number[] {
+    const n = this.paletteBlocks.length;
+    if (n === 0) return [];
+    const step = Math.max(52, Math.min(76, (w - 32) / n));
+    const startX = w / 2 - (step * (n - 1)) / 2;
+    return this.paletteBlocks.map((_, i) => startX + i * step);
+  }
+
   private drawHeaderUI() {
     if (!this.ctx || !this.canvas) return;
 
+    const ctx = this.ctx;
     const w = this.canvas.width;
+    const pad = 16;
 
-    // Level & Target banner
-    this.ctx.fillStyle = '#2B2D5E';
-    this.ctx.fillRect(0, 0, w, 85);
+    ctx.fillStyle = '#2B2D5E';
+    ctx.fillRect(0, 0, w, EquationTowerGame.BANNER_H);
 
-    this.ctx.fillStyle = '#FFE66D';
-    this.ctx.font = 'bold 20px Fredoka, sans-serif';
-    this.ctx.textAlign = 'left';
-    this.ctx.fillText(`Level ${this.level}`, 20, 35);
+    // Row 1: level on the left, running total on the right
+    ctx.textBaseline = 'middle';
+    ctx.font = '600 16px Fredoka, sans-serif';
+    ctx.fillStyle = '#FFE66D';
+    ctx.textAlign = 'left';
+    ctx.fillText(`Level ${this.level}`, pad, 24);
 
-    this.ctx.fillStyle = '#ffffff';
-    this.ctx.font = 'bold 24px Fredoka, sans-serif';
-    this.ctx.textAlign = 'center';
-    this.ctx.fillText(`Target Sum: ${this.targetSum}  |  Current: ${this.currentSum}`, w / 2, 35);
+    ctx.fillStyle = this.currentSum > this.targetSum ? '#FF9B9B' : '#E8E6FF';
+    ctx.textAlign = 'right';
+    ctx.fillText(`Total ${this.currentSum}`, w - pad, 24);
 
-    // Palette blocks to select/spawn
-    const paletteY = 62;
-    const totalW = this.paletteBlocks.length * 65;
-    const startX = (w - totalW) / 2;
+    // Row 2: the target, big and centred
+    ctx.fillStyle = '#ffffff';
+    ctx.textAlign = 'center';
+    ctx.font = '700 26px Fredoka, sans-serif';
+    ctx.fillText(`Make ${this.targetSum}`, w / 2, 56);
 
+    // Row 3: number tiles to drop onto the scale
+    const slots = this.getPaletteSlots(w);
+    const r = EquationTowerGame.PALETTE_R;
     this.paletteBlocks.forEach((item, i) => {
-      const btnX = startX + i * 65 + 30;
+      const btnX = slots[i];
+      ctx.fillStyle = item.color;
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(btnX, EquationTowerGame.PALETTE_Y, r, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
 
-      this.ctx!.fillStyle = item.color;
-      this.ctx!.strokeStyle = '#ffffff';
-      this.ctx!.lineWidth = 2;
-      this.ctx!.beginPath();
-      this.ctx!.arc(btnX, paletteY, 18, 0, Math.PI * 2);
-      this.ctx!.fill();
-      this.ctx!.stroke();
-
-      this.ctx!.fillStyle = '#1A1A2E';
-      this.ctx!.font = 'bold 15px Fredoka, sans-serif';
-      this.ctx!.textAlign = 'center';
-      this.ctx!.textBaseline = 'middle';
-      this.ctx!.fillText(`+${item.value}`, btnX, paletteY);
+      ctx.fillStyle = '#1A1A2E';
+      ctx.font = '700 17px Fredoka, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(`+${item.value}`, btnX, EquationTowerGame.PALETTE_Y + 1);
     });
   }
 

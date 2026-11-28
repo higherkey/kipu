@@ -26,7 +26,7 @@ html #game-header {
 }
 
 .kp-band,
-html #game-header {
+html #game-header::before {
   background-color: var(--paper);
   background-image:
     linear-gradient(to bottom,
@@ -165,11 +165,76 @@ html #game-header {
   display: none;
 }
 
-/* In the game: each end of the band is one cuff holding its buttons,
-   with a running stitch between neighbours */
+/* ----------------------------------------
+   In-game header: the same unit as the home header
+   Cloth behind, a 48px woven band inset 16px from each side with
+   fringe at its ends, one cuff of wrapped thread at each end holding
+   the buttons as pale icons, and the game's name on a stitched label
+   centred on the band, with one plain line saying what the game is.
+   ---------------------------------------- */
+html #game-header {
+  container-type: inline-size;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  padding-block: 0;
+  padding-inline: 16px;
+  gap: 0;
+  background-color: var(--sand);
+  background-image:
+    var(--tex-grain),
+    linear-gradient(to bottom, oklch(97% 0.03 85 / 0.55), transparent);
+  box-shadow: 0 8px 16px -12px oklch(30% 0.06 45 / 0.45);
+}
+
+/* The band itself */
+html #game-header::before {
+  content: '';
+  position: absolute;
+  inset-inline: 16px;
+  inset-block-start: calc((var(--header-height) - 48px) / 2);
+  block-size: 48px;
+  border-radius: 4px;
+  box-shadow:
+    inset 0 1px 0 oklch(100% 0 0 / 0.2),
+    0 3px 6px -4px oklch(30% 0.06 45 / 0.35);
+  pointer-events: none;
+}
+
+/* Fringe at each end of the band, in place of the old cord */
+html #game-header::after {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  inset-block-start: calc((var(--header-height) - 42px) / 2);
+  inset-block-end: auto;
+  block-size: 42px;
+  border-radius: 0;
+  background:
+    linear-gradient(to right, oklch(100% 0 0 / 0.25), transparent) left / 16px 100% no-repeat,
+    repeating-linear-gradient(to bottom, var(--rope-mid) 0 2px, transparent 2px 4px) left / 16px 100% no-repeat,
+    linear-gradient(to left, oklch(100% 0 0 / 0.25), transparent) right / 16px 100% no-repeat,
+    repeating-linear-gradient(to bottom, var(--rope-mid) 0 2px, transparent 2px 4px) right / 16px 100% no-repeat;
+  -webkit-mask-image: linear-gradient(to right, transparent 0, black 10px, black calc(100% - 10px), transparent 100%);
+  mask-image: linear-gradient(to right, transparent 0, black 10px, black calc(100% - 10px), transparent 100%);
+  box-shadow: none;
+  pointer-events: none;
+}
+
+#game-header > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* A cuff at each end of the band holds that end's buttons */
 #game-header .header-nav-left,
 #game-header .header-nav-right {
   --cuff: color-mix(in oklch, var(--band-edge, var(--dye-indigo)) 88%, var(--ink));
+  display: flex;
+  align-self: center;
+  align-items: stretch;
+  block-size: 48px;
+  gap: 0;
   background-color: var(--cuff);
   background-image:
     linear-gradient(to bottom, oklch(100% 0 0 / 0.22), transparent 45%, oklch(0% 0 0 / 0.24)),
@@ -177,13 +242,19 @@ html #game-header {
 }
 
 #game-header .header-nav-left {
+  border-start-start-radius: 4px;
+  border-end-start-radius: 4px;
   border-inline-end: 1.5px dashed oklch(86% 0.045 78 / 0.55);
 }
 
 #game-header .header-nav-right {
+  border-start-end-radius: 4px;
+  border-end-end-radius: 4px;
   border-inline-start: 1.5px dashed oklch(86% 0.045 78 / 0.55);
 }
 
+/* Every button is a square 48px icon in the cuff; the name is kept
+   for screen readers by the button's own label */
 #game-header .header-btn,
 #game-header .header-btn.home-btn,
 #game-header .header-btn.menu-btn,
@@ -192,17 +263,14 @@ html #game-header {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  align-self: stretch;
-  block-size: auto;
-  min-block-size: 48px;
+  inline-size: 48px;
   min-inline-size: 48px;
-  inline-size: auto;
-  padding-block: 0;
-  padding-inline: 12px;
-  font-family: 'Fredoka', sans-serif;
-  font-size: 0.95rem;
-  font-weight: 600;
+  max-inline-size: 48px;
+  block-size: 48px;
+  min-block-size: 48px;
+  margin: 0;
+  padding: 0;
+  gap: 0;
   color: oklch(86% 0.045 78);
   background: transparent;
   border: none;
@@ -212,13 +280,15 @@ html #game-header {
   filter: none;
   cursor: pointer;
   text-decoration: none;
-  white-space: nowrap;
-  text-shadow: 0 1px 0 oklch(0% 0 0 / 0.35);
   transition: background-color 0.15s ease;
 }
 
+#game-header .header-btn .header-label {
+  display: none;
+}
+
 #game-header .header-btn + .header-btn {
-  border-inline-start: 1.5px dashed oklch(86% 0.045 78 / 0.35);
+  border-inline-start: 1.5px dashed oklch(86% 0.045 78 / 0.3);
 }
 
 .kp-header .kp-btn svg,
@@ -229,10 +299,7 @@ html #game-header {
   filter: drop-shadow(0 1px 0 oklch(0% 0 0 / 0.35));
 }
 
-.kp-header .kp-btn:hover {
-  background-color: oklch(100% 0 0 / 0.14);
-}
-
+.kp-header .kp-btn:hover,
 #game-header .header-btn:hover {
   background-color: oklch(100% 0 0 / 0.14);
 }
@@ -244,58 +311,29 @@ html #game-header {
   box-shadow: none;
 }
 
-.kp-header .kp-btn:active {
-  background-color: oklch(0% 0 0 / 0.18);
-}
-
 .kp-header .kp-btn:focus-visible,
 #game-header .header-btn:focus-visible {
   outline: 3px solid var(--dye-ochre);
   outline-offset: -3px;
 }
 
-/* Icon-only cuffs are square */
-#game-header .header-btn.home-btn,
-#game-header .header-btn.menu-btn {
-  inline-size: 48px;
-  padding-inline: 0;
-}
-
-/* ----------------------------------------
-   In-game header: the whole bar is the woven band
-   ---------------------------------------- */
-html #game-header {
-  align-items: stretch;
-  padding-block: 0;
-  padding-inline: 0;
-  gap: 8px;
-  box-shadow:
-    inset 0 1px 0 oklch(100% 0 0 / 0.25),
-    0 6px 12px -6px oklch(30% 0.06 45 / 0.5);
-}
-
-/* The band's own edges replace the old cord */
-html #game-header::after {
-  content: none;
-}
-
-#game-header .header-nav-left,
-#game-header .header-nav-right {
-  align-self: stretch;
-  align-items: stretch;
-  gap: 0;
-}
-
-/* Game name on a stitched label over the band */
+/* The name label, stitched over the band and centred on it */
 #game-header .header-title {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-self: center;
   align-self: center;
-  flex: 0 1 auto;
-  margin-inline: auto;
-  padding-block: 6px 7px;
-  padding-inline: 16px;
-  font-size: clamp(1rem, 0.9rem + 1vw, 1.25rem);
-  line-height: 1.2;
+  flex: none;
+  min-inline-size: 0;
+  max-inline-size: calc(100% - 16px);
+  margin-inline: 8px;
+  padding-block: 4px 5px;
+  padding-inline: 14px;
   color: color-mix(in oklch, var(--dye, var(--dye-cochineal)) 85%, var(--ink));
+  text-align: center;
+  white-space: normal;
+  overflow: hidden;
   background-color: var(--paper);
   background-image: var(--tex-grain);
   border: 1px solid var(--paper-edge);
@@ -303,25 +341,40 @@ html #game-header::after {
   outline: 1.5px dashed var(--stitch);
   outline-offset: -4px;
   box-shadow: inset 0 1px 0 oklch(100% 0 0 / 0.7), 0 2px 4px oklch(30% 0.06 50 / 0.3);
+  box-sizing: border-box;
 }
 
-@media (max-width: 440px) {
-  #game-header .header-title {
-    padding-inline: 10px;
-  }
+#game-header .header-name,
+#game-header .header-subtitle {
+  display: block;
+  max-inline-size: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-@media (max-width: 600px) {
-  #game-header .header-btn.feedback-btn {
-    inline-size: 48px;
-    padding-inline: 0;
-  }
+#game-header .header-name {
+  font-size: clamp(0.8rem, 0.46rem + 1.6cqi, 1.2rem);
+  font-weight: 600;
+  line-height: 1.15;
+  text-shadow: 0 1px 0 oklch(100% 0 0 / 0.6);
+}
+
+/* What the game is, in one short plain line */
+#game-header .header-subtitle {
+  margin-block-start: 1px;
+  font-family: 'Fredoka', sans-serif;
+  font-size: clamp(0.68rem, 0.55rem + 0.6cqi, 0.8rem);
+  font-weight: 500;
+  line-height: 1.15;
+  letter-spacing: 0;
+  color: var(--ink-soft);
 }
 
 @media (max-width: 380px) {
-  #game-header .header-btn.portal-back-btn {
-    inline-size: 48px;
-    padding-inline: 0;
+  #game-header .header-title {
+    padding-inline: 8px;
+    margin-inline: 4px;
   }
 }
 
