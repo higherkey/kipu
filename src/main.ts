@@ -1,5 +1,7 @@
 import './style.css';
+import './styles/khipu.css';
 import './ui/NotFound.css';
+import './styles/khipu-pages.css';
 import { registerSW } from 'virtual:pwa-register';
 import { Icons } from './ui/Icons';
 import { IdleManager } from './core/IdleManager';
@@ -108,6 +110,10 @@ export function escapeHtml(str: string): string {
     .replace(/'/g, '&#39;');
 }
 
+/** Number of game dyes and woven motifs defined in styles/khipu.css. */
+const GAME_DYE_COUNT = 10;
+const GAME_MOTIF_COUNT = 6;
+
 export function renderGameList(portalId?: string): void {
   const container = document.getElementById('game-list');
   if (!container) return;
@@ -118,13 +124,18 @@ export function renderGameList(portalId?: string): void {
     ? allGames.filter(g => g.portal === portalId)
     : allGames;
 
-  container.innerHTML = games.map(game => {
+  container.innerHTML = games.map((game, index) => {
     const iconSvg = (game.icon in Icons)
       ? Icons[game.icon as keyof typeof Icons]
       : (Icons.settings || '');
 
+    // Each card gets its own dye and woven motif. Cycling by position keeps
+    // neighbours on the same page from ever sharing a look.
+    const dye = index % GAME_DYE_COUNT;
+    const motif = index % GAME_MOTIF_COUNT;
+
     return `
-      <a href="/game/${game.id}" data-game="${game.id}" data-portal="${game.portal}" data-category="${game.category}" role="menuitem">
+      <a href="/game/${game.id}" data-game="${game.id}" data-portal="${game.portal}" data-category="${game.category}" data-dye="${dye}" data-motif="${motif}" role="menuitem">
         <span class="icon">${iconSvg}</span>
         <span class="game-label">
           <span class="game-title">${escapeHtml(game.name)}</span>
@@ -135,12 +146,31 @@ export function renderGameList(portalId?: string): void {
   }).join('');
 }
 
+/**
+ * Ties one knot on each portal's pendant string per game in that portal,
+ * the way a khipu records a count, and writes the count on the portal tag.
+ */
+export function renderPortalKnots(): void {
+  const registry = GameRegistry.getInstance();
+  document.querySelectorAll<HTMLElement>('[data-knots-for]').forEach((el) => {
+    const portal = el.dataset.knotsFor as 'sandbox' | 'workshop' | 'lab' | 'busyBoard';
+    const count = registry.getByPortal(portal).length;
+    el.innerHTML = '<span class="knot"></span>'.repeat(count);
+  });
+  document.querySelectorAll<HTMLElement>('[data-count-for]').forEach((el) => {
+    const portal = el.dataset.countFor as 'sandbox' | 'workshop' | 'lab' | 'busyBoard';
+    const count = registry.getByPortal(portal).length;
+    el.textContent = `${count} ${count === 1 ? 'game' : 'games'}`;
+  });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   const navShell = document.getElementById('navigation-shell');
   const gameCanvas = document.getElementById('game-canvas') as HTMLCanvasElement;
 
   // Render initial dynamic game cards from GameRegistry
   renderGameList();
+  renderPortalKnots();
 
   // Setup Hero Banner dots indicators
   const dotsContainer = document.getElementById('hero-dots');
@@ -471,9 +501,16 @@ document.addEventListener('DOMContentLoaded', () => {
       notFound.id = 'not-found-screen';
       notFound.className = 'not-found-container';
       notFound.innerHTML = `
-        <h2>404</h2>
-        <p>This game could not be found.</p>
-        <a href="/" class="back-home-btn">Go Back Home</a>
+        <header class="kp-header">
+          <div class="kp-band" aria-hidden="true"></div>
+          <div class="kp-nav">
+            <div><a href="/" class="kp-btn" aria-label="Back to all games">${Icons.back}<span class="btn-label">Home</span></a></div>
+            <div><h1 class="kp-label">Lost string</h1></div>
+            <div></div>
+          </div>
+          <p class="kp-tagline">We couldn't find that game.</p>
+        </header>
+        <a href="/" class="back-home-btn">Back to all games</a>
       `;
       document.getElementById('app')?.appendChild(notFound);
     } else {

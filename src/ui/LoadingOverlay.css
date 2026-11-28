@@ -69,6 +69,6 @@
 }
 
 @keyframes knot-bounce {
-  from { transform: translateY(0) rotate(-5deg); }
-  to   { transform: translateY(-28px) rotate(5deg); }
+  from { transform: translateY(0); }
+  to   { transform: translateY(-28px); }
 }

@@ -1,0 +1,1159 @@
+/* ========================================
+   Kipu — Khipu Shell Redesign
+   The menu is a khipu: one primary cord, with a pendant string for each
+   portal. Each pendant is dyed its own color and carries one knot per game,
+   the way a khipu records a count. Game tiles hang as tags from cords.
+
+   The materials are meant to feel handmade: twisted cotton cords, wool
+   strings dyed with plant and insect dyes, card-stock tags with stitched
+   edges and brass eyelets, all on warm undyed cloth.
+
+   Loaded after style.css; rules are scoped under #navigation-shell /
+   #mobile-tab-bar so they win over the earlier shell styles without
+   !important.
+   ======================================== */
+
+:root {
+  /* Natural dyes, kept earthy rather than bright */
+  --dye-indigo:    oklch(42% 0.10 262);
+  --dye-cochineal: oklch(52% 0.15 30);
+  --dye-ochre:     oklch(70% 0.12 70);
+  --dye-moss:      oklch(53% 0.09 138);
+
+  /* Surfaces & ink */
+  --sand:          oklch(90.5% 0.04 74);
+  --paper:         oklch(96.5% 0.025 82);
+  --paper-edge:    oklch(84% 0.045 72);
+  --ink:           oklch(27% 0.035 50);
+  --ink-soft:      oklch(46% 0.035 55);
+
+  /* Undyed cotton / camelid fiber */
+  --rope-light:    oklch(80% 0.06 76);
+  --rope-mid:      oklch(67% 0.07 66);
+  --rope-dark:     oklch(49% 0.07 52);
+
+  /* Brass for eyelets */
+  --brass-light:   oklch(82% 0.10 85);
+  --brass-dark:    oklch(55% 0.09 70);
+
+  /* Textures: fine paper grain, and long fibers for cloth */
+  --tex-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .42 0 0 0 0 .3 0 0 0 0 .18 0 0 0 .6 -.2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+  --tex-fiber: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='2400' height='320'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.008 .28' numOctaves='2' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .45 0 0 0 0 .32 0 0 0 0 .2 0 0 0 .8 -.32'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23f)'/%3E%3C/svg%3E");
+
+  /* Twisted rope, lit from above (horizontal) or from the left (vertical) */
+  --rope-h:
+    linear-gradient(to bottom, oklch(100% 0 0 / 0.35), transparent 45%, oklch(25% 0.05 45 / 0.35)),
+    repeating-linear-gradient(-55deg, var(--rope-light) 0 3px, var(--rope-mid) 3px 5.5px, var(--rope-dark) 5.5px 7px);
+  --rope-v:
+    linear-gradient(to right, oklch(100% 0 0 / 0.35), transparent 45%, oklch(25% 0.05 45 / 0.35)),
+    repeating-linear-gradient(35deg, var(--rope-light) 0 3px, var(--rope-mid) 3px 5.5px, var(--rope-dark) 5.5px 7px);
+
+  /* Shadows tinted brown, the way paper casts them on cloth */
+  --tag-shadow:
+    0 1px 1px oklch(35% 0.06 50 / 0.18),
+    0 6px 10px -4px oklch(35% 0.06 50 / 0.22),
+    0 20px 32px -18px oklch(30% 0.07 45 / 0.5);
+  --rope-shadow: 0 3px 3px -1px oklch(30% 0.06 45 / 0.35);
+
+  --stitch: color-mix(in oklch, var(--paper-edge) 55%, var(--rope-dark));
+}
+
+/* Each portal gets its dye, and a readable color for marks drawn on it */
+.portal-busyBoard, [data-portal="busyBoard"] { --dye: var(--dye-indigo);    --on-dye: var(--paper); }
+.portal-sandbox,   [data-portal="sandbox"]   { --dye: var(--dye-cochineal); --on-dye: var(--paper); }
+.portal-workshop,  [data-portal="workshop"]  { --dye: var(--dye-ochre);     --on-dye: var(--ink); }
+.portal-lab,       [data-portal="lab"]       { --dye: var(--dye-moss);      --on-dye: var(--paper); }
+
+/* ----------------------------------------
+   Shell background: undyed cloth, lit softly from above
+   ---------------------------------------- */
+#navigation-shell,
+#navigation-shell.portal-sandbox,
+#navigation-shell.portal-workshop,
+#navigation-shell.portal-lab,
+#navigation-shell.portal-busyBoard {
+  color: var(--ink);
+  background-color: var(--sand);
+  background-size: auto;
+  background-image:
+    var(--tex-fiber),
+    var(--tex-grain),
+    repeating-linear-gradient(0deg, oklch(55% 0.06 65 / 0.04) 0 1px, transparent 1px 4px),
+    repeating-linear-gradient(90deg, oklch(55% 0.06 65 / 0.04) 0 1px, transparent 1px 4px),
+    radial-gradient(130% 70% at 50% 0%, oklch(97% 0.03 85 / 0.85), transparent 65%),
+    radial-gradient(150% 110% at 50% 115%, oklch(62% 0.07 55 / 0.28), transparent 60%);
+  animation: none;
+  filter: none;
+}
+
+/* On a portal page, a soft wash of that portal's dye bleeds in from the top */
+#navigation-shell.portal-sandbox,
+#navigation-shell.portal-workshop,
+#navigation-shell.portal-lab,
+#navigation-shell.portal-busyBoard {
+  background-image:
+    var(--tex-fiber),
+    var(--tex-grain),
+    repeating-linear-gradient(0deg, oklch(55% 0.06 65 / 0.04) 0 1px, transparent 1px 4px),
+    repeating-linear-gradient(90deg, oklch(55% 0.06 65 / 0.04) 0 1px, transparent 1px 4px),
+    radial-gradient(120% 45% at 50% 0%, color-mix(in oklch, var(--dye) 16%, transparent), transparent 75%),
+    radial-gradient(130% 70% at 50% 0%, oklch(97% 0.03 85 / 0.7), transparent 65%),
+    radial-gradient(150% 110% at 50% 115%, oklch(62% 0.07 55 / 0.28), transparent 60%);
+}
+
+/* ----------------------------------------
+   Header: a woven band with the name sewn on as a label
+   The band is a strip of Andean-style weaving: dyed edge stripes and
+   a zigzag row down the middle, with fringe at each end. The title sits
+   on a card-stock label stitched over the band's lower edge.
+   ---------------------------------------- */
+#navigation-shell .menu-header {
+  --band-edge: color-mix(in oklab, var(--dye-indigo) 72%, var(--sand));
+  --band-accent: color-mix(in oklab, var(--dye-cochineal) 62%, var(--sand));
+  --band-line: color-mix(in oklab, var(--dye-ochre) 70%, var(--sand));
+  max-inline-size: 880px;
+  margin-block-end: 1.5rem;
+}
+
+/* Portal pages: the games follow the header closely */
+#navigation-shell.portal-sandbox .menu-header,
+#navigation-shell.portal-workshop .menu-header,
+#navigation-shell.portal-lab .menu-header,
+#navigation-shell.portal-busyBoard .menu-header {
+  margin-block-end: 0.5rem;
+}
+
+#navigation-shell.portal-sandbox .menu-header,
+#navigation-shell.portal-workshop .menu-header,
+#navigation-shell.portal-lab .menu-header,
+#navigation-shell.portal-busyBoard .menu-header {
+  --band-edge: color-mix(in oklab, color-mix(in oklch, var(--dye) 85%, var(--ink)) 72%, var(--sand));
+  --band-accent: color-mix(in oklab, var(--dye) 62%, var(--sand));
+}
+
+/* The band's weave, with a cuff of wrapped thread bound around each
+   end. Shared by the menu header and the page headers (khipu-pages.css). */
+#navigation-shell .cord-line,
+.kp-header .kp-band {
+  --cuff: color-mix(in oklch, var(--band-edge) 88%, var(--ink));
+  --cuff-thread: oklch(86% 0.045 78);
+  --band-layers:
+    /* cuff shading, so each cuff looks wrapped round the band */
+    linear-gradient(to bottom, oklch(100% 0 0 / 0.22), transparent 45%, oklch(0% 0 0 / 0.24)),
+    linear-gradient(to bottom, oklch(100% 0 0 / 0.22), transparent 45%, oklch(0% 0 0 / 0.24)),
+    /* the wraps of thread */
+    repeating-linear-gradient(90deg, oklch(0% 0 0 / 0.22) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(90deg, oklch(0% 0 0 / 0.22) 0 1px, transparent 1px 3px),
+    /* a running stitch where each cuff meets the weave */
+    repeating-linear-gradient(to bottom, oklch(86% 0.045 78 / 0.55) 0 3px, transparent 3px 6px),
+    repeating-linear-gradient(to bottom, oklch(86% 0.045 78 / 0.55) 0 3px, transparent 3px 6px),
+    /* cuff dye */
+    linear-gradient(var(--cuff), var(--cuff)),
+    linear-gradient(var(--cuff), var(--cuff)),
+    /* edge stripes */
+    linear-gradient(to bottom,
+      var(--band-edge) 0 6px, transparent 6px calc(100% - 6px), var(--band-edge) calc(100% - 6px)),
+    /* thin accent lines inside the edges */
+    linear-gradient(to bottom,
+      transparent 0 9px, var(--band-line) 9px 11px,
+      transparent 11px calc(100% - 11px), var(--band-line) calc(100% - 11px) calc(100% - 9px), transparent 0),
+    /* zigzag row */
+    linear-gradient(135deg, var(--band-accent) 25%, transparent 25%),
+    linear-gradient(225deg, var(--band-accent) 25%, transparent 25%),
+    linear-gradient(315deg, var(--band-accent) 25%, transparent 25%),
+    linear-gradient(45deg, var(--band-accent) 25%, transparent 25%),
+    /* the weave itself */
+    repeating-linear-gradient(90deg, oklch(0% 0 0 / 0.06) 0 1px, transparent 1px 3px),
+    var(--tex-grain);
+  --band-sizes:
+    48px 100%, 48px 100%,
+    48px 100%, 48px 100%,
+    1.5px 100%, 1.5px 100%,
+    48px 100%, 48px 100%,
+    auto, auto,
+    14px 14px, 14px 14px, 14px 14px, 14px 14px,
+    auto, auto;
+  --band-positions:
+    left 0 top 0, right 0 top 0,
+    left 0 top 0, right 0 top 0,
+    left 44px top 0, right 44px top 0,
+    left 0 top 0, right 0 top 0,
+    0 0, 0 0,
+    -7px 50%, -7px 50%, 0 50%, 0 50%,
+    0 0, 0 0;
+  --band-repeats:
+    no-repeat, no-repeat,
+    no-repeat, no-repeat,
+    no-repeat, no-repeat,
+    no-repeat, no-repeat,
+    no-repeat, no-repeat,
+    repeat-x, repeat-x, repeat-x, repeat-x,
+    repeat, repeat;
+}
+
+#navigation-shell .cord-line {
+  position: relative;
+  inline-size: calc(100% - 32px);
+  block-size: 48px;
+  margin-block: 0;
+  margin-inline: auto;
+  border-radius: 4px;
+  background-color: var(--paper);
+  background-image: var(--band-layers);
+  background-size: var(--band-sizes);
+  background-position: var(--band-positions);
+  background-repeat: var(--band-repeats);
+  box-shadow:
+    inset 0 1px 0 oklch(100% 0 0 / 0.2),
+    0 3px 6px -4px oklch(30% 0.06 45 / 0.35);
+}
+
+/* Fringe at each end of the band */
+#navigation-shell .cord-line::before,
+#navigation-shell .cord-line::after {
+  content: '';
+  position: absolute;
+  inset-block: 3px;
+  inline-size: 16px;
+  block-size: auto;
+  border-radius: 0;
+  background:
+    linear-gradient(to right, oklch(100% 0 0 / 0.25), transparent),
+    repeating-linear-gradient(to bottom, var(--rope-mid) 0 2px, transparent 2px 4px);
+  box-shadow: none;
+}
+#navigation-shell .cord-line::before {
+  inset-inline: -16px auto;
+  -webkit-mask-image: linear-gradient(to left, black 40%, transparent);
+  mask-image: linear-gradient(to left, black 40%, transparent);
+}
+#navigation-shell .cord-line::after {
+  inset-inline: auto -16px;
+  -webkit-mask-image: linear-gradient(to right, black 40%, transparent);
+  mask-image: linear-gradient(to right, black 40%, transparent);
+}
+
+/* One header unit. Each end of the band is bound with a cuff of
+   wrapped thread in the band's own dye. Back and settings live inside
+   the cuffs as a pale stitched icon, so they read as part of the
+   weaving. Both cuffs are always there, so the name label stays centred
+   whether or not a page has a back button. */
+#navigation-shell .nav-bar {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr) 48px;
+  align-items: start;
+  inline-size: 100%;
+  min-block-size: 0;
+  margin-block: -48px 0;
+  padding-inline: 16px;
+  gap: 0;
+  box-sizing: border-box;
+}
+
+#navigation-shell .nav-left,
+#navigation-shell .nav-right {
+  display: flex;
+  padding-block-start: 0;
+  align-items: flex-start;
+  min-inline-size: 0;
+}
+
+#navigation-shell .nav-center {
+  display: flex;
+  justify-content: center;
+  min-inline-size: 0;
+}
+
+/* The name label, stitched over the band, centred on it */
+#navigation-shell h1 {
+  display: inline-block;
+  margin-block-start: calc((48px - 1.1em - 20px) / 2);
+  padding-block: 9px;
+  padding-inline: 28px;
+  font-size: clamp(2rem, 3cqi + 1.3rem, 3rem);
+  line-height: 1.1;
+  color: var(--dye-cochineal);
+  letter-spacing: -0.5px;
+  font-weight: 600;
+  background-color: var(--paper);
+  background-image: var(--tex-grain);
+  border: 1px solid var(--paper-edge);
+  border-radius: 8px;
+  outline: 1.5px dashed var(--stitch);
+  outline-offset: -6px;
+  box-shadow: inset 0 1px 0 oklch(100% 0 0 / 0.7), var(--tag-shadow);
+  text-shadow: 0 1px 0 oklch(100% 0 0 / 0.6);
+}
+
+#navigation-shell.portal-sandbox h1,
+#navigation-shell.portal-workshop h1,
+#navigation-shell.portal-lab h1,
+#navigation-shell.portal-busyBoard h1 {
+  color: color-mix(in oklch, var(--dye) 85%, var(--ink));
+}
+
+/* Subtitle: plain sentence text in full ink, tucked under the label */
+#navigation-shell .tagline {
+  margin-block-start: 8px;
+  max-inline-size: 65ch;
+  font-size: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--ink);
+}
+
+/* Back and settings: a pale icon stitched into the cuff */
+#navigation-shell .back-btn,
+#navigation-shell .nav-settings-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: 48px;
+  min-inline-size: 48px;
+  block-size: 48px;
+  min-block-size: 48px;
+  margin: 0;
+  padding: 0;
+  gap: 0;
+  color: oklch(86% 0.045 78);
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  outline: none;
+  box-shadow: none;
+  transform: none;
+  transition: background-color 0.15s ease;
+}
+
+#navigation-shell .back-btn.hidden {
+  display: none;
+}
+
+#navigation-shell .back-btn span {
+  display: none;
+}
+
+#navigation-shell .back-btn svg,
+#navigation-shell .nav-settings-btn svg {
+  inline-size: 22px;
+  block-size: 22px;
+  color: oklch(86% 0.045 78);
+  filter: drop-shadow(0 1px 0 oklch(0% 0 0 / 0.35));
+}
+
+#navigation-shell .back-btn:hover,
+#navigation-shell .nav-settings-btn:hover {
+  background-color: oklch(100% 0 0 / 0.14);
+  transform: none;
+}
+
+#navigation-shell .back-btn:active,
+#navigation-shell .nav-settings-btn:active {
+  background-color: oklch(0% 0 0 / 0.18);
+  transform: none;
+  box-shadow: none;
+}
+
+#navigation-shell .back-btn:focus-visible,
+#navigation-shell .nav-settings-btn:focus-visible {
+  outline: 3px solid var(--dye-ochre);
+  outline-offset: -3px;
+}
+
+@container navigation-shell (inline-size < 520px) {
+  #navigation-shell h1 {
+    padding-inline: 20px;
+  }
+}
+
+/* ----------------------------------------
+   Featured game: a card-stock tag with a brass eyelet and stitched edge
+   ---------------------------------------- */
+#navigation-shell .hero-card {
+  background-color: var(--paper);
+  background-image: var(--tex-grain);
+  border: 1px solid var(--paper-edge);
+  border-radius: 20px;
+  box-shadow: inset 0 1px 0 oklch(100% 0 0 / 0.7), var(--tag-shadow);
+  outline: 1.5px dashed var(--stitch);
+  outline-offset: -10px;
+  padding-block: 30px 42px;
+  padding-inline: 48px 32px;
+}
+
+/* Brass eyelet the tag would be tied through */
+#navigation-shell .hero-card::before {
+  content: '';
+  position: absolute;
+  inset-block-start: 20px;
+  inset-inline-start: 18px;
+  inline-size: 16px;
+  block-size: 16px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, var(--sand) 0 32%, transparent 34%),
+    radial-gradient(circle at 35% 30%, var(--brass-light), var(--brass-dark) 70%);
+  box-shadow:
+    inset 0 1px 1px oklch(25% 0.05 50 / 0.5),
+    0 1px 1px oklch(30% 0.06 50 / 0.35);
+}
+
+#navigation-shell .featured-badge {
+  background: none;
+  border: none;
+  color: var(--dye-cochineal);
+  padding: 0;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* A short dyed thread before the label */
+#navigation-shell .featured-badge::before {
+  content: '';
+  inline-size: 20px;
+  block-size: 4px;
+  border-radius: 999px;
+  background:
+    repeating-linear-gradient(-55deg, transparent 0 2px, oklch(0% 0 0 / 0.2) 2px 3px),
+    var(--dye-cochineal);
+}
+
+#navigation-shell .hero-card h2 {
+  color: var(--ink);
+  font-weight: 600;
+  letter-spacing: -0.5px;
+}
+
+#navigation-shell .hero-card p#hero-subtitle {
+  color: var(--dye-cochineal);
+}
+
+#navigation-shell .hero-card p#hero-desc {
+  color: var(--ink-soft);
+}
+
+/* Play button: a dyed felt patch with a stitched edge */
+#navigation-shell .hero-btn-play {
+  background-color: var(--dye-cochineal);
+  background-image: var(--tex-grain);
+  color: var(--paper);
+  border: none;
+  border-radius: 8px;
+  padding: 13px 30px;
+  font-weight: 600;
+  outline: 1.5px dashed oklch(96% 0.03 80 / 0.55);
+  outline-offset: -5px;
+  box-shadow:
+    inset 0 1px 0 oklch(100% 0 0 / 0.2),
+    0 3px 0 oklch(36% 0.12 30),
+    0 10px 16px -8px oklch(30% 0.1 30 / 0.5);
+}
+
+#navigation-shell .hero-btn-play:hover {
+  background-color: color-mix(in oklch, var(--dye-cochineal) 90%, black);
+}
+
+#navigation-shell .hero-btn-play:active {
+  transform: translateY(3px);
+  box-shadow: inset 0 1px 2px oklch(20% 0.05 30 / 0.3);
+}
+
+/* Preview disc: a felt circle with a stitched ring */
+#navigation-shell .hero-interactive-preview {
+  inline-size: 128px;
+  block-size: 128px;
+  border: none;
+  background-color: color-mix(in oklch, var(--dye-cochineal) 12%, var(--paper));
+  background-image: var(--tex-grain);
+  outline: 1.5px dashed color-mix(in oklch, var(--dye-cochineal) 35%, transparent);
+  outline-offset: -12px;
+  box-shadow:
+    inset 0 2px 4px oklch(30% 0.06 40 / 0.15),
+    0 1px 0 oklch(100% 0 0 / 0.6);
+  animation: khipu-float 7s ease-in-out infinite;
+}
+
+@keyframes khipu-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+#navigation-shell #hero-icon-container {
+  color: var(--dye-cochineal);
+}
+
+/* Slide dots: wooden beads on a string */
+#navigation-shell .hero-dots {
+  gap: 6px;
+  padding-inline: 10px;
+  background: linear-gradient(var(--rope-mid), var(--rope-mid)) center / 100% 2px no-repeat;
+}
+
+#navigation-shell .hero-dots .dot {
+  inline-size: 12px;
+  block-size: 12px;
+  border: none;
+  background:
+    radial-gradient(circle at 35% 30%, oklch(100% 0 0 / 0.5), transparent 45%),
+    radial-gradient(circle at 50% 60%, var(--rope-mid), var(--rope-dark));
+  box-shadow: 0 1px 1px oklch(30% 0.06 45 / 0.4);
+  transition: inline-size 0.2s ease, background 0.2s ease;
+}
+
+#navigation-shell .hero-dots .dot.active {
+  inline-size: 22px;
+  border-radius: 999px;
+  transform: none;
+  background:
+    radial-gradient(60% 100% at 35% 25%, oklch(100% 0 0 / 0.35), transparent 60%),
+    var(--dye-cochineal);
+}
+
+@container navigation-shell (inline-size < 520px) {
+  #navigation-shell .hero-card {
+    padding-block: 24px 38px;
+    padding-inline: 40px 20px;
+  }
+
+  #navigation-shell .hero-interactive-preview {
+    inline-size: 96px;
+    block-size: 96px;
+    margin-inline-start: 1rem;
+    outline-offset: -9px;
+  }
+}
+
+/* ----------------------------------------
+   "Pick a string" caption
+   ---------------------------------------- */
+#navigation-shell .portal-instruction {
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin-block-end: 0.5rem;
+}
+
+#navigation-shell .portal-instruction .bouncing-arrow {
+  display: none;
+}
+
+/* ----------------------------------------
+   The khipu: primary cord + one pendant per portal
+   Wide: cord runs across the top and pendants hang down.
+   Narrow: the khipu turns sideways; the cord runs down the
+   left and pendants reach right to their tags.
+   ---------------------------------------- */
+#navigation-shell .portals-grid {
+  position: relative;
+  grid-template-columns: 1fr;
+  gap: 20px;
+  padding-block-start: 8px;
+  padding-inline-start: 18px;
+  margin-block-end: 2.5rem;
+}
+
+/* Primary cord */
+#navigation-shell .portals-grid::before {
+  content: '';
+  position: absolute;
+  inset-block: 0 8px;
+  inset-inline-start: 0;
+  inline-size: 12px;
+  border-radius: 999px;
+  background: var(--rope-v);
+  box-shadow: 3px 0 3px -1px oklch(30% 0.06 45 / 0.35);
+}
+
+/* Portal = pendant string + tag. The anchor itself carries no surface. */
+#navigation-shell .portal-card,
+#navigation-shell .portal-card.portal-sandbox,
+#navigation-shell .portal-card.portal-workshop,
+#navigation-shell .portal-card.portal-lab,
+#navigation-shell .portal-card.portal-busyBoard {
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  overflow: visible;
+  color: var(--ink);
+  transform: none;
+}
+
+/* Drop the old fiber strip and Lab corner brackets */
+#navigation-shell .portal-card::before,
+#navigation-shell .portal-card::after {
+  content: none;
+}
+
+
+#navigation-shell .portal-card .pendant {
+  position: relative;
+  flex: 0 0 auto;
+  inline-size: 118px;
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* The pendant string itself: dyed wool, twisted and lit from above */
+#navigation-shell .portal-card .pendant::before {
+  content: '';
+  position: absolute;
+  inset-inline: -8px -6px;
+  inset-block-start: 50%;
+  block-size: 6px;
+  margin-block-start: -3px;
+  border-radius: 999px;
+  background:
+    linear-gradient(to bottom, oklch(100% 0 0 / 0.3), transparent 50%, oklch(0% 0 0 / 0.3)),
+    repeating-linear-gradient(-55deg,
+      color-mix(in oklch, var(--dye) 72%, white) 0 1.5px,
+      var(--dye) 1.5px 4px,
+      color-mix(in oklch, var(--dye) 70%, black) 4px 5px);
+  box-shadow: 0 2px 2px -1px oklch(30% 0.06 45 / 0.35);
+}
+
+#navigation-shell .knots {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  gap: 2px;
+}
+
+/* One knot per game: a round, tight wrap of the same dyed string */
+#navigation-shell .knot {
+  display: block;
+  inline-size: 8px;
+  block-size: 14px;
+  border-radius: 45%;
+  background:
+    radial-gradient(circle at 38% 28%, oklch(100% 0 0 / 0.4), transparent 50%),
+    repeating-linear-gradient(0deg, transparent 0 2px, oklch(0% 0 0 / 0.18) 2px 3px),
+    color-mix(in oklch, var(--dye) 82%, black);
+  box-shadow: 0 1.5px 1.5px oklch(25% 0.05 45 / 0.4);
+}
+
+/* The tag hanging from the pendant */
+#navigation-shell .portal-card .tag {
+  position: relative;
+  flex: 1 1 auto;
+  min-inline-size: 0;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 18px 16px 34px;
+  background-color: var(--paper);
+  background-image: var(--tex-grain);
+  border: 1px solid var(--paper-edge);
+  border-radius: 14px;
+  box-shadow: inset 0 1px 0 oklch(100% 0 0 / 0.7), var(--tag-shadow);
+  outline: 1.5px dashed color-mix(in oklch, var(--dye) 45%, var(--stitch));
+  outline-offset: -7px;
+  transform: none;
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease;
+}
+
+/* Brass eyelet where the string ties on */
+#navigation-shell .portal-card .tag::before {
+  content: '';
+  position: absolute;
+  inset-inline-start: 12px;
+  inset-block-start: 50%;
+  inline-size: 12px;
+  block-size: 12px;
+  margin-block-start: -6px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, var(--dye) 0 30%, transparent 33%),
+    radial-gradient(circle at 35% 30%, var(--brass-light), var(--brass-dark) 70%);
+  box-shadow: 0 1px 1px oklch(30% 0.06 50 / 0.35);
+}
+
+#navigation-shell .portal-card:hover .tag {
+  transform: translateX(4px);
+}
+
+#navigation-shell .portal-card:active .tag {
+  transform: scale(0.97);
+  box-shadow: inset 0 1px 0 oklch(100% 0 0 / 0.7), 0 1px 2px oklch(30% 0.06 50 / 0.3);
+}
+
+/* Icon: a dyed felt patch, stitched on */
+#navigation-shell .portal-card .icon,
+#navigation-shell .portal-card:hover .icon {
+  flex: 0 0 auto;
+  inline-size: 58px;
+  block-size: 58px;
+  border: none;
+  border-radius: 50%;
+  background-color: var(--dye);
+  background-image:
+    radial-gradient(circle at 35% 25%, oklch(100% 0 0 / 0.18), transparent 55%),
+    var(--tex-grain);
+  color: var(--on-dye);
+  outline: 1.5px dashed color-mix(in oklch, var(--on-dye) 50%, transparent);
+  outline-offset: -6px;
+  box-shadow:
+    inset 0 -2px 3px oklch(0% 0 0 / 0.18),
+    0 2px 3px oklch(30% 0.06 45 / 0.3);
+  transform: none;
+  animation: none;
+}
+
+#navigation-shell .portal-card .icon svg {
+  inline-size: 28px;
+  block-size: 28px;
+  color: currentColor;
+}
+
+#navigation-shell .portal-label {
+  align-items: flex-start;
+  text-align: start;
+  gap: 2px;
+}
+
+#navigation-shell .portal-title {
+  font-size: 1.35rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+#navigation-shell .portal-subtitle {
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+  text-align: start;
+}
+
+#navigation-shell .portal-count {
+  margin-block-start: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: color-mix(in oklch, var(--dye) 80%, var(--ink));
+}
+
+#navigation-shell .portal-count:empty {
+  display: none;
+}
+
+/* Wide: hang the pendants from a cord across the top */
+@container navigation-shell (inline-size >= 700px) {
+  #navigation-shell .portals-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+    padding-block-start: 0;
+    padding-inline-start: 0;
+    align-items: start;
+  }
+
+  #navigation-shell .portals-grid::before {
+    inset-block: 0 auto;
+    inset-inline: -12px;
+    inline-size: auto;
+    block-size: 12px;
+    background: var(--rope-h);
+    box-shadow: var(--rope-shadow);
+  }
+
+  #navigation-shell .portal-card,
+  #navigation-shell .portal-card.portal-sandbox,
+  #navigation-shell .portal-card.portal-workshop,
+  #navigation-shell .portal-card.portal-lab,
+  #navigation-shell .portal-card.portal-busyBoard {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  #navigation-shell .portal-card .pendant {
+    inline-size: auto;
+    block-size: var(--pendant-length, 112px);
+    align-self: center;
+  }
+
+  /* Pendants of different lengths, as on a real khipu */
+  #navigation-shell .portal-card:nth-child(1) { --pendant-length: 108px; }
+  #navigation-shell .portal-card:nth-child(2) { --pendant-length: 136px; }
+  #navigation-shell .portal-card:nth-child(3) { --pendant-length: 120px; }
+  #navigation-shell .portal-card:nth-child(4) { --pendant-length: 148px; }
+
+  #navigation-shell .portal-card .pendant::before {
+    inset-inline: 50% auto;
+    inset-block: 6px -22px;
+    inline-size: 6px;
+    block-size: auto;
+    margin-block-start: 0;
+    margin-inline-start: -3px;
+    background:
+      linear-gradient(to right, oklch(100% 0 0 / 0.3), transparent 50%, oklch(0% 0 0 / 0.3)),
+      repeating-linear-gradient(35deg,
+        color-mix(in oklch, var(--dye) 72%, white) 0 1.5px,
+        var(--dye) 1.5px 4px,
+        color-mix(in oklch, var(--dye) 70%, black) 4px 5px);
+    box-shadow: 2px 0 2px -1px oklch(30% 0.06 45 / 0.35);
+  }
+
+  #navigation-shell .knots {
+    flex-direction: column;
+  }
+
+  #navigation-shell .knot {
+    inline-size: 14px;
+    block-size: 8px;
+    background:
+      radial-gradient(circle at 30% 35%, oklch(100% 0 0 / 0.4), transparent 50%),
+      repeating-linear-gradient(90deg, transparent 0 2px, oklch(0% 0 0 / 0.18) 2px 3px),
+      color-mix(in oklch, var(--dye) 82%, black);
+  }
+
+  #navigation-shell .portal-card .tag {
+    flex-direction: column;
+    justify-content: center;
+    min-block-size: 214px;
+    text-align: center;
+    padding: 38px 14px 22px;
+    transform-origin: top center;
+  }
+
+  #navigation-shell .portal-card .tag::before {
+    inset-inline-start: 50%;
+    inset-block-start: 12px;
+    margin-block-start: 0;
+    margin-inline-start: -6px;
+  }
+
+  #navigation-shell .portal-card:hover .tag {
+    transform: translateY(-3px);
+  }
+
+  #navigation-shell .portal-label {
+    align-items: center;
+    text-align: center;
+  }
+
+  #navigation-shell .portal-subtitle {
+    text-align: center;
+  }
+}
+
+/* ----------------------------------------
+   Portal page: game tags hang from a cord across each row
+   ---------------------------------------- */
+#navigation-shell .cards-grid {
+  --tile-h: 186px;
+  --row-gap: 48px;
+  --cord-drop: 22px; /* where the cord sits in the gap above each row */
+  --cord-w: 9px;
+  --row-period: calc(var(--tile-h) + var(--row-gap));
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  grid-auto-rows: var(--tile-h);
+  justify-content: stretch;
+  column-gap: 18px;
+  row-gap: var(--row-gap);
+  max-inline-size: 880px;
+  --first-gap: 32px; /* room above the first row's cord */
+  padding-block: var(--first-gap) 0;
+  margin-block-end: 48px;
+  background-position: 0 calc(var(--first-gap) - var(--row-gap));
+  /* The cord across each row, shaded round */
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0 var(--cord-drop),
+    oklch(86% 0.05 78) var(--cord-drop),
+    var(--rope-mid) calc(var(--cord-drop) + 4px),
+    var(--rope-dark) calc(var(--cord-drop) + var(--cord-w)),
+    transparent calc(var(--cord-drop) + var(--cord-w)) var(--row-period)
+  );
+}
+
+/* The twist of the cord, drawn only where the cords are */
+#navigation-shell .cards-grid::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(-55deg,
+    oklch(100% 0 0 / 0.22) 0 2px,
+    transparent 2px 4.5px,
+    oklch(25% 0.05 45 / 0.3) 4.5px 6px);
+  -webkit-mask-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0 var(--cord-drop),
+    black var(--cord-drop) calc(var(--cord-drop) + var(--cord-w)),
+    transparent calc(var(--cord-drop) + var(--cord-w)) var(--row-period)
+  );
+  mask-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0 var(--cord-drop),
+    black var(--cord-drop) calc(var(--cord-drop) + var(--cord-w)),
+    transparent calc(var(--cord-drop) + var(--cord-w)) var(--row-period)
+  );
+  -webkit-mask-position: 0 calc(var(--first-gap) - var(--row-gap));
+  mask-position: 0 calc(var(--first-gap) - var(--row-gap));
+}
+
+
+#navigation-shell .cards-grid a,
+#navigation-shell .portal-sandbox .cards-grid a,
+#navigation-shell .portal-lab .cards-grid a,
+#navigation-shell .portal-busyBoard .cards-grid a {
+  aspect-ratio: auto;
+  justify-content: flex-start;
+  gap: 8px;
+  padding: 26px 10px 12px;
+  background-color: var(--paper);
+  background-image: var(--tex-grain);
+  color: var(--ink);
+  border: 1px solid var(--paper-edge);
+  border-radius: 14px;
+  box-shadow: inset 0 1px 0 oklch(100% 0 0 / 0.7), var(--tag-shadow);
+  outline: 1.5px dashed color-mix(in oklch, var(--dye, var(--dye-cochineal)) 40%, var(--stitch));
+  outline-offset: -6px;
+  overflow: visible;
+  transform: none;
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
+}
+
+/* The short dyed string tying each tag up to the cord */
+#navigation-shell .cards-grid a::before {
+  content: '';
+  position: absolute;
+  inset-block: auto;
+  inset-block-start: calc(-1 * var(--row-gap) + var(--cord-drop) + 4px);
+  inset-inline-start: 50%;
+  inline-size: 3px;
+  block-size: calc(var(--row-gap) - var(--cord-drop) + 10px);
+  margin-inline-start: -1.5px;
+  border-radius: 999px;
+  background:
+    repeating-linear-gradient(35deg, transparent 0 2px, oklch(0% 0 0 / 0.2) 2px 3px),
+    color-mix(in oklch, var(--dye, var(--dye-cochineal)) 80%, var(--rope-dark));
+  z-index: 1;
+}
+
+/* Brass eyelet the string passes through */
+#navigation-shell .cards-grid a::after {
+  content: '';
+  position: absolute;
+  inset-block: 8px auto;
+  inset-inline-start: 50%;
+  inline-size: 12px;
+  block-size: 12px;
+  margin-inline-start: -6px;
+  transform: none;
+  opacity: 1;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, var(--paper-edge) 0 30%, transparent 33%),
+    radial-gradient(circle at 35% 30%, var(--brass-light), var(--brass-dark) 70%);
+  box-shadow: 0 1px 1px oklch(30% 0.06 50 / 0.35);
+  z-index: 0;
+}
+
+#navigation-shell .cards-grid a:hover {
+  transform: translateY(-3px);
+}
+
+#navigation-shell .cards-grid a:active,
+#navigation-shell .portal-busyBoard .cards-grid a:active {
+  transform: scale(0.96);
+  box-shadow: inset 0 1px 0 oklch(100% 0 0 / 0.7), 0 1px 2px oklch(30% 0.06 50 / 0.3);
+}
+
+/* ----------------------------------------
+   Each game's own identity: a dye and a woven motif
+   main.ts tags every card with data-dye (0-9) and data-motif (0-5),
+   cycling by position so no two neighbours look alike.
+   ---------------------------------------- */
+#navigation-shell .cards-grid a[data-dye="0"] { --dye: oklch(52% 0.15 30);  --on-dye: var(--paper); } /* madder */
+#navigation-shell .cards-grid a[data-dye="1"] { --dye: oklch(42% 0.10 262); --on-dye: var(--paper); } /* indigo */
+#navigation-shell .cards-grid a[data-dye="2"] { --dye: oklch(70% 0.12 72);  --on-dye: var(--ink); }   /* ochre */
+#navigation-shell .cards-grid a[data-dye="3"] { --dye: oklch(52% 0.09 140); --on-dye: var(--paper); } /* moss */
+#navigation-shell .cards-grid a[data-dye="4"] { --dye: oklch(45% 0.10 320); --on-dye: var(--paper); } /* logwood */
+#navigation-shell .cards-grid a[data-dye="5"] { --dye: oklch(53% 0.08 200); --on-dye: var(--paper); } /* teal */
+#navigation-shell .cards-grid a[data-dye="6"] { --dye: oklch(60% 0.12 48);  --on-dye: var(--paper); } /* terracotta */
+#navigation-shell .cards-grid a[data-dye="7"] { --dye: oklch(58% 0.14 0);   --on-dye: var(--paper); } /* cochineal pink */
+#navigation-shell .cards-grid a[data-dye="8"] { --dye: oklch(44% 0.05 55);  --on-dye: var(--paper); } /* walnut */
+#navigation-shell .cards-grid a[data-dye="9"] { --dye: oklch(64% 0.10 110); --on-dye: var(--ink); }   /* olive */
+
+/* The woven swatch across the top of each tag, with the icon on a dyed patch */
+#navigation-shell .cards-grid a .icon {
+  --weave: color-mix(in oklch, var(--dye) 55%, transparent);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: 100%;
+  block-size: 76px;
+  flex: 0 0 auto;
+  margin: 0;
+  border-radius: 8px;
+  color: var(--on-dye);
+  background-color: color-mix(in oklch, var(--dye) 14%, var(--paper));
+  box-shadow:
+    inset 0 0 0 1px color-mix(in oklch, var(--dye) 25%, transparent),
+    inset 0 2px 4px oklch(30% 0.06 40 / 0.12);
+}
+
+/* Stripes */
+#navigation-shell .cards-grid a[data-motif="0"] .icon {
+  background-image: repeating-linear-gradient(90deg, var(--weave) 0 5px, transparent 5px 9px, var(--weave) 9px 11px, transparent 11px 18px);
+}
+/* Zigzag */
+#navigation-shell .cards-grid a[data-motif="1"] .icon {
+  background-image:
+    linear-gradient(135deg, var(--weave) 25%, transparent 25%),
+    linear-gradient(225deg, var(--weave) 25%, transparent 25%),
+    linear-gradient(315deg, var(--weave) 25%, transparent 25%),
+    linear-gradient(45deg, var(--weave) 25%, transparent 25%);
+  background-size: 16px 16px;
+  background-position: -8px 0, -8px 0, 0 0, 0 0;
+}
+/* Diamonds */
+#navigation-shell .cards-grid a[data-motif="2"] .icon {
+  background-image: repeating-conic-gradient(from 45deg, var(--weave) 0 25%, transparent 0 50%);
+  background-size: 18px 18px;
+  background-position: center;
+}
+/* Dots */
+#navigation-shell .cards-grid a[data-motif="3"] .icon {
+  background-image:
+    radial-gradient(circle, var(--weave) 0 3px, transparent 3.5px),
+    radial-gradient(circle, var(--weave) 0 3px, transparent 3.5px);
+  background-size: 14px 14px;
+  background-position: 0 0, 7px 7px;
+}
+/* Bands */
+#navigation-shell .cards-grid a[data-motif="4"] .icon {
+  background-image: repeating-linear-gradient(0deg, var(--weave) 0 4px, transparent 4px 8px, var(--weave) 8px 10px, transparent 10px 18px);
+}
+/* Checks */
+#navigation-shell .cards-grid a[data-motif="5"] .icon {
+  background-image: repeating-conic-gradient(var(--weave) 0 25%, transparent 0 50%);
+  background-size: 14px 14px;
+}
+
+/* The icon itself, on a felt patch stitched over the swatch */
+#navigation-shell .cards-grid a .icon svg {
+  inline-size: 50px;
+  block-size: 50px;
+  padding: 11px;
+  box-sizing: border-box;
+  border-radius: 50%;
+  background-color: var(--dye);
+  color: var(--on-dye);
+  outline: 1.5px dashed color-mix(in oklch, var(--on-dye) 55%, transparent);
+  outline-offset: -4px;
+  box-shadow:
+    0 0 0 3px var(--paper),
+    0 3px 5px 1px oklch(30% 0.06 45 / 0.35);
+}
+
+#navigation-shell .cards-grid a .game-title {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+#navigation-shell .cards-grid a .game-subtitle {
+  font-size: 0.8rem;
+  color: var(--ink-soft);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+@container navigation-shell (inline-size < 520px) {
+  #navigation-shell .cards-grid {
+    --tile-h: 198px;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    column-gap: 14px;
+  }
+
+  #navigation-shell .cards-grid a .game-title {
+    font-size: 1.05rem;
+  }
+}
+
+/* ----------------------------------------
+   Mobile tab bar: a card-stock strip under a cord
+   ---------------------------------------- */
+@media (max-width: 600px) {
+  #mobile-tab-bar.mobile-tab-bar {
+    background-color: oklch(96% 0.025 82 / 0.94);
+    background-image: var(--tex-grain);
+    border-top: none;
+    box-shadow: 0 -8px 20px -12px oklch(30% 0.06 50 / 0.4);
+  }
+
+  #mobile-tab-bar.mobile-tab-bar::before {
+    content: '';
+    position: absolute;
+    inset-inline: 0;
+    inset-block-start: -4px;
+    block-size: 8px;
+    background: var(--rope-h);
+    box-shadow: var(--rope-shadow);
+  }
+
+  #mobile-tab-bar .tab-item {
+    position: relative;
+    color: var(--ink-soft);
+    opacity: 1;
+  }
+
+  #mobile-tab-bar .tab-item.active {
+    color: var(--dye, var(--dye-cochineal));
+  }
+
+  /* A knot marks the current tab */
+  #mobile-tab-bar .tab-item.active::before {
+    content: '';
+    position: absolute;
+    inset-block-start: 4px;
+    inline-size: 16px;
+    block-size: 7px;
+    border-radius: 45%;
+    background:
+      radial-gradient(circle at 30% 30%, oklch(100% 0 0 / 0.4), transparent 50%),
+      currentColor;
+    box-shadow: 0 1px 1px oklch(25% 0.05 45 / 0.35);
+  }
+
+  #mobile-tab-bar .tab-item[data-tab="busyBoard"] { --dye: var(--dye-indigo); }
+  #mobile-tab-bar .tab-item[data-tab="sandbox"]   { --dye: var(--dye-cochineal); }
+  #mobile-tab-bar .tab-item[data-tab="workshop"]  { --dye: color-mix(in oklch, var(--dye-ochre) 70%, var(--ink)); }
+  #mobile-tab-bar .tab-item[data-tab="lab"]       { --dye: var(--dye-moss); }
+}
+
+/* ----------------------------------------
+   Motion preferences
+   ---------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  #navigation-shell .hero-interactive-preview,
+  #navigation-shell .portal-card .tag,
+  #navigation-shell .cards-grid a {
+    animation: none;
+    transition: none;
+  }
+
+  #navigation-shell .portal-card:hover .tag,
+  #navigation-shell .cards-grid a:hover {
+    transform: none;
+  }
+}

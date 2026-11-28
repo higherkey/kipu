@@ -28,6 +28,7 @@ export class GameHeader {
     const header = document.createElement('header');
     header.id = 'game-header';
     header.className = 'game-header';
+    if (this.config.portalId) header.dataset.portal = this.config.portalId;
     
     const portalName = this.config.portalName || 'Portal';
     const hasPortalBack = !!this.config.onPortalBack;

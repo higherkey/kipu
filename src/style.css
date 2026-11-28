@@ -391,8 +391,8 @@ canvas.hidden,
 }
 
 @keyframes hero-float {
-  0%, 100% { transform: translateY(0) rotate(0deg); }
-  50% { transform: translateY(-8px) rotate(5deg); }
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
 }
 
 #hero-icon-container {
@@ -605,7 +605,7 @@ canvas.hidden,
   box-shadow: 0 var(--shadow-depth) 0px var(--fg);
 }
 .portal-card.portal-sandbox:hover .icon {
-  transform: scale(1.1) rotate(5deg);
+  transform: scale(1.1);
 }
 
 /* Workshop: Pastel Lavender/Purple & Glowing Pulse hover */
@@ -678,7 +678,7 @@ canvas.hidden,
   background: linear-gradient(135deg, #F2F3F4 0%, #D5D8DC 100%);
 }
 .portal-card.portal-busyBoard:hover {
-  transform: scale(1.02) rotate(-1deg);
+  transform: scale(1.02);
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15), 0 var(--shadow-depth) 0px var(--fg);
 }
 .portal-card.portal-busyBoard:hover .icon {

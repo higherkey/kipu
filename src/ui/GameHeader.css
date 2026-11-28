@@ -21,13 +21,27 @@
   align-items: center;
   justify-content: space-between;
   padding: 0 12px;
-  background-color: var(--bg);
-  border-bottom: 3px solid var(--fg);
-  box-shadow:
-    0 3px 0px var(--cord),
-    0 6px 20px rgba(43, 45, 94, 0.12);
+  background-color: var(--paper, var(--bg));
+  background-image: var(--tex-grain, none);
+  border-bottom: none;
+  box-shadow: 0 10px 24px -16px oklch(30% 0.06 50 / 0.45);
   z-index: 100;
   gap: 8px;
+}
+
+/* Khipu cord along the bottom edge, dyed for the current portal */
+#game-header::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -3px;
+  height: 6px;
+  border-radius: 999px;
+  background:
+    linear-gradient(to bottom, oklch(100% 0 0 / 0.3), transparent 50%, oklch(0% 0 0 / 0.3)),
+    repeating-linear-gradient(-55deg, transparent 0 3px, oklch(0% 0 0 / 0.2) 3px 5px),
+    var(--dye, var(--rope-mid, var(--cord)));
 }
 
 #game-header.hidden {
@@ -55,18 +69,18 @@
   height: 44px;
   min-height: 44px;
   min-width: 44px;
-  border-radius: var(--radius-sm);
-  border: 2px solid var(--fg);
-  background-color: var(--cord);
-  color: var(--fg);
+  border-radius: var(--radius-pill);
+  border: 1.5px solid var(--paper-edge, var(--cord));
+  background-color: var(--paper, var(--bg));
+  color: var(--ink, var(--fg));
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
-  box-shadow: 0 var(--shadow-depth) 0px var(--fg);
+  box-shadow: 0 2px 0 var(--paper-edge, var(--cord));
   transition: transform 0.08s ease, box-shadow 0.08s ease, background-color 0.15s ease;
-  padding: 0 12px;
+  padding: 0 14px;
   font-family: 'Fredoka', sans-serif;
   font-size: 0.9rem;
   font-weight: 600;
@@ -74,21 +88,23 @@
   white-space: nowrap;
 }
 
+.header-btn:hover {
+  background-color: oklch(96% 0.03 80);
+}
+
 .header-btn:active {
   transform: translateY(2px);
-  box-shadow: 0 1px 0px var(--fg);
+  box-shadow: 0 0 0 var(--paper-edge, var(--cord));
 }
 
 .header-btn.portal-back-btn {
-  background-color: var(--bg);
-  color: var(--fg);
-  border-color: var(--fg);
+  color: color-mix(in oklch, var(--dye, var(--fg)) 85%, var(--ink, var(--fg)));
   padding: 0 12px;
   max-width: 170px;
 }
 
 .header-btn.portal-back-btn:hover {
-  background-color: var(--cord);
+  background-color: oklch(96% 0.03 80);
 }
 
 .header-btn.portal-back-btn .header-label {
@@ -103,9 +119,10 @@
   height: 44px;
   min-width: 44px;
   padding: 0;
-  background-color: var(--primary);
-  color: #fff;
-  border-color: var(--fg);
+  background-color: var(--dye-cochineal, var(--primary));
+  color: var(--paper, #fff);
+  border-color: transparent;
+  box-shadow: 0 2px 0 oklch(36% 0.14 25);
 }
 
 .header-btn.home-btn:hover {
@@ -135,7 +152,7 @@
 .header-title {
   font-size: clamp(0.95rem, 3.2vw, 1.25rem);
   font-weight: 600;
-  color: var(--fg);
+  color: var(--ink, var(--fg));
   text-align: center;
   flex: 1;
   min-width: 0;

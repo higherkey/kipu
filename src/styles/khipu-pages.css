@@ -1,0 +1,628 @@
+/* ========================================
+   Kipu — the khipu header on every other page
+   Settings, the in-game header, the not-found page and the grown-ups
+   gate share the menu's header: a woven band with back and settings
+   sewn on as card-stock patches, the page name on a stitched label
+   over the band, and a plain subtitle tucked under the label.
+
+   Loaded after khipu.css. Page markup opts in with the kp-* classes;
+   the in-game header (#game-header) is styled directly.
+   ======================================== */
+
+/* ----------------------------------------
+   The woven band
+   ---------------------------------------- */
+.kp-band,
+html #game-header {
+  --band-edge: color-mix(in oklab, var(--dye-indigo) 72%, var(--sand));
+  --band-accent: color-mix(in oklab, var(--dye-cochineal) 62%, var(--sand));
+  --band-line: color-mix(in oklab, var(--dye-ochre) 70%, var(--sand));
+}
+
+.kp-band[data-portal],
+#game-header[data-portal] {
+  --band-edge: color-mix(in oklab, color-mix(in oklch, var(--dye) 85%, var(--ink)) 72%, var(--sand));
+  --band-accent: color-mix(in oklab, var(--dye) 62%, var(--sand));
+}
+
+.kp-band,
+html #game-header {
+  background-color: var(--paper);
+  background-image:
+    linear-gradient(to bottom,
+      var(--band-edge) 0 6px, transparent 6px calc(100% - 6px), var(--band-edge) calc(100% - 6px)),
+    linear-gradient(to bottom,
+      transparent 0 9px, var(--band-line) 9px 11px,
+      transparent 11px calc(100% - 11px), var(--band-line) calc(100% - 11px) calc(100% - 9px), transparent 0),
+    linear-gradient(135deg, var(--band-accent) 25%, transparent 25%),
+    linear-gradient(225deg, var(--band-accent) 25%, transparent 25%),
+    linear-gradient(315deg, var(--band-accent) 25%, transparent 25%),
+    linear-gradient(45deg, var(--band-accent) 25%, transparent 25%),
+    repeating-linear-gradient(90deg, oklch(0% 0 0 / 0.06) 0 1px, transparent 1px 3px),
+    var(--tex-grain);
+  background-size:
+    auto, auto,
+    14px 14px, 14px 14px, 14px 14px, 14px 14px,
+    auto, auto;
+  background-position:
+    0 0, 0 0,
+    -7px 50%, -7px 50%, 0 50%, 0 50%,
+    0 0, 0 0;
+  background-repeat:
+    no-repeat, no-repeat,
+    repeat-x, repeat-x, repeat-x, repeat-x,
+    repeat, repeat;
+}
+
+/* ----------------------------------------
+   Page header (settings, not-found)
+   ---------------------------------------- */
+.kp-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  inline-size: 100%;
+  max-inline-size: 880px;
+  margin-inline: auto;
+  padding-block: 24px 16px;
+  padding-inline: 16px;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.kp-header .kp-band {
+  background-image: var(--band-layers);
+  background-size: var(--band-sizes);
+  background-position: var(--band-positions);
+  background-repeat: var(--band-repeats);
+  inline-size: 100%;
+  block-size: 48px;
+  border-radius: 4px;
+  box-shadow:
+    inset 0 1px 0 oklch(100% 0 0 / 0.2),
+    0 3px 6px -4px oklch(30% 0.06 45 / 0.35);
+}
+
+.kp-header .kp-nav {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr) 48px;
+  align-items: start;
+  gap: 0;
+  inline-size: 100%;
+  min-block-size: 0;
+  margin-block-start: -48px;
+  padding-inline: 0;
+  box-sizing: border-box;
+}
+
+.kp-header .kp-nav > * {
+  display: flex;
+  min-inline-size: 0;
+}
+
+.kp-header .kp-nav > :nth-child(2) {
+  justify-content: center;
+}
+
+/* The page name on a stitched label, centred over the band */
+.kp-header .kp-label {
+  display: inline-block;
+  margin: 0;
+  margin-block-start: calc((48px - 1.1em - 20px) / 2);
+  padding-block: 9px;
+  padding-inline: 24px;
+  font-size: clamp(1.75rem, 1.4rem + 2vw, 2.5rem);
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: -0.5px;
+  color: var(--dye-cochineal);
+  background-color: var(--paper);
+  background-image: var(--tex-grain);
+  border: 1px solid var(--paper-edge);
+  border-radius: 8px;
+  outline: 1.5px dashed var(--stitch);
+  outline-offset: -6px;
+  box-shadow: inset 0 1px 0 oklch(100% 0 0 / 0.7), var(--tag-shadow);
+  text-shadow: 0 1px 0 oklch(100% 0 0 / 0.6);
+}
+
+.kp-header .kp-tagline {
+  margin-block: 8px 0;
+  max-inline-size: 65ch;
+  font-size: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--ink);
+}
+
+/* ----------------------------------------
+   Buttons in the band: a pale stitched icon inside a cuff of wrapped
+   thread in the band's own dye. On the page headers the cuffs are part
+   of the band; in the game header each button is its own cuff.
+   ---------------------------------------- */
+.kp-header .kp-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: 48px;
+  min-inline-size: 48px;
+  block-size: 48px;
+  min-block-size: 48px;
+  padding: 0;
+  color: oklch(86% 0.045 78);
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  outline: none;
+  box-shadow: none;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.kp-header .kp-btn .btn-label {
+  display: none;
+}
+
+/* In the game: each end of the band is one cuff holding its buttons,
+   with a running stitch between neighbours */
+#game-header .header-nav-left,
+#game-header .header-nav-right {
+  --cuff: color-mix(in oklch, var(--band-edge, var(--dye-indigo)) 88%, var(--ink));
+  background-color: var(--cuff);
+  background-image:
+    linear-gradient(to bottom, oklch(100% 0 0 / 0.22), transparent 45%, oklch(0% 0 0 / 0.24)),
+    repeating-linear-gradient(90deg, oklch(0% 0 0 / 0.22) 0 1px, transparent 1px 3px);
+}
+
+#game-header .header-nav-left {
+  border-inline-end: 1.5px dashed oklch(86% 0.045 78 / 0.55);
+}
+
+#game-header .header-nav-right {
+  border-inline-start: 1.5px dashed oklch(86% 0.045 78 / 0.55);
+}
+
+#game-header .header-btn,
+#game-header .header-btn.home-btn,
+#game-header .header-btn.menu-btn,
+#game-header .header-btn.feedback-btn,
+#game-header .header-btn.portal-back-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  align-self: stretch;
+  block-size: auto;
+  min-block-size: 48px;
+  min-inline-size: 48px;
+  inline-size: auto;
+  padding-block: 0;
+  padding-inline: 12px;
+  font-family: 'Fredoka', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: oklch(86% 0.045 78);
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  outline: none;
+  box-shadow: none;
+  filter: none;
+  cursor: pointer;
+  text-decoration: none;
+  white-space: nowrap;
+  text-shadow: 0 1px 0 oklch(0% 0 0 / 0.35);
+  transition: background-color 0.15s ease;
+}
+
+#game-header .header-btn + .header-btn {
+  border-inline-start: 1.5px dashed oklch(86% 0.045 78 / 0.35);
+}
+
+.kp-header .kp-btn svg,
+#game-header .header-btn svg {
+  color: oklch(86% 0.045 78);
+  inline-size: 22px;
+  block-size: 22px;
+  filter: drop-shadow(0 1px 0 oklch(0% 0 0 / 0.35));
+}
+
+.kp-header .kp-btn:hover {
+  background-color: oklch(100% 0 0 / 0.14);
+}
+
+#game-header .header-btn:hover {
+  background-color: oklch(100% 0 0 / 0.14);
+}
+
+.kp-header .kp-btn:active,
+#game-header .header-btn:active {
+  background-color: oklch(0% 0 0 / 0.18);
+  transform: none;
+  box-shadow: none;
+}
+
+.kp-header .kp-btn:active {
+  background-color: oklch(0% 0 0 / 0.18);
+}
+
+.kp-header .kp-btn:focus-visible,
+#game-header .header-btn:focus-visible {
+  outline: 3px solid var(--dye-ochre);
+  outline-offset: -3px;
+}
+
+/* Icon-only cuffs are square */
+#game-header .header-btn.home-btn,
+#game-header .header-btn.menu-btn {
+  inline-size: 48px;
+  padding-inline: 0;
+}
+
+/* ----------------------------------------
+   In-game header: the whole bar is the woven band
+   ---------------------------------------- */
+html #game-header {
+  align-items: stretch;
+  padding-block: 0;
+  padding-inline: 0;
+  gap: 8px;
+  box-shadow:
+    inset 0 1px 0 oklch(100% 0 0 / 0.25),
+    0 6px 12px -6px oklch(30% 0.06 45 / 0.5);
+}
+
+/* The band's own edges replace the old cord */
+html #game-header::after {
+  content: none;
+}
+
+#game-header .header-nav-left,
+#game-header .header-nav-right {
+  align-self: stretch;
+  align-items: stretch;
+  gap: 0;
+}
+
+/* Game name on a stitched label over the band */
+#game-header .header-title {
+  align-self: center;
+  flex: 0 1 auto;
+  margin-inline: auto;
+  padding-block: 6px 7px;
+  padding-inline: 16px;
+  font-size: clamp(1rem, 0.9rem + 1vw, 1.25rem);
+  line-height: 1.2;
+  color: color-mix(in oklch, var(--dye, var(--dye-cochineal)) 85%, var(--ink));
+  background-color: var(--paper);
+  background-image: var(--tex-grain);
+  border: 1px solid var(--paper-edge);
+  border-radius: 6px;
+  outline: 1.5px dashed var(--stitch);
+  outline-offset: -4px;
+  box-shadow: inset 0 1px 0 oklch(100% 0 0 / 0.7), 0 2px 4px oklch(30% 0.06 50 / 0.3);
+}
+
+@media (max-width: 440px) {
+  #game-header .header-title {
+    padding-inline: 10px;
+  }
+}
+
+@media (max-width: 600px) {
+  #game-header .header-btn.feedback-btn {
+    inline-size: 48px;
+    padding-inline: 0;
+  }
+}
+
+@media (max-width: 380px) {
+  #game-header .header-btn.portal-back-btn {
+    inline-size: 48px;
+    padding-inline: 0;
+  }
+}
+
+/* ----------------------------------------
+   Settings page
+   ---------------------------------------- */
+html .settings-view {
+  color: var(--ink);
+  background-color: var(--sand);
+  background-image:
+    var(--tex-fiber),
+    var(--tex-grain),
+    radial-gradient(130% 70% at 50% 0%, oklch(97% 0.03 85 / 0.85), transparent 65%);
+}
+
+.settings-view .settings-container {
+  max-inline-size: 880px;
+  padding-inline: 16px;
+  gap: 24px;
+}
+
+/* Each section is a stitched card-stock panel */
+.settings-view .settings-card,
+.settings-view .monetization-card {
+  background-color: var(--paper);
+  background-image: var(--tex-grain);
+  border: 1px solid var(--paper-edge);
+  border-radius: 14px;
+  outline: 1.5px dashed var(--stitch);
+  outline-offset: -7px;
+  box-shadow: inset 0 1px 0 oklch(100% 0 0 / 0.7), var(--tag-shadow);
+  padding: 24px;
+}
+
+.settings-view .card-title {
+  color: var(--dye-cochineal);
+}
+
+.settings-view .card-desc,
+.settings-view .settings-row-desc,
+.settings-view .mode-option-desc,
+.settings-view .tier-desc,
+.settings-view .tier-period,
+.settings-view .settings-version,
+.settings-view .status-text {
+  color: var(--ink-soft);
+}
+
+.settings-view .settings-row-title,
+.settings-view .mode-option-title,
+.settings-view .tier-name,
+.settings-view .parental-mode-legend,
+.settings-view .tier-perks {
+  color: var(--ink);
+}
+
+.settings-view .settings-row {
+  border-block-end: 1px dashed var(--paper-edge);
+}
+
+/* Row icons: small dyed felt patches */
+.settings-view .settings-row-icon {
+  inline-size: 40px;
+  block-size: 40px;
+  background-color: var(--dye-cochineal);
+  background-image: var(--tex-grain);
+  color: var(--paper);
+  outline: 1.5px dashed oklch(96% 0.03 80 / 0.5);
+  outline-offset: -4px;
+}
+
+/* Switches: a rounded-square woven track, moss when on */
+.settings-view .settings-toggle,
+.settings-view .settings-toggle.on {
+  inline-size: auto;
+  block-size: auto;
+  min-inline-size: 48px;
+  min-block-size: 48px;
+  border: none;
+  border-radius: 0;
+  background-color: transparent;
+}
+
+.settings-view .settings-toggle .toggle-track {
+  border-radius: 8px;
+  background-color: var(--rope-light);
+  border: 1px solid var(--rope-dark);
+}
+
+.settings-view .settings-toggle .toggle-thumb {
+  inset-block-start: 3px;
+  inset-inline-start: 3px;
+  inline-size: 20px;
+  block-size: 20px;
+  border: none;
+  border-radius: 5px;
+  background-color: var(--paper);
+  box-shadow: 0 1px 2px oklch(30% 0.06 50 / 0.4);
+}
+
+.settings-view .settings-toggle.on .toggle-track {
+  background-color: var(--dye-moss);
+  border-color: color-mix(in oklch, var(--dye-moss) 70%, var(--ink));
+}
+
+.settings-view .settings-toggle.on .toggle-thumb {
+  transform: translateX(20px);
+}
+
+.settings-view .parental-mode-fieldset {
+  background-color: color-mix(in oklch, var(--sand) 40%, var(--paper));
+  border: 1px solid var(--paper-edge);
+  border-radius: 8px;
+}
+
+.settings-view .parental-mode-option {
+  border-radius: 6px;
+}
+
+.settings-view .parental-mode-option:hover {
+  background-color: color-mix(in oklch, var(--rope-light) 30%, transparent);
+}
+
+.settings-view .mode-radio-input {
+  accent-color: var(--dye-cochineal);
+}
+
+/* Support tiers: smaller tags inside the panel */
+.settings-view .tier-card {
+  background-color: var(--paper);
+  background-image: var(--tex-grain);
+  border: 1px solid var(--paper-edge);
+  border-radius: 10px;
+  outline: 1.5px dashed var(--stitch);
+  outline-offset: -6px;
+  box-shadow: inset 0 1px 0 oklch(100% 0 0 / 0.7), 0 2px 4px oklch(30% 0.06 50 / 0.25);
+}
+
+.settings-view .tier-card:hover {
+  border-color: var(--rope-dark);
+}
+
+.settings-view .tier-card.active-tier {
+  border-color: var(--dye-moss);
+  background-color: color-mix(in oklch, var(--dye-moss) 8%, var(--paper));
+}
+
+.settings-view .tier-badge {
+  background-color: var(--dye-indigo);
+  color: var(--paper);
+  border-radius: 4px;
+}
+
+.settings-view .tier-price {
+  color: var(--dye-cochineal);
+}
+
+.settings-view .perk-check {
+  color: var(--dye-moss);
+}
+
+/* Buttons: dyed felt patches, square-cornered, no pills */
+.settings-view .settings-btn,
+.settings-view .tier-action-btn {
+  min-block-size: 48px;
+  border-radius: 6px;
+  font-weight: 600;
+}
+
+.settings-view .settings-btn.primary-btn,
+.settings-view .tier-action-btn {
+  background-color: var(--dye-cochineal);
+  background-image: var(--tex-grain);
+  color: var(--paper);
+  border: none;
+  outline: 1.5px dashed oklch(96% 0.03 80 / 0.55);
+  outline-offset: -5px;
+  box-shadow:
+    inset 0 1px 0 oklch(100% 0 0 / 0.2),
+    0 3px 0 oklch(36% 0.12 30);
+}
+
+.settings-view .settings-btn.primary-btn:hover,
+.settings-view .tier-action-btn:hover {
+  background-color: oklch(47% 0.15 30);
+}
+
+.settings-view .settings-btn.primary-btn:active,
+.settings-view .tier-action-btn:active {
+  transform: translateY(2px);
+  box-shadow: inset 0 1px 0 oklch(100% 0 0 / 0.2), 0 1px 0 oklch(36% 0.12 30);
+}
+
+.settings-view .tier-action-btn.active {
+  background-color: var(--dye-moss);
+  box-shadow: inset 0 1px 0 oklch(100% 0 0 / 0.2), 0 3px 0 oklch(38% 0.08 138);
+}
+
+.settings-view .settings-btn.secondary-btn {
+  background-color: var(--paper);
+  background-image: var(--tex-grain);
+  color: var(--ink);
+  border: 1px solid var(--paper-edge);
+  outline: 1.5px dashed var(--stitch);
+  outline-offset: -5px;
+  box-shadow: inset 0 1px 0 oklch(100% 0 0 / 0.6), 0 2px 4px oklch(30% 0.06 50 / 0.3);
+}
+
+.settings-view .settings-btn.secondary-btn:hover {
+  background-color: oklch(98% 0.02 82);
+}
+
+/* ----------------------------------------
+   Not-found page
+   ---------------------------------------- */
+html .not-found-container {
+  justify-content: flex-start;
+  gap: 24px;
+  padding-block: 24px;
+  padding-inline: 0;
+  color: var(--ink);
+  background-color: var(--sand);
+  background-image:
+    var(--tex-fiber),
+    var(--tex-grain),
+    radial-gradient(130% 70% at 50% 0%, oklch(97% 0.03 85 / 0.85), transparent 65%);
+}
+
+.not-found-container .kp-header {
+  padding-block-start: 0;
+}
+
+.not-found-container .back-home-btn {
+  min-block-size: 48px;
+  padding-block: 0;
+  padding-inline: 24px;
+  font-size: 1.1rem;
+  color: var(--paper);
+  background-color: var(--dye-cochineal);
+  background-image: var(--tex-grain);
+  border: none;
+  border-radius: 6px;
+  outline: 1.5px dashed oklch(96% 0.03 80 / 0.55);
+  outline-offset: -5px;
+  box-shadow:
+    inset 0 1px 0 oklch(100% 0 0 / 0.2),
+    0 3px 0 oklch(36% 0.12 30),
+    0 10px 16px -8px oklch(30% 0.1 30 / 0.5);
+}
+
+.not-found-container .back-home-btn:hover {
+  background-color: oklch(47% 0.15 30);
+}
+
+.not-found-container .back-home-btn:active {
+  transform: translateY(2px);
+  box-shadow: inset 0 1px 0 oklch(100% 0 0 / 0.2), 0 1px 0 oklch(36% 0.12 30);
+}
+
+/* ----------------------------------------
+   Grown-ups gate: a card-stock panel over a plain dim, no frosted blur
+   ---------------------------------------- */
+html .parental-gate-overlay {
+  background-color: oklch(25% 0.03 50 / 0.7);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+html .parental-gate-modal {
+  color: var(--ink);
+  background-color: var(--paper);
+  background-image: var(--tex-grain);
+  border: 1px solid var(--paper-edge);
+  border-radius: 14px;
+  outline: 1.5px dashed var(--stitch);
+  outline-offset: -8px;
+  box-shadow: inset 0 1px 0 oklch(100% 0 0 / 0.7), var(--tag-shadow);
+}
+
+.parental-gate-modal .parental-gate-close-btn {
+  border-radius: 6px;
+  border: 1px solid var(--paper-edge);
+  background-color: var(--paper);
+  color: var(--ink);
+  box-shadow: inset 0 1px 0 oklch(100% 0 0 / 0.6), 0 2px 4px oklch(30% 0.06 50 / 0.3);
+}
+
+.parental-gate-modal .parental-gate-choice-btn {
+  border-radius: 6px;
+  border: 1px solid var(--paper-edge);
+  background-color: var(--paper);
+  color: var(--ink);
+  box-shadow: inset 0 1px 0 oklch(100% 0 0 / 0.6), 0 2px 4px oklch(30% 0.06 50 / 0.3);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kp-header .kp-btn,
+  #game-header .header-btn,
+  .settings-view .settings-btn,
+  .settings-view .tier-action-btn,
+  .not-found-container .back-home-btn {
+    transition-duration: 0.01ms;
+  }
+}
