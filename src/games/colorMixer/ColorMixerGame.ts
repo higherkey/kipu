@@ -135,6 +135,26 @@ export class ColorMixerGame extends BaseGame {
     this.setupWells();
     this.setupBrushes();
 
+    // TEMP preview check only (throwaway branch)
+    const q = new URLSearchParams(window.location.search);
+    const qb = q.get('brush') as BrushId | null;
+    const qc = q.get('color') as ColorId | null;
+    if (qb && BRUSH_IDS.includes(qb)) this.activeBrush = qb;
+    if (qc && COLOR_IDS.includes(qc)) this.activeColor = qc;
+    if (q.get('seed') && this.bufferCtx) {
+      const c = this.bufferCtx;
+      c.save();
+      c.strokeStyle = COLOR_MAP.blue;
+      c.lineWidth = 32;
+      c.lineCap = 'round';
+      c.beginPath();
+      c.arc(this.canvas.width / 2, this.canvas.height / 2, 110, 0, Math.PI * 2);
+      c.stroke();
+      c.fillStyle = COLOR_MAP.yellow;
+      c.fillRect(20, this.canvas.height / 2 - 140, 60, 60);
+      c.restore();
+    }
+
     // Canvas-level pointer & touch listeners
     this.canvas.addEventListener('touchstart', this.handleTouchStart, { passive: false });
     this.canvas.addEventListener('touchmove', this.handleTouchMove, { passive: false });
