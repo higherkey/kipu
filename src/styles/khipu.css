@@ -108,9 +108,9 @@
    on a card-stock label stitched over the band's lower edge.
    ---------------------------------------- */
 #navigation-shell .menu-header {
-  --band-edge: color-mix(in oklch, var(--dye-indigo) 72%, var(--sand));
-  --band-accent: color-mix(in oklch, var(--dye-cochineal) 62%, var(--sand));
-  --band-line: color-mix(in oklch, var(--dye-ochre) 70%, var(--sand));
+  --band-edge: color-mix(in oklab, var(--dye-indigo) 72%, var(--sand));
+  --band-accent: color-mix(in oklab, var(--dye-cochineal) 62%, var(--sand));
+  --band-line: color-mix(in oklab, var(--dye-ochre) 70%, var(--sand));
   max-inline-size: 880px;
   margin-block-end: 1.5rem;
 }
@@ -127,8 +127,8 @@
 #navigation-shell.portal-workshop .menu-header,
 #navigation-shell.portal-lab .menu-header,
 #navigation-shell.portal-busyBoard .menu-header {
-  --band-edge: color-mix(in oklch, color-mix(in oklch, var(--dye) 85%, var(--ink)) 72%, var(--sand));
-  --band-accent: color-mix(in oklch, var(--dye) 62%, var(--sand));
+  --band-edge: color-mix(in oklab, color-mix(in oklch, var(--dye) 85%, var(--ink)) 72%, var(--sand));
+  --band-accent: color-mix(in oklab, var(--dye) 62%, var(--sand));
 }
 
 /* The band's weave, with a cuff of wrapped thread bound around each

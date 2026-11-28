@@ -14,15 +14,15 @@
    ---------------------------------------- */
 .kp-band,
 html #game-header {
-  --band-edge: color-mix(in oklch, var(--dye-indigo) 72%, var(--sand));
-  --band-accent: color-mix(in oklch, var(--dye-cochineal) 62%, var(--sand));
-  --band-line: color-mix(in oklch, var(--dye-ochre) 70%, var(--sand));
+  --band-edge: color-mix(in oklab, var(--dye-indigo) 72%, var(--sand));
+  --band-accent: color-mix(in oklab, var(--dye-cochineal) 62%, var(--sand));
+  --band-line: color-mix(in oklab, var(--dye-ochre) 70%, var(--sand));
 }
 
 .kp-band[data-portal],
 #game-header[data-portal] {
-  --band-edge: color-mix(in oklch, color-mix(in oklch, var(--dye) 85%, var(--ink)) 72%, var(--sand));
-  --band-accent: color-mix(in oklch, var(--dye) 62%, var(--sand));
+  --band-edge: color-mix(in oklab, color-mix(in oklch, var(--dye) 85%, var(--ink)) 72%, var(--sand));
+  --band-accent: color-mix(in oklab, var(--dye) 62%, var(--sand));
 }
 
 .kp-band,
