@@ -112,7 +112,15 @@
   --band-accent: var(--dye-cochineal);
   --band-line: var(--dye-ochre);
   max-inline-size: 880px;
-  margin-block-end: 1.75rem;
+  margin-block-end: 1.5rem;
+}
+
+/* Portal pages: the games follow the header closely */
+#navigation-shell.portal-sandbox .menu-header,
+#navigation-shell.portal-workshop .menu-header,
+#navigation-shell.portal-lab .menu-header,
+#navigation-shell.portal-busyBoard .menu-header {
+  margin-block-end: 0.5rem;
 }
 
 #navigation-shell.portal-sandbox .menu-header,
@@ -125,9 +133,10 @@
 
 #navigation-shell .cord-line {
   position: relative;
-  inline-size: calc(100% - 36px);
-  block-size: 38px;
-  margin-block: 4px 0;
+  inline-size: calc(100% - 32px);
+  block-size: 48px;
+  margin-block: 0;
+  margin-inline: auto;
   border-radius: 4px;
   background-color: var(--paper);
   background-image:
@@ -169,8 +178,6 @@
   content: '';
   position: absolute;
   inset-block: 3px;
-  inset-block-end: 3px;
-  bottom: auto;
   inline-size: 16px;
   block-size: auto;
   border-radius: 0;
@@ -180,43 +187,48 @@
   box-shadow: none;
 }
 #navigation-shell .cord-line::before {
-  left: -16px;
-  right: auto;
+  inset-inline: -16px auto;
   -webkit-mask-image: linear-gradient(to left, black 40%, transparent);
   mask-image: linear-gradient(to left, black 40%, transparent);
 }
 #navigation-shell .cord-line::after {
-  right: -16px;
-  left: auto;
+  inset-inline: auto -16px;
   -webkit-mask-image: linear-gradient(to right, black 40%, transparent);
   mask-image: linear-gradient(to right, black 40%, transparent);
 }
 
-/* Buttons sit just under the band; the label overlaps it */
+/* One header unit: back and settings are patches sewn onto the ends of
+   the band, the name label is stitched over its middle, and the
+   subtitle hangs straight under the label. */
 #navigation-shell .nav-bar {
-  margin-block-start: -20px;
+  margin-block: -48px 0;
   min-block-size: 0;
   align-items: flex-start;
-  padding-inline: 8px;
+  padding-inline: 20px;
+  gap: 8px;
 }
 
 #navigation-shell .nav-left,
 #navigation-shell .nav-right {
-  padding-block-start: 32px;
+  padding-block-start: 0;
+  align-items: flex-start;
 }
 
-/* The name label, stitched onto the band */
+/* The name label, stitched over the band, centred on it */
 #navigation-shell h1 {
   display: inline-block;
-  padding: 10px 30px 12px;
+  margin-block-start: -12px;
+  padding-block: 8px 10px;
+  padding-inline: 28px;
   font-size: clamp(2rem, 3cqi + 1.3rem, 3rem);
+  line-height: 1.1;
   color: var(--dye-cochineal);
   letter-spacing: -0.5px;
   font-weight: 600;
   background-color: var(--paper);
   background-image: var(--tex-grain);
   border: 1px solid var(--paper-edge);
-  border-radius: 10px;
+  border-radius: 8px;
   outline: 1.5px dashed var(--stitch);
   outline-offset: -6px;
   box-shadow: inset 0 1px 0 oklch(100% 0 0 / 0.7), var(--tag-shadow);
@@ -230,51 +242,47 @@
   color: color-mix(in oklch, var(--dye) 85%, var(--ink));
 }
 
+/* Subtitle: plain sentence text in full ink, tucked under the label */
 #navigation-shell .tagline {
-  margin-block-start: 0.9rem;
-  font-size: 0.85rem;
+  margin-block-start: 8px;
+  max-inline-size: 65ch;
+  font-size: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
   font-weight: 600;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--ink-soft);
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--ink);
 }
 
-@container navigation-shell (inline-size < 520px) {
-  #navigation-shell .cord-line {
-    block-size: 32px;
-  }
-
-  #navigation-shell .nav-bar {
-    margin-block-start: -16px;
-    padding-inline: 2px;
-  }
-
-  #navigation-shell .nav-left,
-  #navigation-shell .nav-right {
-    padding-block-start: 26px;
-  }
-
-  #navigation-shell h1 {
-    padding: 8px 20px 10px;
-  }
-
-  #navigation-shell .back-btn span {
-    display: none;
-  }
-}
-
-/* Back and settings buttons: small card-stock tags */
+/* Back and settings: card-stock patches stitched onto the band ends,
+   the full height of the band, with the band's own dye on the icon */
 #navigation-shell .back-btn,
 #navigation-shell .nav-settings-btn {
+  min-block-size: 48px;
+  block-size: 48px;
+  min-inline-size: 48px;
+  inline-size: auto;
+  padding-block: 0;
+  padding-inline: 12px;
   background-color: var(--paper);
   background-image: var(--tex-grain);
   color: var(--ink);
   border: 1px solid var(--paper-edge);
-  border-radius: var(--radius-pill);
+  border-radius: 6px;
+  outline: 1.5px dashed color-mix(in oklch, var(--band-edge) 45%, var(--stitch));
+  outline-offset: -5px;
   box-shadow:
     inset 0 1px 0 oklch(100% 0 0 / 0.6),
-    0 2px 0 var(--paper-edge),
-    0 8px 14px -8px oklch(30% 0.06 50 / 0.45);
+    0 2px 4px oklch(30% 0.06 50 / 0.3);
+}
+
+#navigation-shell .nav-settings-btn {
+  padding-inline: 0;
+  inline-size: 48px;
+}
+
+#navigation-shell .back-btn svg,
+#navigation-shell .nav-settings-btn svg {
+  color: var(--band-edge);
 }
 
 #navigation-shell .back-btn:hover,
@@ -284,8 +292,33 @@
 
 #navigation-shell .back-btn:active,
 #navigation-shell .nav-settings-btn:active {
-  transform: translateY(2px);
+  transform: translateY(1px);
   box-shadow: inset 0 1px 2px oklch(30% 0.06 50 / 0.2);
+}
+
+#navigation-shell .back-btn:focus-visible,
+#navigation-shell .nav-settings-btn:focus-visible {
+  outline: 3px solid var(--band-edge);
+  outline-offset: 2px;
+}
+
+@container navigation-shell (inline-size < 520px) {
+  #navigation-shell .nav-bar {
+    padding-inline: 18px;
+  }
+
+  #navigation-shell h1 {
+    padding-inline: 20px;
+  }
+
+  #navigation-shell .back-btn {
+    padding-inline: 0;
+    inline-size: 48px;
+  }
+
+  #navigation-shell .back-btn span {
+    display: none;
+  }
 }
 
 /* ----------------------------------------
@@ -364,7 +397,7 @@
   background-image: var(--tex-grain);
   color: var(--paper);
   border: none;
-  border-radius: var(--radius-pill);
+  border-radius: 8px;
   padding: 13px 30px;
   font-weight: 600;
   outline: 1.5px dashed oklch(96% 0.03 80 / 0.55);
@@ -786,8 +819,10 @@
   column-gap: 18px;
   row-gap: var(--row-gap);
   max-inline-size: 880px;
-  padding-block: var(--row-gap) 0;
+  --first-gap: 32px; /* room above the first row's cord */
+  padding-block: var(--first-gap) 0;
   margin-block-end: 48px;
+  background-position: 0 calc(var(--first-gap) - var(--row-gap));
   /* The cord across each row, shaded round */
   background-image: repeating-linear-gradient(
     to bottom,
@@ -821,6 +856,8 @@
     black var(--cord-drop) calc(var(--cord-drop) + var(--cord-w)),
     transparent calc(var(--cord-drop) + var(--cord-w)) var(--row-period)
   );
+  -webkit-mask-position: 0 calc(var(--first-gap) - var(--row-gap));
+  mask-position: 0 calc(var(--first-gap) - var(--row-gap));
 }
 
 
