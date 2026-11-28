@@ -58,7 +58,8 @@
 
 .cq-intro select,
 .cq-tools button,
-.cq-actions button {
+.cq-actions button,
+.cq-new button {
   min-inline-size: 48px;
   min-block-size: 48px;
   padding: 0.25rem 0.75rem;
@@ -75,7 +76,8 @@
 }
 
 .cq-tools,
-.cq-actions {
+.cq-actions,
+.cq-new {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
@@ -105,7 +107,43 @@
   color: var(--cq-white);
 }
 
-.cq-actions button:disabled {
+.cq-new {
+  align-items: center;
+  margin-block-start: 0.75rem;
+  padding-block-start: 0.75rem;
+  border-block-start: 2px dashed var(--cq-light-line);
+}
+
+#cq-new-label {
+  flex-basis: 100%;
+  font-weight: 700;
+}
+
+.cq-size {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.cq-size button {
+  padding: 0;
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.cq-size-value {
+  min-inline-size: 4.5em;
+  text-align: center;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.cq-new .cq-generate {
+  flex: 1;
+}
+
+.cq-actions button:disabled,
+.cq-new button:disabled {
   border-style: dashed;
   color: var(--cq-light-line);
 }
@@ -120,7 +158,8 @@
 
 .cq-library-status:empty { margin-block: 0; }
 
-.cq-actions button[aria-disabled="true"] {
+.cq-actions button[aria-disabled="true"],
+.cq-new button[aria-disabled="true"] {
   cursor: progress;
 }
 
@@ -138,8 +177,6 @@
   outline-offset: -2px;
 }
 
-.cq-board[data-size="6"] { --cq-columns: 6; }
-.cq-board[data-size="7"] { --cq-columns: 7; }
 
 .cq-tile {
   position: relative;
@@ -165,6 +202,9 @@
 .cq-tile[data-room="E"] { --cq-room: oklch(88% 0.085 315); }
 .cq-tile[data-room="F"] { --cq-room: oklch(91% 0.07 188); }
 .cq-tile[data-room="G"] { --cq-room: oklch(92% 0.06 62); }
+.cq-tile[data-room="H"] { --cq-room: oklch(90% 0.09 125); }
+.cq-tile[data-room="I"] { --cq-room: oklch(87% 0.075 355); }
+.cq-tile[data-room="J"] { --cq-room: oklch(86% 0.06 280); }
 
 .cq-tile.cq-divider-end {
   border-inline-end: 3px solid var(--cq-accent);
@@ -227,6 +267,20 @@
     min-block-size: 48px;
     min-inline-size: 48px;
   }
+}
+
+/* 8 × 8 and up: let tiles shrink so the whole board fits a phone. */
+.cq-board-dense .cq-tile {
+  min-block-size: 28px;
+  min-inline-size: 28px;
+}
+
+.cq-board-dense .cq-tile svg {
+  inline-size: 70%;
+}
+
+.cq-board-dense .cq-mark {
+  font-size: 1.125rem;
 }
 
 @media (max-width: 323px) {
