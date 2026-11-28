@@ -108,9 +108,9 @@
    on a card-stock label stitched over the band's lower edge.
    ---------------------------------------- */
 #navigation-shell .menu-header {
-  --band-edge: var(--dye-indigo);
-  --band-accent: var(--dye-cochineal);
-  --band-line: var(--dye-ochre);
+  --band-edge: color-mix(in oklch, var(--dye-indigo) 72%, var(--sand));
+  --band-accent: color-mix(in oklch, var(--dye-cochineal) 62%, var(--sand));
+  --band-line: color-mix(in oklch, var(--dye-ochre) 70%, var(--sand));
   max-inline-size: 880px;
   margin-block-end: 1.5rem;
 }
@@ -127,16 +127,16 @@
 #navigation-shell.portal-workshop .menu-header,
 #navigation-shell.portal-lab .menu-header,
 #navigation-shell.portal-busyBoard .menu-header {
-  --band-edge: color-mix(in oklch, var(--dye) 85%, var(--ink));
-  --band-accent: var(--dye);
+  --band-edge: color-mix(in oklch, color-mix(in oklch, var(--dye) 85%, var(--ink)) 72%, var(--sand));
+  --band-accent: color-mix(in oklch, var(--dye) 62%, var(--sand));
 }
 
 /* The band's weave, with a cuff of wrapped thread bound around each
    end. Shared by the menu header and the page headers (khipu-pages.css). */
 #navigation-shell .cord-line,
 .kp-header .kp-band {
-  --cuff: color-mix(in oklch, var(--band-edge) 82%, var(--ink));
-  --cuff-thread: oklch(96% 0.025 85);
+  --cuff: color-mix(in oklch, var(--band-edge) 88%, var(--ink));
+  --cuff-thread: oklch(86% 0.045 78);
   --band-layers:
     /* cuff shading, so each cuff looks wrapped round the band */
     linear-gradient(to bottom, oklch(100% 0 0 / 0.22), transparent 45%, oklch(0% 0 0 / 0.24)),
@@ -145,8 +145,8 @@
     repeating-linear-gradient(90deg, oklch(0% 0 0 / 0.22) 0 1px, transparent 1px 3px),
     repeating-linear-gradient(90deg, oklch(0% 0 0 / 0.22) 0 1px, transparent 1px 3px),
     /* a running stitch where each cuff meets the weave */
-    repeating-linear-gradient(to bottom, oklch(96% 0.025 85 / 0.55) 0 3px, transparent 3px 6px),
-    repeating-linear-gradient(to bottom, oklch(96% 0.025 85 / 0.55) 0 3px, transparent 3px 6px),
+    repeating-linear-gradient(to bottom, oklch(86% 0.045 78 / 0.55) 0 3px, transparent 3px 6px),
+    repeating-linear-gradient(to bottom, oklch(86% 0.045 78 / 0.55) 0 3px, transparent 3px 6px),
     /* cuff dye */
     linear-gradient(var(--cuff), var(--cuff)),
     linear-gradient(var(--cuff), var(--cuff)),
@@ -204,8 +204,8 @@
   background-position: var(--band-positions);
   background-repeat: var(--band-repeats);
   box-shadow:
-    inset 0 1px 0 oklch(100% 0 0 / 0.25),
-    0 6px 10px -6px oklch(30% 0.06 45 / 0.5);
+    inset 0 1px 0 oklch(100% 0 0 / 0.2),
+    0 3px 6px -4px oklch(30% 0.06 45 / 0.35);
 }
 
 /* Fringe at each end of the band */
@@ -267,8 +267,8 @@
 /* The name label, stitched over the band, centred on it */
 #navigation-shell h1 {
   display: inline-block;
-  margin-block-start: -12px;
-  padding-block: 8px 10px;
+  margin-block-start: calc((48px - 1.1em - 20px) / 2);
+  padding-block: 9px;
   padding-inline: 28px;
   font-size: clamp(2rem, 3cqi + 1.3rem, 3rem);
   line-height: 1.1;
@@ -316,7 +316,7 @@
   margin: 0;
   padding: 0;
   gap: 0;
-  color: oklch(96% 0.025 85);
+  color: oklch(86% 0.045 78);
   background: transparent;
   border: none;
   border-radius: 0;
@@ -338,7 +338,7 @@
 #navigation-shell .nav-settings-btn svg {
   inline-size: 22px;
   block-size: 22px;
-  color: oklch(96% 0.025 85);
+  color: oklch(86% 0.045 78);
   filter: drop-shadow(0 1px 0 oklch(0% 0 0 / 0.35));
 }
 
