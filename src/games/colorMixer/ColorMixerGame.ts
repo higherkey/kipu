@@ -366,7 +366,7 @@ export class ColorMixerGame extends BaseGame {
         this.sprayAt(
           this.lastPos.x + (cx - this.lastPos.x) * t,
           this.lastPos.y + (cy - this.lastPos.y) * t,
-          10
+          16
         );
       }
     } else if (this.activeBrush === 'dots') {
@@ -454,7 +454,7 @@ export class ColorMixerGame extends BaseGame {
 
     ctx.save();
     this.clipToPaintArea(ctx);
-    ctx.globalAlpha = 0.5;
+    ctx.globalAlpha = 0.6;
     ctx.fillStyle = COLOR_MAP[this.activeColor];
     ctx.beginPath();
     for (let i = 0; i < count; i++) {
@@ -477,10 +477,12 @@ export class ColorMixerGame extends BaseGame {
     const colorHex = COLOR_MAP[this.activeColor];
     const radius = 12 + Math.random() * 7;
 
+    // Fade to a clear version of the same colour, so the edge has no grey ring
+    const [r, g, b] = hexToRgb(colorHex);
     const grad = ctx.createRadialGradient(x, y, radius * 0.1, x, y, radius);
     grad.addColorStop(0, colorHex);
     grad.addColorStop(0.86, colorHex);
-    grad.addColorStop(1, 'rgba(0,0,0,0)');
+    grad.addColorStop(1, `rgba(${r},${g},${b},0)`);
 
     ctx.save();
     this.clipToPaintArea(ctx);
@@ -605,7 +607,7 @@ export class ColorMixerGame extends BaseGame {
   update(dt: number): void {
     // The airbrush keeps spraying while the finger rests in one place
     if (this.isDrawing && this.activeBrush === 'spray') {
-      this.sprayAt(this.lastPos.x, this.lastPos.y, Math.max(4, Math.round(dt * 0.9)));
+      this.sprayAt(this.lastPos.x, this.lastPos.y, Math.max(6, Math.round(dt * 1.2)));
       const now = performance.now();
       if (now - this.audioThrottleTime > 160) {
         this.audio.play('synth:click', 150 + Math.floor(Math.random() * 40));
@@ -792,23 +794,31 @@ export class ColorMixerGame extends BaseGame {
 
     switch (id) {
       case 'smudge': {
-        // A smear trail ending under a fingertip
-        ctx.strokeStyle = 'rgba(43, 45, 94, 0.25)';
-        ctx.lineWidth = 9;
-        ctx.beginPath();
-        ctx.moveTo(cx - 15, cy + 7);
-        ctx.lineTo(cx + 2, cy + 3);
-        ctx.stroke();
+        // A finger pulling a soft smear behind it
+        ctx.strokeStyle = 'rgba(43, 45, 94, 0.18)';
+        for (const [dy, len] of [[-2, 12], [4, 16], [10, 10]]) {
+          ctx.lineWidth = 5;
+          ctx.beginPath();
+          ctx.moveTo(cx - 4 - len, cy + dy);
+          ctx.lineTo(cx - 2, cy + dy);
+          ctx.stroke();
+        }
         ctx.fillStyle = '#F2C9A5';
         ctx.strokeStyle = INK;
         ctx.lineWidth = 2;
-        this.roundedRectPath(ctx, cx, cy - 12, 11, 22, 5.5);
+        this.roundedRectPath(ctx, cx - 3, cy - 14, 14, 28, 7);
         ctx.fill();
         ctx.stroke();
-        // Fingernail
+        // Fingernail and knuckle crease
         ctx.fillStyle = '#FFFFFF';
-        this.roundedRectPath(ctx, cx + 2.5, cy - 10, 6, 6, 3);
+        this.roundedRectPath(ctx, cx, cy - 11, 8, 8, 4);
         ctx.fill();
+        ctx.stroke();
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(cx, cy + 5);
+        ctx.lineTo(cx + 8, cy + 5);
+        ctx.stroke();
         break;
       }
       case 'brush': {
