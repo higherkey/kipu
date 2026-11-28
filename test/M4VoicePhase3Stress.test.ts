@@ -479,10 +479,8 @@ describe('M4 Adversarial Stress: Eeno Voice Board & Phase 3 Games Hardening', ()
         game.init(canvas);
 
         // Spawn a block via palette click
-        const paletteY = 62;
-        const totalW = 5 * 65;
-        const startX = (800 - totalW) / 2;
-        const btnX = startX + 30; // First button center
+        const paletteY = (EquationTowerGame as any).PALETTE_Y;
+        const btnX = (game as any).getPaletteSlots(800)[0]; // First button center
 
         canvas.dispatchEvent(new MouseEvent('mousedown', { clientX: btnX, clientY: paletteY }));
         canvas.dispatchEvent(new MouseEvent('mouseup'));
