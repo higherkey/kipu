@@ -520,6 +520,7 @@ export class EquationTowerGame implements Game {
     this.drawGhostCells(L);
     this.drawBlocks(L);
     this.drawOverTint(L);
+    this.drawBlockLabels(L);
     this.drawLeaving(L);
     this.drawInfo(L);
     if (this.won) {
@@ -662,11 +663,21 @@ export class EquationTowerGame implements Game {
       const sq = b.squash;
       const bw = L.blockW * (1 + 0.05 * sq);
       const bh = height * (1 - 0.07 * sq);
-      this.drawBlock(L.cx - bw / 2, b.y - bh, bw, bh, b.value, L.unit * (1 - 0.07 * sq), this.won);
+      this.drawBlock(L.cx - bw / 2, b.y - bh, bw, bh, b.value, L.unit * (1 - 0.07 * sq), this.won, false);
     }
   }
 
-  private drawBlock(x: number, top: number, w: number, h: number, value: number, unit: number, glow: boolean) {
+  /** Numbers go on last, so the hatching over a too-tall tower never hides them. */
+  private drawBlockLabels(L: TowerLayout) {
+    for (const b of this.blocks) {
+      const sq = b.squash;
+      const bw = L.blockW * (1 + 0.05 * sq);
+      const bh = b.value * L.unit * (1 - 0.07 * sq);
+      this.drawBlockLabel(L.cx - bw / 2, b.y - bh, bw, bh, b.value, L.unit * (1 - 0.07 * sq));
+    }
+  }
+
+  private drawBlock(x: number, top: number, w: number, h: number, value: number, unit: number, glow: boolean, label = true) {
     const ctx = this.ctx!;
     const d = dye(value);
 
@@ -714,6 +725,12 @@ export class EquationTowerGame implements Game {
     ctx.roundRect(x, top, w, h, 6);
     ctx.stroke();
 
+    if (label) this.drawBlockLabel(x, top, w, h, value, unit);
+  }
+
+  private drawBlockLabel(x: number, top: number, w: number, h: number, value: number, unit: number) {
+    const ctx = this.ctx!;
+    const d = dye(value);
     const size = Math.round(Math.max(14, Math.min(34, value === 1 ? unit * 0.78 : unit * 0.9 + 4)));
     ctx.fillStyle = d.text;
     ctx.font = `700 ${size}px ${FONT}`;
@@ -823,9 +840,14 @@ export class EquationTowerGame implements Game {
       if (i > 0) tokens.push({ text: '+', color: INK_SOFT, bold: false });
       tokens.push({ text: String(b.value), color: numberInk(b.value), bold: true });
     });
-    tokens.push({ text: '=', color: INK_SOFT, bold: false });
     const totalColor = sum === this.target ? GOOD : sum > this.target ? WARN : INK;
-    tokens.push({ text: String(sum), color: totalColor, bold: true });
+    if (this.blocks.length > 1 || sum === this.target) {
+      tokens.push({ text: '=', color: INK_SOFT, bold: false });
+      tokens.push({ text: String(sum), color: totalColor, bold: true });
+    } else if (tokens.length === 1) {
+      // One block on its own: just its number, coloured by how it compares with the line
+      tokens[0] = { ...tokens[0], color: totalColor === INK ? tokens[0].color : totalColor };
+    }
 
     let size = 26;
     const measure = () => {
@@ -979,6 +1001,8 @@ export class EquationTowerGame implements Game {
 
   resize(_width?: number, _height?: number): void {
     this.relayout();
+    // Resizing clears the canvas; draw straight away so a paused game isn't left blank.
+    if (this.ctx && this.canvas) this.render();
   }
 
   destroy(): void {
