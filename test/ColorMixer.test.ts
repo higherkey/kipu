@@ -125,15 +125,16 @@ describe('ColorMixerGame - Defect Resolution & Lifecycle Tests', () => {
       expect(mockAudioController.play).toHaveBeenCalledWith('bloop');
       expect(mockAudioController.speak).toHaveBeenCalledWith('Yellow', 'en-US');
       expect(mockHapticController.lightTap).toHaveBeenCalled();
-      expect((game as any).activeTool).toBe('yellow');
+      expect((game as any).activeColor).toBe('yellow');
     });
 
-    it('plays synth:pluck when finger smudge tool is selected', () => {
+    it('plays synth:pluck when the smudge brush is used', () => {
       game.init(canvas);
-      const fingerWell = (game as any).wells[5];
-      (game as any).startPress(fingerWell.x + 10, (game as any).potsY + 20);
+      const smudge = (game as any).brushes[0];
+      (game as any).startPress(smudge.x + 10, smudge.y + 10);
 
-      expect((game as any).activeTool).toBe('finger');
+      expect((game as any).activeBrush).toBe('smudge');
+      expect(mockAudioController.speak).toHaveBeenCalledWith('Smudge', 'en-US');
 
       // Click below header to smudge
       const drawY = (game as any).potsY + (game as any).potsHeight + 100;
@@ -143,9 +144,10 @@ describe('ColorMixerGame - Defect Resolution & Lifecycle Tests', () => {
       expect(mockHapticController.lightTap).toHaveBeenCalled();
     });
 
-    it('plays bloop when placing a paint drop below header', () => {
+    it('plays bloop when painting with the round brush below header', () => {
       game.init(canvas);
-      (game as any).activeTool = 'red';
+      (game as any).activeColor = 'red';
+      (game as any).activeBrush = 'brush';
 
       const drawY = (game as any).potsY + (game as any).potsHeight + 50;
       (game as any).startPress(200, drawY);
@@ -282,7 +284,9 @@ describe('ColorMixerGame - Defect Resolution & Lifecycle Tests', () => {
       expect(bufferCanvas.width).toBe(800);
       expect(bufferCanvas.height).toBe(600);
 
-      // Resize to 1024x768 (e.g. tablet rotation)
+      // Resize to 1024x768 (e.g. tablet rotation); main.ts resizes the canvas first
+      canvas.width = 1024;
+      canvas.height = 768;
       game.resize(1024, 768);
 
       expect(bufferCanvas.width).toBe(1024);
@@ -296,8 +300,14 @@ describe('ColorMixerGame - Defect Resolution & Lifecycle Tests', () => {
 
       // Verify wells recalculated for new usable width
       const wells = (game as any).wells;
-      expect(wells).toHaveLength(6);
-      expect(wells[5].x + wells[5].width).toBeLessThanOrEqual(1024);
+      expect(wells).toHaveLength(5);
+      expect(wells[4].x + wells[4].width).toBeLessThanOrEqual(1024);
+
+      // Brush tray follows the new bottom edge
+      const brushes = (game as any).brushes;
+      expect(brushes).toHaveLength(5);
+      expect(brushes[0].y).toBeGreaterThan(768 - (game as any).trayHeight);
+      expect(brushes[4].x + brushes[4].width).toBeLessThanOrEqual(1024);
     });
 
     it('gracefully ignores non-positive or invalid dimensions', () => {
@@ -313,7 +323,88 @@ describe('ColorMixerGame - Defect Resolution & Lifecycle Tests', () => {
     });
   });
 
-  describe('5. Environment & Compliance Checks', () => {
+  describe('5. Brushes', () => {
+    const paintY = () => (game as any).headerLineY + 120;
+
+    it('picking a colour while smudging switches back to the round brush', () => {
+      game.init(canvas);
+      (game as any).activeBrush = 'smudge';
+      const blueWell = (game as any).wells[2];
+      (game as any).startPress(blueWell.x + 10, (game as any).potsY + 20);
+      expect((game as any).activeColor).toBe('blue');
+      expect((game as any).activeBrush).toBe('brush');
+    });
+
+    it('round brush strokes a thick round line in the active colour', () => {
+      game.init(canvas);
+      (game as any).activeColor = 'blue';
+      (game as any).activeBrush = 'brush';
+      (game as any).startPress(200, paintY());
+      (game as any).movePress(260, paintY() + 20);
+      expect(bufferCtx.lineTo).toHaveBeenCalledWith(260, paintY() + 20);
+      expect(bufferCtx.strokeStyle).toBe('#007AFF');
+      expect(bufferCtx.lineWidth).toBe(32);
+    });
+
+    it('spray keeps spraying while the finger is held still', () => {
+      game.init(canvas);
+      (game as any).activeBrush = 'spray';
+      (game as any).startPress(300, paintY());
+      const spraySpy = vi.spyOn(game as any, 'sprayAt');
+      game.update(16);
+      expect(spraySpy).toHaveBeenCalledWith(300, paintY(), expect.any(Number));
+      (game as any).endPress();
+      spraySpy.mockClear();
+      game.update(16);
+      expect(spraySpy).not.toHaveBeenCalled();
+    });
+
+    it('dots brush stamps one dot per spacing along a drag', () => {
+      game.init(canvas);
+      (game as any).activeBrush = 'dots';
+      const dotSpy = vi.spyOn(game as any, 'placeDot');
+      (game as any).startPress(100, paintY());
+      expect(dotSpy).toHaveBeenCalledTimes(1);
+      (game as any).movePress(100 + (game as any).dotSpacing * 3 + 5, paintY());
+      expect(dotSpy).toHaveBeenCalledTimes(4);
+    });
+
+    it('fill brush floods the touched area and writes it back', () => {
+      const w = canvas.width;
+      const h = canvas.height;
+      (bufferCtx as any).getImageData = vi.fn((_x: number, _y: number, iw: number, ih: number) => ({
+        data: new Uint8ClampedArray(iw * ih * 4).fill(240),
+        width: iw,
+        height: ih,
+      }));
+      (bufferCtx as any).putImageData = vi.fn();
+      game.init(canvas);
+      (game as any).activeColor = 'yellow';
+      (game as any).activeBrush = 'fill';
+      (game as any).startPress(w / 2, h / 2);
+
+      expect((bufferCtx as any).getImageData).toHaveBeenCalled();
+      expect((bufferCtx as any).putImageData).toHaveBeenCalled();
+      const image = (bufferCtx as any).putImageData.mock.calls[0][0];
+      expect(Array.from(image.data.slice(0, 4))).toEqual([255, 204, 0, 255]);
+      expect((game as any).isDrawing).toBe(false);
+    });
+
+    it('does not paint under the brush tray', () => {
+      game.init(canvas);
+      (game as any).activeBrush = 'brush';
+      (game as any).startPress(400, canvas.height - 5);
+      expect((game as any).isDrawing).toBe(false);
+    });
+
+    it('draws the brush tray without errors', () => {
+      game.init(canvas);
+      expect(() => game.update(16)).not.toThrow();
+      expect(mainCtx.fillText).toHaveBeenCalledWith('FILL', expect.any(Number), expect.any(Number));
+    });
+  });
+
+  describe('6. Environment & Compliance Checks', () => {
     it('runs completely without Node globals (fs, path)', () => {
       // Confirms tests execute safely in browser-compatible jsdom environment
       expect(typeof window).toBe('object');

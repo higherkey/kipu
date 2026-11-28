@@ -85,33 +85,32 @@ describe('ColorMixerGame', () => {
     game = new ColorMixerGame();
   });
 
-  it('should initialize successfully and create paint wells', () => {
+  it('should initialize successfully with paint wells and a brush tray', () => {
     game.init(canvas);
     expect(canvas.getContext).toHaveBeenCalledWith('2d');
-    
+
     const wells = (game as any).wells;
-    expect(wells).toHaveLength(6); // Red, Yellow, Blue, White, Black, Finger
-    expect(wells[0].id).toBe('red');
-    expect(wells[1].id).toBe('yellow');
-    expect(wells[2].id).toBe('blue');
-    expect(wells[3].id).toBe('white');
-    expect(wells[4].id).toBe('black');
-    expect(wells[5].id).toBe('finger');
+    expect(wells.map((w: any) => w.id)).toEqual(['red', 'yellow', 'blue', 'white', 'black']);
+
+    const brushes = (game as any).brushes;
+    expect(brushes.map((b: any) => b.id)).toEqual(['smudge', 'brush', 'spray', 'dots', 'fill']);
   });
 
-  it('should switch active tools when selecting wells', () => {
+  it('should switch colors and brushes separately', () => {
     game.init(canvas);
-    expect((game as any).activeTool).toBe('red');
+    expect((game as any).activeColor).toBe('red');
+    expect((game as any).activeBrush).toBe('brush');
 
     // Simulate clicking Yellow well
     const yellowWell = (game as any).wells[1];
     (game as any).startPress(yellowWell.x + 10, (game as any).potsY + 20);
-    expect((game as any).activeTool).toBe('yellow');
+    expect((game as any).activeColor).toBe('yellow');
 
-    // Simulate clicking Finger well
-    const fingerWell = (game as any).wells[5];
-    (game as any).startPress(fingerWell.x + 10, (game as any).potsY + 20);
-    expect((game as any).activeTool).toBe('finger');
+    // Simulate clicking the Spray brush in the tray
+    const spray = (game as any).brushes[2];
+    (game as any).startPress(spray.x + 10, spray.y + 10);
+    expect((game as any).activeBrush).toBe('spray');
+    expect((game as any).activeColor).toBe('yellow');
   });
 
   it('should start drawing and place drops below the header boundary', () => {
