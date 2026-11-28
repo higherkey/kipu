@@ -235,7 +235,7 @@ export class GameRegistry {
         portal: 'lab',
         icon: 'layers',
         category: 'brain',
-        desc: 'Stack physics blocks on a balance scale to hit target sum goals without tumbling!',
+        desc: 'Each block is as tall as its number. Stack them to reach the line!',
         constructorRef: EquationTowerGame
       },
       {
