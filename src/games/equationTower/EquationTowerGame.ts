@@ -158,6 +158,7 @@ export class EquationTowerGame implements Game {
 
     this.loadLevel();
     canvas.addEventListener('pointerdown', this.handlePointerDown);
+    window.addEventListener('keydown', this.handleKeyDown);
   }
 
   /* ---------- State ---------- */
@@ -345,7 +346,18 @@ export class EquationTowerGame implements Game {
 
     const cx = towerRect.x + towerRect.w / 2;
     const blockW = Math.max(84, Math.min(150, Math.floor(towerRect.w * 0.3)));
-    const unit = Math.max(12, Math.min(54, Math.floor((baseY - towerRect.y - 12) / (this.target + 2))));
+    const unit = Math.max(12, Math.min(64, Math.floor((baseY - towerRect.y - 12) / (this.target + 2))));
+
+    // A short tower leaves a gap under the prompt: move the prompt halfway down toward it.
+    if (!side) {
+      const need = (this.target + 2) * unit + 12;
+      const spare = baseY - towerRect.y - need;
+      if (spare > 0) {
+        const shift = Math.round(spare / 2);
+        info = { ...info, y: info.y + shift };
+        towerRect = { ...towerRect, y: towerRect.y + shift, h: towerRect.h - shift };
+      }
+    }
 
     return { mode: side ? 'side' : 'stack', info, tower: towerRect, baseY, cx, blockW, unit, tray, tiles };
   }
@@ -357,6 +369,33 @@ export class EquationTowerGame implements Game {
     e.preventDefault();
     const rect = this.canvas.getBoundingClientRect();
     this.tapAt(e.clientX - rect.left, e.clientY - rect.top);
+  };
+
+  /** Keyboard play: number keys drop that block, Backspace takes the top one off, Enter goes on. */
+  private handleKeyDown = (e: KeyboardEvent) => {
+    if (!this.layout || this.paused) return;
+    if (this.won) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        this.nextLevel();
+      }
+      return;
+    }
+    const n = Number(e.key);
+    const i = this.tray.indexOf(n);
+    if (i >= 0) {
+      e.preventDefault();
+      if (this.addBlock(n)) {
+        this.tilePress[i] = 1;
+        this.noFitT = 0;
+      } else {
+        this.tileShake[i] = 0.45;
+        this.noFitT = 1.8;
+      }
+    } else if ((e.key === 'Backspace' || e.key === 'Delete') && this.blocks.length > 0) {
+      e.preventDefault();
+      this.removeBlock(this.blocks[this.blocks.length - 1].id);
+    }
   };
 
   /** Handles a tap at canvas coordinates. */
@@ -716,7 +755,7 @@ export class EquationTowerGame implements Game {
     const cx = I.x + I.w / 2;
 
     // "Make 7" tag, or "You made 7!" once it's done
-    const top = L.mode === 'stack' ? 12 : 16;
+    const top = I.y + (L.mode === 'stack' ? 12 : 16);
     const lead = this.won ? 'You made' : 'Make';
     const numText = this.won ? `${this.target}!` : String(this.target);
     ctx.font = `600 22px ${FONT}`;
@@ -935,6 +974,7 @@ export class EquationTowerGame implements Game {
 
   destroy(): void {
     this.canvas?.removeEventListener('pointerdown', this.handlePointerDown);
+    window.removeEventListener('keydown', this.handleKeyDown);
     this.timers.forEach(t => window.clearTimeout(t));
     this.timers = [];
     this.blocks = [];

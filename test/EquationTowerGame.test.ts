@@ -165,6 +165,14 @@ describe('EquationTowerGame', () => {
     expect(g().blocks[0].y).toBeCloseTo(L.baseY);
   });
 
+  it('plays from the keyboard: a number drops that block, Backspace takes one off', () => {
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: '2' }));
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: '9' }));
+    expect(g().blocks.map((b: any) => b.value)).toEqual([2]);
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Backspace' }));
+    expect(g().blocks).toHaveLength(0);
+  });
+
   it('removes its listener on destroy', () => {
     const removeSpy = vi.spyOn(canvas, 'removeEventListener');
     game.destroy();
