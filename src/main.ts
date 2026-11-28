@@ -252,29 +252,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Navigation Guards
   router.beforeEach(async (to, from) => {
-    // 1. Guard active game session exits per Issue #28
+    // 1. Leaving a game (back, home, browser back) goes straight through with
+    //    no grown-ups check. An open feedback panel closes first.
     if (from && from.startsWith('/game/') && to !== from) {
       if (gameUI?.closeFeedback(true)) return false;
-      pauseGame();
-      document.body.classList.add('parental-gate-open');
-      const canvas = document.getElementById('game-canvas');
-      canvas?.classList.add('interaction-locked');
-
-      return new Promise<boolean>((resolve) => {
-        ParentalGate.getInstance().verify(
-          () => {
-            document.body.classList.remove('parental-gate-open');
-            canvas?.classList.remove('interaction-locked');
-            resolve(true);
-          },
-          () => {
-            document.body.classList.remove('parental-gate-open');
-            canvas?.classList.remove('interaction-locked');
-            resumeGame();
-            resolve(false);
-          }
-        );
-      });
     }
 
     // 2. Guard protected Settings route per Issues #16, #28
