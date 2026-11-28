@@ -94,4 +94,22 @@ describe('Cat Quarters play', () => {
     expect(canvas.classList.contains('hidden')).toBe(false);
     expect(document.querySelector('.cat-quarters')).toBeNull();
   });
+
+  it('picks a new puzzle size within the range and remembers it', () => {
+    localStorage.removeItem('kipu-cat-quarters-size');
+    launch();
+    const value = () => document.querySelector('.cq-size-value')!.textContent;
+    expect(value()).toBe('7 × 7');
+    for (let i = 0; i < 8; i++) button('.cq-size-up').click();
+    expect(value()).toBe('10 × 10');
+    expect(button('.cq-size-up').disabled).toBe(true);
+    for (let i = 0; i < 8; i++) button('.cq-size-down').click();
+    expect(value()).toBe('5 × 5');
+    expect(button('.cq-size-down').disabled).toBe(true);
+    button('.cq-size-up').click();
+    expect(localStorage.getItem('kipu-cat-quarters-size')).toBe('6');
+    game.destroy();
+    launch();
+    expect(value()).toBe('6 × 6');
+  });
 });

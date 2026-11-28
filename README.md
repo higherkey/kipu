@@ -131,14 +131,9 @@ Kipu uses a three-tier design framework:
 npm run dev
 ```
 
-To test Cat Quarters generation locally, build the app and serve it with Cloudflare Pages Functions.
+Cat Quarters builds new puzzles on the device, in a web worker, so it works offline. Pick a size from 5 × 5 to 10 × 10 under "New puzzle size". Every board has exactly one solution, and room sizes are bounded by the board (at least 3 tiles, 2 on 5 × 5, and at most 1.6 times the width) so no room gives its cat away or swallows the board. Generated boards are saved in the browser and stay in the puzzle picker.
 
-```bash
-npm run build
-wrangler pages dev dist
-```
-
-New puzzles need an internet connection on the hosted site. Generated boards are saved in the browser and stay in the puzzle picker for offline replay.
+The Pages Function at `/api/cat-quarters/puzzle?size=7` uses the same generator. The game no longer calls it.
 
 ### Production Build
 

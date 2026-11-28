@@ -7,21 +7,35 @@ export const PUZZLES = [
   { name: 'Rooftop Roost', rows: ['AABCCCC', 'BBBBCCC', 'EEECCCC', 'EEEECCD', 'EEECCFD', 'EEEGGFF', 'EEEGGGG'] },
 ];
 
-export const GENERATED_SIZE = 7;
-export const GENERATED_ROOMS = 'ABCDEFG';
+/** Generated boards can be this many tiles wide. */
+export const MIN_SIZE = 5;
+export const MAX_SIZE = 10;
+export const DEFAULT_SIZE = 7;
+
+/** Room letters in reading order, one per room. */
+export const ROOM_LETTERS = 'ABCDEFGHIJ';
+
+export function isPuzzleSize(size: unknown): size is number {
+  return typeof size === 'number' && Number.isInteger(size) && size >= MIN_SIZE && size <= MAX_SIZE;
+}
 
 export function puzzleKey(rows: readonly string[]): string {
   const rooms = new Map<string, string>();
   return Array.from(rows.join(''), room => {
-    if (!rooms.has(room)) rooms.set(room, GENERATED_ROOMS[rooms.size]);
+    if (!rooms.has(room)) rooms.set(room, ROOM_LETTERS[rooms.size]);
     return rooms.get(room);
   }).join('');
 }
 
+/** A square board, MIN_SIZE to MAX_SIZE tiles wide, using exactly that many rooms lettered from A. */
 export function isGeneratedBoard(rows: unknown): rows is string[] {
-  return Array.isArray(rows) && rows.length === GENERATED_SIZE
-    && Array.from(rows).every(row => typeof row === 'string' && /^[A-G]{7}$/.test(row))
-    && new Set(rows.join('')).size === GENERATED_SIZE;
+  if (!Array.isArray(rows)) return false;
+  const size = rows.length;
+  if (!isPuzzleSize(size)) return false;
+  const letters = ROOM_LETTERS.slice(0, size);
+  if (!rows.every(row => typeof row === 'string' && row.length === size
+    && Array.from(row).every(room => letters.includes(room)))) return false;
+  return new Set(rows.join('')).size === size;
 }
 
 export function findConflicts(regions: string, size: number, cats: readonly number[]): Set<number> {
